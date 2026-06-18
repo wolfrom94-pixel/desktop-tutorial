@@ -1,0 +1,950 @@
+{
+  "version": "1.0",
+  "class": "rogue",
+  "glyphs": [
+    {
+      "id": "ambush",
+      "name": "Ambush",
+      "radius": 3,
+      "description": "Traps and Damage over Time deal more damage.",
+      "effect": "Trap Skills and Damage over Time effects deal 10%[x] increased damage for each Magic node within range.",
+      "bonusEffect": "If there are 8 or more Dexterity nodes within range, Trap Skills and DoT effects deal an additional 20%[x] increased damage.",
+      "bonusStat": "Dexterity",
+      "bonusThreshold": 8
+    },
+    {
+      "id": "cutthroat",
+      "name": "Cutthroat's Glyph",
+      "radius": 3,
+      "description": "Cutthroat Skills deal increased damage.",
+      "effect": "Cutthroat Skills deal 10%[x] increased damage for each Magic node within range.",
+      "bonusEffect": "If there are 8 or more Dexterity nodes within range, Cutthroat Skills also apply Vulnerable for 2 seconds.",
+      "bonusStat": "Dexterity",
+      "bonusThreshold": 8
+    },
+    {
+      "id": "marksman",
+      "name": "Marksman's Glyph",
+      "radius": 3,
+      "description": "Marksman Skills deal increased damage.",
+      "effect": "Marksman Skills deal 10%[x] increased damage for each Magic node within range.",
+      "bonusEffect": "If there are 8 or more Dexterity nodes within range, your Marksman Skills have a 10% increased Lucky Hit Chance.",
+      "bonusStat": "Dexterity",
+      "bonusThreshold": 8
+    },
+    {
+      "id": "bladedancer",
+      "name": "Bladedancer",
+      "radius": 4,
+      "description": "Mobility and blade skills get bonuses.",
+      "effect": "Mobility Skills increase your damage by 5%[x] for 3 seconds after use. Blade Skills deal 8%[x] increased damage per Magic node within range.",
+      "bonusEffect": "If there are 10 or more Dexterity nodes within range, Mobility Skills also grant 15% Movement Speed for 3 seconds.",
+      "bonusStat": "Dexterity",
+      "bonusThreshold": 10
+    },
+    {
+      "id": "control",
+      "name": "Control",
+      "radius": 3,
+      "description": "Crowd controlled enemies take more damage.",
+      "effect": "Crowd Controlled enemies take 15%[x] increased damage from your attacks per Magic node within range.",
+      "bonusEffect": "If there are 8 or more Dexterity nodes within range, the duration of Crowd Control effects you apply is increased by 20%.",
+      "bonusStat": "Dexterity",
+      "bonusThreshold": 8
+    },
+    {
+      "id": "exploit",
+      "name": "Exploit",
+      "radius": 3,
+      "description": "Vulnerable enemies take more damage.",
+      "effect": "Vulnerable enemies take 12%[x] increased damage from your attacks per Magic node within range.",
+      "bonusEffect": "If there are 8 or more Dexterity nodes within range, you deal an additional 10%[x] increased damage to Vulnerable enemies.",
+      "bonusStat": "Dexterity",
+      "bonusThreshold": 8
+    },
+    {
+      "id": "efficacy",
+      "name": "Efficacy",
+      "radius": 3,
+      "description": "Resource generation and skill cost reduction.",
+      "effect": "Gain 5% increased Energy Regeneration and 3% reduced Skill costs per Magic node within range.",
+      "bonusEffect": "If there are 8 or more Dexterity nodes within range, spending Energy has a 20% chance to refund 10 Energy.",
+      "bonusStat": "Dexterity",
+      "bonusThreshold": 8
+    },
+    {
+      "id": "domination",
+      "name": "Domination",
+      "radius": 3,
+      "description": "Bonus damage against elites.",
+      "effect": "Deal 12%[x] increased damage to Elite enemies per Magic node within range.",
+      "bonusEffect": "If there are 8 or more Dexterity nodes within range, Elites have a 10% chance to drop bonus rewards when killed.",
+      "bonusStat": "Dexterity",
+      "bonusThreshold": 8
+    },
+    {
+      "id": "turf",
+      "name": "Turf",
+      "radius": 4,
+      "description": "Area control and positional bonuses.",
+      "effect": "Gain 8%[x] increased damage while standing still or moving slowly. Enemies in your immediate vicinity take 5%[x] increased damage per Magic node within range.",
+      "bonusEffect": "If there are 10 or more Dexterity nodes within range, enemies within melee range take an additional 15%[x] increased damage.",
+      "bonusStat": "Dexterity",
+      "bonusThreshold": 10
+    },
+    {
+      "id": "revenge",
+      "name": "Revenge",
+      "radius": 3,
+      "description": "Retaliation damage.",
+      "effect": "When you take damage, your next attack deals 10%[x] increased damage per Magic node within range.",
+      "bonusEffect": "If there are 8 or more Dexterity nodes within range, taking damage that exceeds 10% of your maximum Life grants 5% increased damage for 5 seconds.",
+      "bonusStat": "Dexterity",
+      "bonusThreshold": 8
+    },
+    {
+      "id": "imp",
+      "name": "Imp",
+      "radius": 4,
+      "description": "Shadow and Darkness skill bonuses.",
+      "effect": "Shadow Skills deal 10%[x] increased damage and have a 5% increased Lucky Hit Chance per Magic node within range.",
+      "bonusEffect": "If there are 10 or more Intelligence nodes within range, Shadow Skills have a 15% chance to apply a Shadow pool on hit.",
+      "bonusStat": "Intelligence",
+      "bonusThreshold": 10
+    },
+    {
+      "id": "territorial",
+      "name": "Territorial",
+      "radius": 3,
+      "description": "Territory-based stat bonuses.",
+      "effect": "While no enemies are within 8 yards, gain 10%[x] increased damage and 5% increased Movement Speed per Magic node within range.",
+      "bonusEffect": "If there are 8 or more Dexterity nodes within range, the range threshold increases to 15 yards.",
+      "bonusStat": "Dexterity",
+      "bonusThreshold": 8
+    },
+    {
+      "id": "torch",
+      "name": "Torch",
+      "radius": 3,
+      "description": "Burning effect amplification.",
+      "effect": "Burning enemies take 15%[x] increased damage from your attacks per Magic node within range.",
+      "bonusEffect": "If there are 8 or more Intelligence nodes within range, your Burning effects deal damage 20% faster.",
+      "bonusStat": "Intelligence",
+      "bonusThreshold": 8
+    },
+    {
+      "id": "elementalist",
+      "name": "Elementalist",
+      "radius": 4,
+      "description": "Elemental damage bonuses.",
+      "effect": "Cold, Fire, and Poison damage is increased by 8%[x] per Magic node within range.",
+      "bonusEffect": "If there are 10 or more Intelligence nodes within range, applying any elemental status effect grants 10%[x] increased damage for 5 seconds.",
+      "bonusStat": "Intelligence",
+      "bonusThreshold": 10
+    },
+    {
+      "id": "ranger",
+      "name": "Ranger",
+      "radius": 3,
+      "description": "Ranged attack bonuses.",
+      "effect": "Attacks made from more than 10 yards away deal 10%[x] increased damage per Magic node within range.",
+      "bonusEffect": "If there are 8 or more Dexterity nodes within range, your ranged attacks pierce through 1 additional enemy.",
+      "bonusStat": "Dexterity",
+      "bonusThreshold": 8
+    },
+    {
+      "id": "subtlety",
+      "name": "Subtlety",
+      "radius": 4,
+      "description": "Stealth and shadow bonuses.",
+      "effect": "Entering Concealment or activating a Shadow Skill grants 15%[x] increased damage for 4 seconds. Each Magic node within range extends this duration by 0.5 seconds.",
+      "bonusEffect": "If there are 10 or more Dexterity nodes within range, breaking Concealment with an attack deals 50%[x] increased damage.",
+      "bonusStat": "Dexterity",
+      "bonusThreshold": 10
+    }
+  ],
+  "boards": [
+    {
+      "id": "starting",
+      "name": "Starting Board",
+      "isStarting": true,
+      "width": 13,
+      "height": 15,
+      "rowRanges": [
+        [6, 6],
+        [5, 7],
+        [4, 8],
+        [3, 9],
+        [2, 10],
+        [2, 10],
+        [1, 11],
+        [1, 11],
+        [1, 11],
+        [2, 10],
+        [3, 9],
+        [4, 8],
+        [5, 7],
+        [5, 7],
+        [6, 6]
+      ],
+      "specialNodes": {
+        "6,0": { "type": "start" },
+        "6,7": { "type": "legendary", "id": "starting_legendary" },
+        "6,9": { "type": "glyph" },
+        "6,14": { "type": "gate", "direction": "south" },
+        "3,4": { "type": "magic", "stat": "dexterity" },
+        "9,4": { "type": "magic", "stat": "dexterity" },
+        "2,6": { "type": "magic", "stat": "dexterity" },
+        "10,6": { "type": "magic", "stat": "dexterity" },
+        "1,8": { "type": "magic", "stat": "dexterity" },
+        "11,8": { "type": "magic", "stat": "dexterity" },
+        "4,5": { "type": "rare", "id": "rare_starting_1" },
+        "8,5": { "type": "rare", "id": "rare_starting_2" },
+        "4,10": { "type": "rare", "id": "rare_starting_3" },
+        "8,10": { "type": "rare", "id": "rare_starting_4" }
+      },
+      "gates": [
+        { "id": "starting_gate_south", "col": 6, "row": 14, "direction": "south" }
+      ],
+      "legendaryId": "starting_legendary"
+    },
+    {
+      "id": "deadly_ambush",
+      "name": "Deadly Ambush",
+      "isStarting": false,
+      "width": 21,
+      "height": 21,
+      "rowRanges": [
+        [10, 10],
+        [8, 12],
+        [8, 12],
+        [8, 12],
+        [8, 12],
+        [8, 12],
+        [8, 12],
+        [8, 12],
+        [6, 14],
+        [0, 20],
+        [0, 20],
+        [0, 20],
+        [6, 14],
+        [8, 12],
+        [8, 12],
+        [8, 12],
+        [8, 12],
+        [8, 12],
+        [8, 12],
+        [8, 12],
+        [10, 10]
+      ],
+      "specialNodes": {
+        "10,0": { "type": "gate", "direction": "north" },
+        "10,20": { "type": "gate", "direction": "south" },
+        "0,10": { "type": "gate", "direction": "west" },
+        "20,10": { "type": "gate", "direction": "east" },
+        "10,10": { "type": "legendary", "id": "deadly_ambush_legendary" },
+        "10,4": { "type": "glyph" },
+        "8,2": { "type": "magic", "stat": "dexterity" },
+        "12,2": { "type": "magic", "stat": "dexterity" },
+        "8,8": { "type": "magic", "stat": "dexterity" },
+        "12,8": { "type": "magic", "stat": "dexterity" },
+        "3,10": { "type": "magic", "stat": "dexterity" },
+        "17,10": { "type": "magic", "stat": "dexterity" },
+        "8,12": { "type": "magic", "stat": "dexterity" },
+        "12,12": { "type": "magic", "stat": "dexterity" },
+        "10,16": { "type": "magic", "stat": "dexterity" },
+        "9,5": { "type": "rare", "id": "rare_deadly_ambush_1" },
+        "11,5": { "type": "rare", "id": "rare_deadly_ambush_2" },
+        "6,10": { "type": "rare", "id": "rare_deadly_ambush_3" },
+        "14,10": { "type": "rare", "id": "rare_deadly_ambush_4" },
+        "9,15": { "type": "rare", "id": "rare_deadly_ambush_5" },
+        "11,15": { "type": "rare", "id": "rare_deadly_ambush_6" }
+      },
+      "gates": [
+        { "id": "deadly_ambush_gate_north", "col": 10, "row": 0, "direction": "north" },
+        { "id": "deadly_ambush_gate_south", "col": 10, "row": 20, "direction": "south" },
+        { "id": "deadly_ambush_gate_west", "col": 0, "row": 10, "direction": "west" },
+        { "id": "deadly_ambush_gate_east", "col": 20, "row": 10, "direction": "east" }
+      ],
+      "legendaryId": "deadly_ambush_legendary"
+    },
+    {
+      "id": "eldritch_bounty",
+      "name": "Eldritch Bounty",
+      "isStarting": false,
+      "width": 21,
+      "height": 21,
+      "rowRanges": [
+        [10, 10],
+        [8, 12],
+        [8, 12],
+        [8, 12],
+        [8, 12],
+        [8, 12],
+        [8, 12],
+        [8, 12],
+        [6, 14],
+        [0, 20],
+        [0, 20],
+        [0, 20],
+        [6, 14],
+        [8, 12],
+        [8, 12],
+        [8, 12],
+        [8, 12],
+        [8, 12],
+        [8, 12],
+        [8, 12],
+        [10, 10]
+      ],
+      "specialNodes": {
+        "10,0": { "type": "gate", "direction": "north" },
+        "10,20": { "type": "gate", "direction": "south" },
+        "0,10": { "type": "gate", "direction": "west" },
+        "20,10": { "type": "gate", "direction": "east" },
+        "10,10": { "type": "legendary", "id": "eldritch_bounty_legendary" },
+        "10,5": { "type": "glyph" },
+        "9,2": { "type": "magic", "stat": "intelligence" },
+        "11,2": { "type": "magic", "stat": "intelligence" },
+        "8,7": { "type": "magic", "stat": "intelligence" },
+        "12,7": { "type": "magic", "stat": "intelligence" },
+        "2,9": { "type": "magic", "stat": "intelligence" },
+        "18,9": { "type": "magic", "stat": "intelligence" },
+        "2,11": { "type": "magic", "stat": "intelligence" },
+        "18,11": { "type": "magic", "stat": "intelligence" },
+        "9,18": { "type": "magic", "stat": "intelligence" },
+        "11,18": { "type": "magic", "stat": "intelligence" },
+        "9,3": { "type": "rare", "id": "rare_eldritch_bounty_1" },
+        "11,3": { "type": "rare", "id": "rare_eldritch_bounty_2" },
+        "5,10": { "type": "rare", "id": "rare_eldritch_bounty_3" },
+        "15,10": { "type": "rare", "id": "rare_eldritch_bounty_4" },
+        "10,17": { "type": "rare", "id": "rare_eldritch_bounty_5" }
+      },
+      "gates": [
+        { "id": "eldritch_bounty_gate_north", "col": 10, "row": 0, "direction": "north" },
+        { "id": "eldritch_bounty_gate_south", "col": 10, "row": 20, "direction": "south" },
+        { "id": "eldritch_bounty_gate_west", "col": 0, "row": 10, "direction": "west" },
+        { "id": "eldritch_bounty_gate_east", "col": 20, "row": 10, "direction": "east" }
+      ],
+      "legendaryId": "eldritch_bounty_legendary"
+    },
+    {
+      "id": "cheap_shot",
+      "name": "Cheap Shot",
+      "isStarting": false,
+      "width": 21,
+      "height": 21,
+      "rowRanges": [
+        [10, 10],
+        [8, 12],
+        [8, 12],
+        [8, 12],
+        [8, 12],
+        [8, 12],
+        [8, 12],
+        [8, 12],
+        [6, 14],
+        [0, 20],
+        [0, 20],
+        [0, 20],
+        [6, 14],
+        [8, 12],
+        [8, 12],
+        [8, 12],
+        [8, 12],
+        [8, 12],
+        [8, 12],
+        [8, 12],
+        [10, 10]
+      ],
+      "specialNodes": {
+        "10,0": { "type": "gate", "direction": "north" },
+        "10,20": { "type": "gate", "direction": "south" },
+        "0,10": { "type": "gate", "direction": "west" },
+        "20,10": { "type": "gate", "direction": "east" },
+        "10,10": { "type": "legendary", "id": "cheap_shot_legendary" },
+        "10,3": { "type": "glyph" },
+        "8,1": { "type": "magic", "stat": "dexterity" },
+        "12,1": { "type": "magic", "stat": "dexterity" },
+        "9,6": { "type": "magic", "stat": "dexterity" },
+        "11,6": { "type": "magic", "stat": "dexterity" },
+        "1,9": { "type": "magic", "stat": "dexterity" },
+        "19,9": { "type": "magic", "stat": "dexterity" },
+        "1,11": { "type": "magic", "stat": "dexterity" },
+        "19,11": { "type": "magic", "stat": "dexterity" },
+        "8,14": { "type": "magic", "stat": "dexterity" },
+        "12,14": { "type": "magic", "stat": "dexterity" },
+        "8,4": { "type": "rare", "id": "rare_cheap_shot_1" },
+        "12,4": { "type": "rare", "id": "rare_cheap_shot_2" },
+        "4,10": { "type": "rare", "id": "rare_cheap_shot_3" },
+        "16,10": { "type": "rare", "id": "rare_cheap_shot_4" },
+        "8,16": { "type": "rare", "id": "rare_cheap_shot_5" },
+        "12,16": { "type": "rare", "id": "rare_cheap_shot_6" }
+      },
+      "gates": [
+        { "id": "cheap_shot_gate_north", "col": 10, "row": 0, "direction": "north" },
+        { "id": "cheap_shot_gate_south", "col": 10, "row": 20, "direction": "south" },
+        { "id": "cheap_shot_gate_west", "col": 0, "row": 10, "direction": "west" },
+        { "id": "cheap_shot_gate_east", "col": 20, "row": 10, "direction": "east" }
+      ],
+      "legendaryId": "cheap_shot_legendary"
+    },
+    {
+      "id": "no_witnesses",
+      "name": "No Witnesses",
+      "isStarting": false,
+      "width": 21,
+      "height": 21,
+      "rowRanges": [
+        [10, 10],
+        [8, 12],
+        [8, 12],
+        [8, 12],
+        [8, 12],
+        [8, 12],
+        [8, 12],
+        [8, 12],
+        [6, 14],
+        [0, 20],
+        [0, 20],
+        [0, 20],
+        [6, 14],
+        [8, 12],
+        [8, 12],
+        [8, 12],
+        [8, 12],
+        [8, 12],
+        [8, 12],
+        [8, 12],
+        [10, 10]
+      ],
+      "specialNodes": {
+        "10,0": { "type": "gate", "direction": "north" },
+        "10,20": { "type": "gate", "direction": "south" },
+        "0,10": { "type": "gate", "direction": "west" },
+        "20,10": { "type": "gate", "direction": "east" },
+        "10,10": { "type": "legendary", "id": "no_witnesses_legendary" },
+        "10,6": { "type": "glyph" },
+        "8,3": { "type": "magic", "stat": "dexterity" },
+        "12,3": { "type": "magic", "stat": "dexterity" },
+        "8,8": { "type": "magic", "stat": "dexterity" },
+        "12,8": { "type": "magic", "stat": "dexterity" },
+        "4,9": { "type": "magic", "stat": "dexterity" },
+        "16,9": { "type": "magic", "stat": "dexterity" },
+        "4,11": { "type": "magic", "stat": "dexterity" },
+        "16,11": { "type": "magic", "stat": "dexterity" },
+        "10,14": { "type": "magic", "stat": "dexterity" },
+        "9,4": { "type": "rare", "id": "rare_no_witnesses_1" },
+        "11,4": { "type": "rare", "id": "rare_no_witnesses_2" },
+        "7,10": { "type": "rare", "id": "rare_no_witnesses_3" },
+        "13,10": { "type": "rare", "id": "rare_no_witnesses_4" },
+        "10,16": { "type": "rare", "id": "rare_no_witnesses_5" }
+      },
+      "gates": [
+        { "id": "no_witnesses_gate_north", "col": 10, "row": 0, "direction": "north" },
+        { "id": "no_witnesses_gate_south", "col": 10, "row": 20, "direction": "south" },
+        { "id": "no_witnesses_gate_west", "col": 0, "row": 10, "direction": "west" },
+        { "id": "no_witnesses_gate_east", "col": 20, "row": 10, "direction": "east" }
+      ],
+      "legendaryId": "no_witnesses_legendary"
+    },
+    {
+      "id": "cunning_stratagem",
+      "name": "Cunning Stratagem",
+      "isStarting": false,
+      "width": 21,
+      "height": 21,
+      "rowRanges": [
+        [10, 10],
+        [8, 12],
+        [8, 12],
+        [8, 12],
+        [8, 12],
+        [8, 12],
+        [8, 12],
+        [8, 12],
+        [6, 14],
+        [0, 20],
+        [0, 20],
+        [0, 20],
+        [6, 14],
+        [8, 12],
+        [8, 12],
+        [8, 12],
+        [8, 12],
+        [8, 12],
+        [8, 12],
+        [8, 12],
+        [10, 10]
+      ],
+      "specialNodes": {
+        "10,0": { "type": "gate", "direction": "north" },
+        "10,20": { "type": "gate", "direction": "south" },
+        "0,10": { "type": "gate", "direction": "west" },
+        "20,10": { "type": "gate", "direction": "east" },
+        "10,10": { "type": "legendary", "id": "cunning_stratagem_legendary" },
+        "10,4": { "type": "glyph" },
+        "9,1": { "type": "magic", "stat": "dexterity" },
+        "11,1": { "type": "magic", "stat": "dexterity" },
+        "8,6": { "type": "magic", "stat": "dexterity" },
+        "12,6": { "type": "magic", "stat": "dexterity" },
+        "3,9": { "type": "magic", "stat": "dexterity" },
+        "17,9": { "type": "magic", "stat": "dexterity" },
+        "3,11": { "type": "magic", "stat": "dexterity" },
+        "17,11": { "type": "magic", "stat": "dexterity" },
+        "9,17": { "type": "magic", "stat": "dexterity" },
+        "11,17": { "type": "magic", "stat": "dexterity" },
+        "9,2": { "type": "rare", "id": "rare_cunning_stratagem_1" },
+        "11,2": { "type": "rare", "id": "rare_cunning_stratagem_2" },
+        "6,10": { "type": "rare", "id": "rare_cunning_stratagem_3" },
+        "14,10": { "type": "rare", "id": "rare_cunning_stratagem_4" },
+        "9,18": { "type": "rare", "id": "rare_cunning_stratagem_5" },
+        "11,18": { "type": "rare", "id": "rare_cunning_stratagem_6" }
+      },
+      "gates": [
+        { "id": "cunning_stratagem_gate_north", "col": 10, "row": 0, "direction": "north" },
+        { "id": "cunning_stratagem_gate_south", "col": 10, "row": 20, "direction": "south" },
+        { "id": "cunning_stratagem_gate_west", "col": 0, "row": 10, "direction": "west" },
+        { "id": "cunning_stratagem_gate_east", "col": 20, "row": 10, "direction": "east" }
+      ],
+      "legendaryId": "cunning_stratagem_legendary"
+    },
+    {
+      "id": "tricks_of_trade",
+      "name": "Tricks of the Trade",
+      "isStarting": false,
+      "width": 21,
+      "height": 21,
+      "rowRanges": [
+        [10, 10],
+        [8, 12],
+        [8, 12],
+        [8, 12],
+        [8, 12],
+        [8, 12],
+        [8, 12],
+        [8, 12],
+        [6, 14],
+        [0, 20],
+        [0, 20],
+        [0, 20],
+        [6, 14],
+        [8, 12],
+        [8, 12],
+        [8, 12],
+        [8, 12],
+        [8, 12],
+        [8, 12],
+        [8, 12],
+        [10, 10]
+      ],
+      "specialNodes": {
+        "10,0": { "type": "gate", "direction": "north" },
+        "10,20": { "type": "gate", "direction": "south" },
+        "0,10": { "type": "gate", "direction": "west" },
+        "20,10": { "type": "gate", "direction": "east" },
+        "10,10": { "type": "legendary", "id": "tricks_legendary" },
+        "10,5": { "type": "glyph" },
+        "8,2": { "type": "magic", "stat": "dexterity" },
+        "12,2": { "type": "magic", "stat": "dexterity" },
+        "9,7": { "type": "magic", "stat": "dexterity" },
+        "11,7": { "type": "magic", "stat": "dexterity" },
+        "2,10": { "type": "magic", "stat": "dexterity" },
+        "18,10": { "type": "magic", "stat": "dexterity" },
+        "8,13": { "type": "magic", "stat": "dexterity" },
+        "12,13": { "type": "magic", "stat": "dexterity" },
+        "10,18": { "type": "magic", "stat": "dexterity" },
+        "8,3": { "type": "rare", "id": "rare_tricks_1" },
+        "12,3": { "type": "rare", "id": "rare_tricks_2" },
+        "5,10": { "type": "rare", "id": "rare_tricks_3" },
+        "15,10": { "type": "rare", "id": "rare_tricks_4" },
+        "8,17": { "type": "rare", "id": "rare_tricks_5" },
+        "12,17": { "type": "rare", "id": "rare_tricks_6" }
+      },
+      "gates": [
+        { "id": "tricks_gate_north", "col": 10, "row": 0, "direction": "north" },
+        { "id": "tricks_gate_south", "col": 10, "row": 20, "direction": "south" },
+        { "id": "tricks_gate_west", "col": 0, "row": 10, "direction": "west" },
+        { "id": "tricks_gate_east", "col": 20, "row": 10, "direction": "east" }
+      ],
+      "legendaryId": "tricks_legendary"
+    },
+    {
+      "id": "exploit_weakness",
+      "name": "Exploit Weakness",
+      "isStarting": false,
+      "width": 21,
+      "height": 21,
+      "rowRanges": [
+        [10, 10],
+        [8, 12],
+        [8, 12],
+        [8, 12],
+        [8, 12],
+        [8, 12],
+        [8, 12],
+        [8, 12],
+        [6, 14],
+        [0, 20],
+        [0, 20],
+        [0, 20],
+        [6, 14],
+        [8, 12],
+        [8, 12],
+        [8, 12],
+        [8, 12],
+        [8, 12],
+        [8, 12],
+        [8, 12],
+        [10, 10]
+      ],
+      "specialNodes": {
+        "10,0": { "type": "gate", "direction": "north" },
+        "10,20": { "type": "gate", "direction": "south" },
+        "0,10": { "type": "gate", "direction": "west" },
+        "20,10": { "type": "gate", "direction": "east" },
+        "10,10": { "type": "legendary", "id": "exploit_legendary" },
+        "10,3": { "type": "glyph" },
+        "8,1": { "type": "magic", "stat": "dexterity" },
+        "12,1": { "type": "magic", "stat": "dexterity" },
+        "8,5": { "type": "magic", "stat": "dexterity" },
+        "12,5": { "type": "magic", "stat": "dexterity" },
+        "1,10": { "type": "magic", "stat": "dexterity" },
+        "19,10": { "type": "magic", "stat": "dexterity" },
+        "8,15": { "type": "magic", "stat": "dexterity" },
+        "12,15": { "type": "magic", "stat": "dexterity" },
+        "9,19": { "type": "magic", "stat": "dexterity" },
+        "11,19": { "type": "magic", "stat": "dexterity" },
+        "9,4": { "type": "rare", "id": "rare_exploit_weakness_1" },
+        "11,4": { "type": "rare", "id": "rare_exploit_weakness_2" },
+        "7,10": { "type": "rare", "id": "rare_exploit_weakness_3" },
+        "13,10": { "type": "rare", "id": "rare_exploit_weakness_4" },
+        "9,16": { "type": "rare", "id": "rare_exploit_weakness_5" },
+        "11,16": { "type": "rare", "id": "rare_exploit_weakness_6" }
+      },
+      "gates": [
+        { "id": "exploit_weakness_gate_north", "col": 10, "row": 0, "direction": "north" },
+        { "id": "exploit_weakness_gate_south", "col": 10, "row": 20, "direction": "south" },
+        { "id": "exploit_weakness_gate_west", "col": 0, "row": 10, "direction": "west" },
+        { "id": "exploit_weakness_gate_east", "col": 20, "row": 10, "direction": "east" }
+      ],
+      "legendaryId": "exploit_legendary"
+    }
+  ],
+  "legendaryNodes": {
+    "starting_legendary": {
+      "id": "starting_legendary",
+      "name": "Savagery",
+      "description": "Lucky Hit: Up to a 5% chance to make your next attack deal 100%[x] increased damage for 4 seconds.",
+      "stats": {}
+    },
+    "deadly_ambush_legendary": {
+      "id": "deadly_ambush_legendary",
+      "name": "Ambuscade",
+      "description": "When you damage an enemy with a Trap Skill, that enemy takes 40%[x] increased damage from your next attack.",
+      "stats": {}
+    },
+    "eldritch_bounty_legendary": {
+      "id": "eldritch_bounty_legendary",
+      "name": "Shadow Bounty",
+      "description": "Lucky Hit: Shadow Damage has up to a 20% chance to create a pool of shadow that deals damage and Slows enemies for 3 seconds.",
+      "stats": {}
+    },
+    "cheap_shot_legendary": {
+      "id": "cheap_shot_legendary",
+      "name": "Cheap Shot",
+      "description": "When you Crowd Control an enemy, your next attack against them deals 50%[x] increased damage and applies a stacking 25% Slow.",
+      "stats": {}
+    },
+    "no_witnesses_legendary": {
+      "id": "no_witnesses_legendary",
+      "name": "Assassination",
+      "description": "Killing an enemy increases your damage by 15%[x] for 4 seconds, stacking up to 3 times.",
+      "stats": {}
+    },
+    "cunning_stratagem_legendary": {
+      "id": "cunning_stratagem_legendary",
+      "name": "Cunning",
+      "description": "Every 10 seconds, your next attack deals 200%[x] increased damage and applies all active combo effects simultaneously.",
+      "stats": {}
+    },
+    "tricks_legendary": {
+      "id": "tricks_legendary",
+      "name": "Jack of All Trades",
+      "description": "Each different type of Skill you've used in the last 5 seconds increases your damage by 10%[x], up to 50%.",
+      "stats": {}
+    },
+    "exploit_legendary": {
+      "id": "exploit_legendary",
+      "name": "Pressure Point",
+      "description": "Your Critical Strikes against Vulnerable enemies have a 30% chance to deal 200%[x] bonus damage.",
+      "stats": {}
+    }
+  },
+  "rareNodes": {
+    "rare_starting_1": {
+      "id": "rare_starting_1",
+      "name": "Precision",
+      "description": "+8% Critical Strike Chance",
+      "bonus": { "critChance": 8 }
+    },
+    "rare_starting_2": {
+      "id": "rare_starting_2",
+      "name": "Swift Strike",
+      "description": "+15% Attack Speed",
+      "bonus": { "attackSpeed": 15 }
+    },
+    "rare_starting_3": {
+      "id": "rare_starting_3",
+      "name": "Lethal Tempo",
+      "description": "+20% Damage with Core Skills",
+      "bonus": { "coreSkillDmg": 20 }
+    },
+    "rare_starting_4": {
+      "id": "rare_starting_4",
+      "name": "Shadow Veil",
+      "description": "+10% Damage Reduction",
+      "bonus": { "dmgReduction": 10 }
+    },
+    "rare_deadly_ambush_1": {
+      "id": "rare_deadly_ambush_1",
+      "name": "Trap Mastery",
+      "description": "+25% Trap Skill Damage",
+      "bonus": { "trapSkillDmg": 25 }
+    },
+    "rare_deadly_ambush_2": {
+      "id": "rare_deadly_ambush_2",
+      "name": "Spring-Loaded",
+      "description": "-20% Trap Cooldown Duration",
+      "bonus": { "trapCooldownReduction": 20 }
+    },
+    "rare_deadly_ambush_3": {
+      "id": "rare_deadly_ambush_3",
+      "name": "Predator's Mark",
+      "description": "+12% Critical Strike Damage",
+      "bonus": { "critDamage": 12 }
+    },
+    "rare_deadly_ambush_4": {
+      "id": "rare_deadly_ambush_4",
+      "name": "Patient Killer",
+      "description": "+18% Damage Over Time",
+      "bonus": { "dotDamage": 18 }
+    },
+    "rare_deadly_ambush_5": {
+      "id": "rare_deadly_ambush_5",
+      "name": "Ambush Expertise",
+      "description": "+10% Damage to Slowed Enemies",
+      "bonus": { "slowedEnemyDmg": 10 }
+    },
+    "rare_deadly_ambush_6": {
+      "id": "rare_deadly_ambush_6",
+      "name": "Hunter's Edge",
+      "description": "+5% Maximum Energy",
+      "bonus": { "maxEnergy": 5 }
+    },
+    "rare_eldritch_bounty_1": {
+      "id": "rare_eldritch_bounty_1",
+      "name": "Shadow Infusion",
+      "description": "+20% Shadow Damage",
+      "bonus": { "shadowDamage": 20 }
+    },
+    "rare_eldritch_bounty_2": {
+      "id": "rare_eldritch_bounty_2",
+      "name": "Dark Fortune",
+      "description": "+8% Lucky Hit Chance",
+      "bonus": { "luckyHitChance": 8 }
+    },
+    "rare_eldritch_bounty_3": {
+      "id": "rare_eldritch_bounty_3",
+      "name": "Eldritch Resilience",
+      "description": "+12% Maximum Life",
+      "bonus": { "maxLife": 12 }
+    },
+    "rare_eldritch_bounty_4": {
+      "id": "rare_eldritch_bounty_4",
+      "name": "Bounty Hunter",
+      "description": "+15% Damage to Elites",
+      "bonus": { "eliteDamage": 15 }
+    },
+    "rare_eldritch_bounty_5": {
+      "id": "rare_eldritch_bounty_5",
+      "name": "Cursed Touch",
+      "description": "+10% Damage to Crowd Controlled Enemies",
+      "bonus": { "ccEnemyDamage": 10 }
+    },
+    "rare_cheap_shot_1": {
+      "id": "rare_cheap_shot_1",
+      "name": "Low Blow",
+      "description": "+20% Crowd Control Duration",
+      "bonus": { "ccDuration": 20 }
+    },
+    "rare_cheap_shot_2": {
+      "id": "rare_cheap_shot_2",
+      "name": "Dirty Fighting",
+      "description": "+15% Damage to Stunned Enemies",
+      "bonus": { "stunnedEnemyDmg": 15 }
+    },
+    "rare_cheap_shot_3": {
+      "id": "rare_cheap_shot_3",
+      "name": "Sucker Punch",
+      "description": "+18% Damage to Knocked Down Enemies",
+      "bonus": { "knockedEnemyDmg": 18 }
+    },
+    "rare_cheap_shot_4": {
+      "id": "rare_cheap_shot_4",
+      "name": "Street Fighter",
+      "description": "+10% Close-Range Damage",
+      "bonus": { "closeRangeDmg": 10 }
+    },
+    "rare_cheap_shot_5": {
+      "id": "rare_cheap_shot_5",
+      "name": "Glass Jaw",
+      "description": "+12% Critical Strike Chance against Crowd Controlled enemies",
+      "bonus": { "ccCritChance": 12 }
+    },
+    "rare_cheap_shot_6": {
+      "id": "rare_cheap_shot_6",
+      "name": "Iron Grip",
+      "description": "+8% Resistance to All Elements",
+      "bonus": { "allResistance": 8 }
+    },
+    "rare_no_witnesses_1": {
+      "id": "rare_no_witnesses_1",
+      "name": "Executioner",
+      "description": "+20% Damage to Enemies Below 35% Life",
+      "bonus": { "lowLifeEnemyDmg": 20 }
+    },
+    "rare_no_witnesses_2": {
+      "id": "rare_no_witnesses_2",
+      "name": "Cold Blood",
+      "description": "+10% Critical Strike Damage",
+      "bonus": { "critDamage": 10 }
+    },
+    "rare_no_witnesses_3": {
+      "id": "rare_no_witnesses_3",
+      "name": "Cleanup Crew",
+      "description": "+15% Movement Speed after killing an Elite",
+      "bonus": { "eliteKillMoveSpeed": 15 }
+    },
+    "rare_no_witnesses_4": {
+      "id": "rare_no_witnesses_4",
+      "name": "Vanishing Act",
+      "description": "+10% Evade Cooldown Reduction",
+      "bonus": { "evadeCooldown": 10 }
+    },
+    "rare_no_witnesses_5": {
+      "id": "rare_no_witnesses_5",
+      "name": "Silencer",
+      "description": "+25% Damage to Isolated Enemies",
+      "bonus": { "isolatedEnemyDmg": 25 }
+    },
+    "rare_cunning_stratagem_1": {
+      "id": "rare_cunning_stratagem_1",
+      "name": "Tactical Advantage",
+      "description": "+15% Skill Damage when using a different Skill type than your last",
+      "bonus": { "comboSkillDmg": 15 }
+    },
+    "rare_cunning_stratagem_2": {
+      "id": "rare_cunning_stratagem_2",
+      "name": "Adaptive Fighter",
+      "description": "+10% Damage and +10% Movement Speed when your active Skill types change",
+      "bonus": { "adaptiveDmg": 10, "adaptiveMoveSpeed": 10 }
+    },
+    "rare_cunning_stratagem_3": {
+      "id": "rare_cunning_stratagem_3",
+      "name": "Strategist's Mind",
+      "description": "+8% Cooldown Reduction",
+      "bonus": { "cooldownReduction": 8 }
+    },
+    "rare_cunning_stratagem_4": {
+      "id": "rare_cunning_stratagem_4",
+      "name": "Calculated Risk",
+      "description": "+20% Damage when below 50% Energy",
+      "bonus": { "lowEnergyDmg": 20 }
+    },
+    "rare_cunning_stratagem_5": {
+      "id": "rare_cunning_stratagem_5",
+      "name": "Prepared Mind",
+      "description": "+12% Energy Regeneration",
+      "bonus": { "energyRegen": 12 }
+    },
+    "rare_cunning_stratagem_6": {
+      "id": "rare_cunning_stratagem_6",
+      "name": "Overclocked",
+      "description": "+10% Attack Speed when above 75% Energy",
+      "bonus": { "highEnergyAttackSpeed": 10 }
+    },
+    "rare_tricks_1": {
+      "id": "rare_tricks_1",
+      "name": "Versatile Combatant",
+      "description": "+10% Damage for each Skill type used recently",
+      "bonus": { "versatileDmg": 10 }
+    },
+    "rare_tricks_2": {
+      "id": "rare_tricks_2",
+      "name": "Wild Card",
+      "description": "+15% Chance to Proc a random Lesser Power on hit",
+      "bonus": { "wildCardChance": 15 }
+    },
+    "rare_tricks_3": {
+      "id": "rare_tricks_3",
+      "name": "Generalist",
+      "description": "+8% to All Skill Damage",
+      "bonus": { "allSkillDmg": 8 }
+    },
+    "rare_tricks_4": {
+      "id": "rare_tricks_4",
+      "name": "Quick Study",
+      "description": "+10% Skill Rank Bonus Damage",
+      "bonus": { "skillRankDmg": 10 }
+    },
+    "rare_tricks_5": {
+      "id": "rare_tricks_5",
+      "name": "Sleight of Hand",
+      "description": "+12% Lucky Hit Chance",
+      "bonus": { "luckyHitChance": 12 }
+    },
+    "rare_tricks_6": {
+      "id": "rare_tricks_6",
+      "name": "Bag of Tricks",
+      "description": "+15% Damage to Elites",
+      "bonus": { "eliteDamage": 15 }
+    },
+    "rare_exploit_weakness_1": {
+      "id": "rare_exploit_weakness_1",
+      "name": "Exploit",
+      "description": "+20% Damage to Vulnerable Enemies",
+      "bonus": { "vulnerableDmg": 20 }
+    },
+    "rare_exploit_weakness_2": {
+      "id": "rare_exploit_weakness_2",
+      "name": "Rupture",
+      "description": "+15% Vulnerability Duration",
+      "bonus": { "vulnerableDuration": 15 }
+    },
+    "rare_exploit_weakness_3": {
+      "id": "rare_exploit_weakness_3",
+      "name": "Piercing Insight",
+      "description": "+10% Chance to Apply Vulnerable on Critical Strike",
+      "bonus": { "critVulnerableChance": 10 }
+    },
+    "rare_exploit_weakness_4": {
+      "id": "rare_exploit_weakness_4",
+      "name": "Weakening Strikes",
+      "description": "+12% Critical Strike Damage against Vulnerable Enemies",
+      "bonus": { "vulnerableCritDmg": 12 }
+    },
+    "rare_exploit_weakness_5": {
+      "id": "rare_exploit_weakness_5",
+      "name": "Open Wound",
+      "description": "+18% Damage Over Time to Vulnerable Enemies",
+      "bonus": { "vulnerableDoTDmg": 18 }
+    },
+    "rare_exploit_weakness_6": {
+      "id": "rare_exploit_weakness_6",
+      "name": "Total Exposure",
+      "description": "+8% Damage Reduction from Vulnerable Enemies",
+      "bonus": { "vulnerableDmgReduction": 8 }
+    }
+  }
+}
