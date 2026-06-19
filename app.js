@@ -17,7 +17,8 @@ const BOARD_META = {
   danse_macabre:     { name: 'Danse Macabre',         icon: '💃', legendaryId: 'danse_macabre_legendary',    rareIds: ['rare_danse_macabre_1','rare_danse_macabre_2','rare_danse_macabre_3','rare_danse_macabre_4','rare_danse_macabre_5','rare_danse_macabre_6'] },
 };
 
-const MAX_POINTS = 220;
+const MAX_POINTS = 300;
+const MAX_BOARDS = 5;
 
 // ============================================================
 //  STATE
@@ -26,7 +27,7 @@ const MAX_POINTS = 220;
 const state = {
   boards: ['starting'],
   boardData: {
-    starting: { glyphId: null, activeRares: new Set() }
+    starting: { glyphId: null, glyphLevel: 1, activeRares: new Set() }
   }
 };
 
@@ -74,7 +75,7 @@ function calcStats() {
 
     if (bdata.glyphId) {
       const g = DATA.glyphs && DATA.glyphs.find(function(g) { return g.id === bdata.glyphId; });
-      if (g) applyGlyph(g, t);
+      if (g) applyGlyph(g, t, bdata.glyphLevel || 1);
     }
   });
 
@@ -89,8 +90,16 @@ function calcStats() {
   return t;
 }
 
-function applyGlyph(g, t) {
-  const bonus = 17;
+function glyphRadius(level) {
+  if (level >= 51) return 5;
+  if (level >= 25) return 4;
+  return 3;
+}
+
+function applyGlyph(g, t, level) {
+  const lvl = level || 1;
+  // Bonus scales roughly: starts ~17 at lvl 1, grows to ~85 at lvl 150
+  const bonus = Math.round(17 * (1 + (lvl - 1) / 30));
   const map = {
     headhunter: 'damage', ambush: 'trap', bane_rogue: 'poison', canny: 'damage',
     chip: 'damage', closer: 'damage', combat: 'critdmg', control_rogue: 'damage',
@@ -118,11 +127,12 @@ function calcPointsUsed() {
 
 function buildShareCode() {
   const d = {
-    v: 2,
+    v: 3,
     b: state.boards.map(function(bid) {
       return {
         id: bid,
         g: state.boardData[bid].glyphId,
+        gl: state.boardData[bid].glyphLevel || 1,
         r: Array.from(state.boardData[bid].activeRares),
       };
     })
@@ -132,17 +142,17 @@ function buildShareCode() {
 
 function loadShareCode(code) {
   const d = JSON.parse(decodeURIComponent(atob(code)));
-  if (d.v !== 2 || !Array.isArray(d.b)) throw new Error('Invalid share code');
+  if (![2, 3].includes(d.v) || !Array.isArray(d.b)) throw new Error('Invalid share code');
   state.boards = [];
   state.boardData = {};
   d.b.forEach(function(bd) {
     if (!BOARD_META[bd.id]) return;
     state.boards.push(bd.id);
-    state.boardData[bd.id] = { glyphId: bd.g || null, activeRares: new Set(bd.r || []) };
+    state.boardData[bd.id] = { glyphId: bd.g || null, glyphLevel: bd.gl || 1, activeRares: new Set(bd.r || []) };
   });
   if (!state.boards.includes('starting')) {
     state.boards.unshift('starting');
-    state.boardData.starting = { glyphId: null, activeRares: new Set() };
+    state.boardData.starting = { glyphId: null, glyphLevel: 1, activeRares: new Set() };
   }
 }
 
@@ -305,6 +315,66 @@ function buildBoardCard(bid, idx) {
     });
   }
 
+  // Glyph level stepper
+  const glyphLevelRow = document.createElement('div');
+  glyphLevelRow.className = 'glyph-level-row';
+  glyphLevelRow.hidden = !bdata.glyphId;
+
+  const lvlLabel = document.createElement('span');
+  lvlLabel.className = 'glyph-level-label';
+  lvlLabel.textContent = 'Level';
+
+  const lvlMinus = document.createElement('button');
+  lvlMinus.className = 'glyph-lvl-btn';
+  lvlMinus.textContent = '−';
+
+  const lvlVal = document.createElement('span');
+  lvlVal.className = 'glyph-lvl-val';
+  lvlVal.textContent = String(bdata.glyphLevel || 1);
+
+  const lvlPlus = document.createElement('button');
+  lvlPlus.className = 'glyph-lvl-btn';
+  lvlPlus.textContent = '+';
+
+  const radiusBadge = document.createElement('span');
+  radiusBadge.className = 'glyph-radius-badge';
+
+  function updateRadiusBadge(level) {
+    const r = glyphRadius(level);
+    const isLeg = level >= 51;
+    radiusBadge.textContent = 'r' + r + (isLeg ? ' ✦' : '');
+    radiusBadge.className = 'glyph-radius-badge' + (isLeg ? ' legendary' : '');
+  }
+  updateRadiusBadge(bdata.glyphLevel || 1);
+
+  function setGlyphLevel(newLvl) {
+    newLvl = Math.max(1, Math.min(150, newLvl));
+    state.boardData[bid].glyphLevel = newLvl;
+    lvlVal.textContent = String(newLvl);
+    updateRadiusBadge(newLvl);
+    renderStats();
+  }
+
+  lvlMinus.addEventListener('click', function() { setGlyphLevel((state.boardData[bid].glyphLevel || 1) - 1); });
+  lvlPlus.addEventListener('click',  function() { setGlyphLevel((state.boardData[bid].glyphLevel || 1) + 1); });
+
+  // Long-press for fast increment
+  let lvlInterval = null;
+  function startHold(delta) { lvlInterval = setInterval(function() { setGlyphLevel((state.boardData[bid].glyphLevel || 1) + delta); }, 120); }
+  function stopHold() { clearInterval(lvlInterval); }
+  lvlMinus.addEventListener('pointerdown', function() { startHold(-1); });
+  lvlPlus.addEventListener('pointerdown',  function() { startHold(+1); });
+  ['pointerup','pointerleave'].forEach(function(ev) {
+    lvlMinus.addEventListener(ev, stopHold);
+    lvlPlus.addEventListener(ev, stopHold);
+  });
+
+  glyphLevelRow.appendChild(lvlLabel);
+  glyphLevelRow.appendChild(lvlMinus);
+  glyphLevelRow.appendChild(lvlVal);
+  glyphLevelRow.appendChild(lvlPlus);
+  glyphLevelRow.appendChild(radiusBadge);
+
   const glyphInfo = document.createElement('div');
   glyphInfo.className = 'glyph-info';
   glyphInfo.hidden = !bdata.glyphId;
@@ -312,14 +382,17 @@ function buildBoardCard(bid, idx) {
   function updateGlyphInfo(gid) {
     if (!gid || !DATA.glyphs) {
       glyphInfo.hidden = true;
+      glyphLevelRow.hidden = true;
       return;
     }
     const g = DATA.glyphs.find(function(g) { return g.id === gid; });
     if (!g) {
       glyphInfo.hidden = true;
+      glyphLevelRow.hidden = true;
       return;
     }
     glyphInfo.hidden = false;
+    glyphLevelRow.hidden = false;
     glyphInfo.innerHTML = '';
     if (g.description) {
       const d = document.createElement('div');
@@ -347,6 +420,7 @@ function buildBoardCard(bid, idx) {
 
   glyphSec.appendChild(glyphLabel);
   glyphSec.appendChild(glyphSelect);
+  glyphSec.appendChild(glyphLevelRow);
   glyphSec.appendChild(glyphInfo);
   body.appendChild(glyphSec);
 
@@ -489,8 +563,12 @@ function updatePointsBar() {
 
 function addBoard(bid) {
   if (state.boards.includes(bid)) return;
+  if (state.boards.length >= MAX_BOARDS) {
+    alert('Maximum ' + MAX_BOARDS + ' boards (Season 6 limit).');
+    return;
+  }
   state.boards.push(bid);
-  state.boardData[bid] = { glyphId: null, activeRares: new Set() };
+  state.boardData[bid] = { glyphId: null, glyphLevel: 1, activeRares: new Set() };
   render();
   closeAllSheets();
 }
@@ -521,6 +599,10 @@ function closeAllSheets() {
 }
 
 function openAddBoardSheet() {
+  if (state.boards.length >= MAX_BOARDS) {
+    alert('Du har allerede ' + MAX_BOARDS + ' boards — det er max i Season 6.');
+    return;
+  }
   const list = document.getElementById('add-board-list');
   list.innerHTML = '';
 

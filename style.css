@@ -750,6 +750,68 @@ input {
   font-weight: 600;
 }
 
+/* Glyph level stepper */
+.glyph-level-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.glyph-level-label {
+  font-size: 12px;
+  color: var(--txt2);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  flex-shrink: 0;
+}
+
+.glyph-lvl-btn {
+  width: 36px;
+  height: 36px;
+  background: var(--bg3);
+  border: 1px solid var(--bdr2);
+  border-radius: 8px;
+  color: var(--txt1);
+  font-size: 18px;
+  line-height: 1;
+  flex-shrink: 0;
+  touch-action: none;
+  user-select: none;
+}
+
+.glyph-lvl-btn:active {
+  background: var(--bdr2);
+}
+
+.glyph-lvl-val {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--txt0);
+  min-width: 36px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.glyph-radius-badge {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--blue);
+  background: rgba(72, 136, 192, 0.15);
+  border: 1px solid rgba(72, 136, 192, 0.35);
+  border-radius: 6px;
+  padding: 3px 8px;
+  flex-shrink: 0;
+  letter-spacing: 0.3px;
+}
+
+.glyph-radius-badge.legendary {
+  color: var(--goldlt);
+  background: rgba(200, 152, 48, 0.15);
+  border-color: rgba(200, 152, 48, 0.4);
+}
+
 /* --- Utility: hidden --- */
 [hidden] {
   display: none !important;
