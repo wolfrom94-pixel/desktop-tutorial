@@ -87,6 +87,7 @@ const BOARD_DEFS = {
       '5,10':{ type:'rare', id:'rare_deadly_ambush_3' },
       '15,10':{ type:'rare', id:'rare_deadly_ambush_4' },
       '9,16':{ type:'rare', id:'rare_deadly_ambush_5' },
+      '11,16':{ type:'rare', id:'rare_deadly_ambush_6' },
     },
     gates:[
       { id:'gate_n', col:10, row:0,  direction:'north' },
@@ -117,6 +118,7 @@ const BOARD_DEFS = {
       '10,7': { type:'rare', id:'rare_eldritch_bounty_3' },
       '10,13':{ type:'rare', id:'rare_eldritch_bounty_4' },
       '4,10': { type:'rare', id:'rare_eldritch_bounty_5' },
+      '16,10':{ type:'rare', id:'rare_eldritch_bounty_6' },
     },
     gates:[
       { id:'gate_n', col:10, row:0,  direction:'north' },
@@ -147,6 +149,7 @@ const BOARD_DEFS = {
       '6,10':{ type:'rare', id:'rare_cheap_shot_3' },
       '14,10':{ type:'rare', id:'rare_cheap_shot_4' },
       '10,14':{ type:'rare', id:'rare_cheap_shot_5' },
+      '10,12':{ type:'rare', id:'rare_cheap_shot_6' },
     },
     gates:[
       { id:'gate_n', col:10, row:0,  direction:'north' },
@@ -177,6 +180,7 @@ const BOARD_DEFS = {
       '3,10':{ type:'rare', id:'rare_no_witnesses_3' },
       '17,10':{ type:'rare', id:'rare_no_witnesses_4' },
       '10,19':{ type:'rare', id:'rare_no_witnesses_5' },
+      '11,13':{ type:'rare', id:'rare_no_witnesses_6' },
     },
     gates:[
       { id:'gate_n', col:10, row:0,  direction:'north' },
@@ -207,6 +211,7 @@ const BOARD_DEFS = {
       '4,10':{ type:'rare', id:'rare_cunning_stratagem_3' },
       '16,10':{ type:'rare', id:'rare_cunning_stratagem_4' },
       '10,18':{ type:'rare', id:'rare_cunning_stratagem_5' },
+      '9,14':{ type:'rare', id:'rare_cunning_stratagem_6' },
     },
     gates:[
       { id:'gate_n', col:10, row:0,  direction:'north' },
@@ -237,6 +242,7 @@ const BOARD_DEFS = {
       '12,10':{ type:'rare', id:'rare_tricks_3' },
       '9,11':{ type:'rare', id:'rare_tricks_4' },
       '11,11':{ type:'rare', id:'rare_tricks_5' },
+      '10,13':{ type:'rare', id:'rare_tricks_6' },
     },
     gates:[
       { id:'gate_n', col:10, row:0,  direction:'north' },
@@ -267,6 +273,69 @@ const BOARD_DEFS = {
       '5,10':{ type:'rare', id:'rare_exploit_weakness_3' },
       '15,10':{ type:'rare', id:'rare_exploit_weakness_4' },
       '10,11':{ type:'rare', id:'rare_exploit_weakness_5' },
+      '12,10':{ type:'rare', id:'rare_exploit_weakness_6' },
+    },
+    gates:[
+      { id:'gate_n', col:10, row:0,  direction:'north' },
+      { id:'gate_s', col:10, row:20, direction:'south' },
+      { id:'gate_w', col:0,  row:10, direction:'west'  },
+      { id:'gate_e', col:20, row:10, direction:'east'  },
+    ],
+  },
+
+  leyrana_instinct: {
+    name:"Leyrana's Instinct", width:21, height:21,
+    rowRanges:_cross(),
+    specialNodes:{
+      '10,0': { type:'gate', direction:'north' },
+      '10,20':{ type:'gate', direction:'south' },
+      '0,10': { type:'gate', direction:'west'  },
+      '20,10':{ type:'gate', direction:'east'  },
+      '10,10':{ type:'legendary', id:'leyrana_instinct_legendary' },
+      '10,5': { type:'glyph' },
+      '9,2':{ type:'magic' },'11,2':{ type:'magic' },
+      '9,7':{ type:'magic' },'11,7':{ type:'magic' },
+      '2,9':{ type:'magic' },'18,9':{ type:'magic' },
+      '2,11':{ type:'magic' },'18,11':{ type:'magic' },
+      '10,15':{ type:'magic' },
+      '9,18':{ type:'magic' },'11,18':{ type:'magic' },
+      '9,3':{ type:'rare', id:'rare_leyrana_instinct_1' },
+      '11,3':{ type:'rare', id:'rare_leyrana_instinct_2' },
+      '4,10':{ type:'rare', id:'rare_leyrana_instinct_3' },
+      '16,10':{ type:'rare', id:'rare_leyrana_instinct_4' },
+      '10,8':{ type:'rare', id:'rare_leyrana_instinct_5' },
+      '10,13':{ type:'rare', id:'rare_leyrana_instinct_6' },
+    },
+    gates:[
+      { id:'gate_n', col:10, row:0,  direction:'north' },
+      { id:'gate_s', col:10, row:20, direction:'south' },
+      { id:'gate_w', col:0,  row:10, direction:'west'  },
+      { id:'gate_e', col:20, row:10, direction:'east'  },
+    ],
+  },
+
+  danse_macabre: {
+    name:'Danse Macabre', width:21, height:21,
+    rowRanges:_cross(),
+    specialNodes:{
+      '10,0': { type:'gate', direction:'north' },
+      '10,20':{ type:'gate', direction:'south' },
+      '0,10': { type:'gate', direction:'west'  },
+      '20,10':{ type:'gate', direction:'east'  },
+      '10,10':{ type:'legendary', id:'danse_macabre_legendary' },
+      '10,16':{ type:'glyph' },
+      '9,2':{ type:'magic' },'11,2':{ type:'magic' },
+      '10,5':{ type:'magic' },
+      '3,9':{ type:'magic' },'17,9':{ type:'magic' },
+      '3,11':{ type:'magic' },'17,11':{ type:'magic' },
+      '9,14':{ type:'magic' },'11,14':{ type:'magic' },
+      '10,19':{ type:'magic' },
+      '9,3':{ type:'rare', id:'rare_danse_macabre_1' },
+      '11,3':{ type:'rare', id:'rare_danse_macabre_2' },
+      '5,10':{ type:'rare', id:'rare_danse_macabre_3' },
+      '15,10':{ type:'rare', id:'rare_danse_macabre_4' },
+      '10,8':{ type:'rare', id:'rare_danse_macabre_5' },
+      '10,13':{ type:'rare', id:'rare_danse_macabre_6' },
     },
     gates:[
       { id:'gate_n', col:10, row:0,  direction:'north' },
@@ -1192,10 +1261,31 @@ function calcStats() {
 
 function applyGlyph(g, t) {
   const b = 17;
-  const m = { ambush:'trap',cutthroat:'damage',marksman:'damage',bladedancer:'damage',
-              control:'damage',exploit:'vulnerable',efficacy:'damage',domination:'damage',
-              turf:'armor',revenge:'damage',imp:'poison',territorial:'dexterity',
-              torch:'damage',elementalist:'intelligence',ranger:'damage',subtlety:'damage' };
+  const m = {
+    headhunter:'damage',
+    ambush:'trap',
+    bane_rogue:'poison',
+    canny:'damage',
+    chip:'damage',
+    closer:'damage',
+    combat:'critdmg',
+    control_rogue:'damage',
+    devious:'damage',
+    diminish:'damage',
+    efficacy:'damage',
+    exploit_rogue:'vulnerable',
+    explosive:'damage',
+    fluidity:'damage',
+    frostfeeder:'damage',
+    infusion:'damage',
+    nightstalker:'poison',
+    pride:'damage',
+    ranger:'damage',
+    snare:'trap',
+    tracker_rogue:'poison',
+    turf:'armor',
+    versatility:'damage',
+  };
   const k = m[g.id]||'damage';
   t[k] = (t[k]||0)+b;
 }
