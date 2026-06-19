@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>D4 Rogue Paragon Planner</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- STICKY HEADER -->
+  <header class="app-header">
+    <div class="header-top">
+      <div class="logo">
+        <span class="logo-icon">&#x1F5E1;&#xFE0F;</span>
+        <span class="logo-text">Rogue Paragon</span>
+      </div>
+      <div class="header-actions">
+        <button class="btn-icon" id="btn-share" aria-label="Share / Import">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+            <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+          </svg>
+        </button>
+        <button class="btn-icon btn-danger" id="btn-reset" aria-label="Reset">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="1 4 1 10 7 10"/>
+            <path d="M3.51 15a9 9 0 1 0 .49-4.94"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+    <div class="points-bar-wrap">
+      <div class="points-label">
+        <span id="points-used">0</span> / 220 Paragon Points
+      </div>
+      <div class="points-bar-track">
+        <div class="points-bar-fill" id="points-bar-fill"></div>
+      </div>
+    </div>
+  </header>
+
+  <!-- BOARD CHIPS STRIP -->
+  <div class="chips-strip" id="chips-strip">
+    <div class="chips-scroll" id="chips-scroll">
+      <!-- chips rendered by JS -->
+      <button class="chip chip-add" id="btn-add-board">
+        <span>+</span>&nbsp;Add Board
+      </button>
+    </div>
+  </div>
+
+  <!-- MAIN BOARD CARDS -->
+  <main class="boards-list" id="boards-list">
+    <!-- board cards rendered by JS -->
+  </main>
+
+  <!-- BOTTOM STATS BAR -->
+  <div class="stats-bar" id="stats-bar">
+    <div class="stats-collapsed" id="stats-collapsed">
+      <span class="stats-bar-label">&#x1F4CA; Stats</span>
+      <span class="stats-summary" id="stats-summary"></span>
+      <span class="stats-chevron" id="stats-chevron">&#9650;</span>
+    </div>
+    <div class="stats-expanded" id="stats-expanded" hidden>
+      <div class="stats-grid" id="stats-grid"></div>
+    </div>
+  </div>
+
+  <!-- MODAL OVERLAY -->
+  <div class="modal-overlay" id="modal-overlay" hidden></div>
+
+  <!-- ADD BOARD MODAL (bottom sheet) -->
+  <div class="bottom-sheet" id="sheet-add-board" hidden>
+    <div class="sheet-handle"></div>
+    <div class="sheet-header">
+      <h2 class="sheet-title">Add Board</h2>
+      <button class="btn-icon" id="btn-close-add-board" aria-label="Close">&#x2715;</button>
+    </div>
+    <div class="sheet-body" id="add-board-list">
+      <!-- populated by JS -->
+    </div>
+  </div>
+
+  <!-- SHARE MODAL (bottom sheet) -->
+  <div class="bottom-sheet" id="sheet-share" hidden>
+    <div class="sheet-handle"></div>
+    <div class="sheet-header">
+      <h2 class="sheet-title">Share / Import</h2>
+      <button class="btn-icon" id="btn-close-share" aria-label="Close">&#x2715;</button>
+    </div>
+    <div class="sheet-body">
+      <section class="share-section">
+        <label class="share-label">Your build code</label>
+        <div class="share-row">
+          <input type="text" class="share-input" id="share-code-out" readonly>
+          <button class="btn-copy" id="btn-copy-code">Copy</button>
+        </div>
+        <div class="copy-confirm" id="copy-confirm" hidden>Copied!</div>
+      </section>
+      <section class="share-section">
+        <label class="share-label">Import a build code</label>
+        <div class="share-row">
+          <input type="text" class="share-input" id="share-code-in" placeholder="Paste code here...">
+          <button class="btn-copy" id="btn-load-code">Load</button>
+        </div>
+        <div class="share-error" id="share-error" hidden></div>
+      </section>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
