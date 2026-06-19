@@ -2,251 +2,116 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-  <title>D4 Rogue Paragon Planner — Vessel of Hatred</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>D4 Rogue Paragon Planner</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<div id="app">
 
-  <!-- ── Header ── -->
-  <header id="header">
-    <div class="header-left">
+  <!-- STICKY HEADER -->
+  <header class="app-header">
+    <div class="header-top">
       <div class="logo">
-        <span class="logo-icon">⚔</span>
-        <span class="logo-text">Rogue Paragon Planner</span>
-        <span class="logo-sub">Vessel of Hatred</span>
+        <span class="logo-icon">&#x1F5E1;&#xFE0F;</span>
+        <span class="logo-text">Rogue Paragon</span>
+      </div>
+      <div class="header-actions">
+        <button class="btn-icon" id="btn-share" aria-label="Share / Import">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+            <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+          </svg>
+        </button>
+        <button class="btn-icon btn-danger" id="btn-reset" aria-label="Reset">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="1 4 1 10 7 10"/>
+            <path d="M3.51 15a9 9 0 1 0 .49-4.94"/>
+          </svg>
+        </button>
       </div>
     </div>
-    <div class="header-center">
-      <div class="paragon-counter">
-        <span class="counter-label">Points Used</span>
-        <span id="points-used" class="counter-value">0</span>
-        <span class="counter-sep">/</span>
-        <span id="points-total" class="counter-value">300</span>
+    <div class="points-bar-wrap">
+      <div class="points-label">
+        <span id="points-used">0</span> / 220 Paragon Points
       </div>
-    </div>
-    <div class="header-right">
-      <button class="btn btn-secondary" id="btn-reset">Reset</button>
-      <button class="btn btn-secondary" id="btn-import">Import</button>
-      <button class="btn btn-primary"   id="btn-export">Export</button>
+      <div class="points-bar-track">
+        <div class="points-bar-fill" id="points-bar-fill"></div>
+      </div>
     </div>
   </header>
 
-  <div id="main-layout">
-
-    <!-- ── Left Sidebar ── -->
-    <aside id="sidebar-left">
-
-      <div class="sidebar-section">
-        <h3 class="sidebar-title">Active Boards</h3>
-        <div id="board-list"></div>
-      </div>
-
-      <div class="sidebar-section">
-        <h3 class="sidebar-title">Selected Board</h3>
-        <div id="info-board-name" class="board-info-name">Starting Board</div>
-        <div class="rotation-row">
-          <span class="info-label">Rotation:</span>
-          <div id="rotation-btns" class="rotation-btns">
-            <button class="rot-btn active" data-rotation="0">0°</button>
-            <button class="rot-btn" data-rotation="90">90°</button>
-            <button class="rot-btn" data-rotation="180">180°</button>
-            <button class="rot-btn" data-rotation="270">270°</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="sidebar-section">
-        <h3 class="sidebar-title">Instructions</h3>
-        <div class="instructions">
-          <p>1. Click nodes to allocate paragon points.</p>
-          <p>2. Reach a <span class="hl-gate">Gate ◈</span> to connect a new board.</p>
-          <p>3. Click the gate to choose which board attaches.</p>
-          <p>4. Rotate boards at 0°/90°/180°/270° to align gates.</p>
-          <p>5. Click a <span class="hl-glyph">Glyph ⬡</span> socket to equip a glyph.</p>
-        </div>
-      </div>
-    </aside>
-
-    <!-- ── Canvas ── -->
-    <main id="canvas-container">
-      <div id="canvas-toolbar">
-        <div class="toolbar-group">
-          <button class="tool-btn" id="btn-zoom-in"  title="Zoom in">+</button>
-          <button class="tool-btn" id="btn-zoom-out" title="Zoom out">−</button>
-          <button class="tool-btn" id="btn-zoom-fit" title="Fit all boards">⊡</button>
-        </div>
-        <span class="toolbar-sep"></span>
-        <span id="zoom-label" class="zoom-label">100%</span>
-      </div>
-
-      <div id="svg-wrapper">
-        <svg id="paragon-canvas" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <!-- Glow filters -->
-            <filter id="glow-leg" x="-50%" y="-50%" width="200%" height="200%">
-              <feGaussianBlur stdDeviation="5" result="b"/>
-              <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
-            </filter>
-            <filter id="glow-rare" x="-40%" y="-40%" width="180%" height="180%">
-              <feGaussianBlur stdDeviation="3" result="b"/>
-              <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
-            </filter>
-            <filter id="glow-magic" x="-30%" y="-30%" width="160%" height="160%">
-              <feGaussianBlur stdDeviation="2" result="b"/>
-              <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
-            </filter>
-            <filter id="glow-gate" x="-40%" y="-40%" width="180%" height="180%">
-              <feGaussianBlur stdDeviation="3" result="b"/>
-              <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
-            </filter>
-            <!-- Board background pattern -->
-            <pattern id="board-bg" patternUnits="userSpaceOnUse" width="44" height="44">
-              <rect width="44" height="44" fill="#0e060c"/>
-              <rect x="1" y="1" width="42" height="42" fill="#130a10" stroke="#1c0f18" stroke-width="0.5"/>
-            </pattern>
-          </defs>
-          <g id="canvas-root">
-            <g id="layer-bg"></g>
-            <g id="layer-connectors"></g>
-            <g id="layer-glyph-radius"></g>
-            <g id="layer-connections"></g>
-            <g id="layer-nodes"></g>
-            <g id="layer-labels"></g>
-          </g>
-        </svg>
-      </div>
-
-      <!-- Floating node tooltip -->
-      <div id="tooltip" class="tooltip hidden">
-        <div class="tt-header">
-          <span class="tt-name"></span>
-          <span class="tt-badge"></span>
-        </div>
-        <div class="tt-stat"></div>
-        <div class="tt-effect"></div>
-        <div class="tt-hint"></div>
-      </div>
-    </main>
-
-    <!-- ── Right Sidebar ── -->
-    <aside id="sidebar-right">
-
-      <!-- Stats -->
-      <div class="sidebar-section">
-        <h3 class="sidebar-title">Stats</h3>
-        <div class="stats-panel">
-          <div class="stat-row"><span class="si dex">👣</span><span class="sn">Dexterity</span>    <span id="s-dex" class="sv">0</span></div>
-          <div class="stat-row"><span class="si str">🛡</span><span class="sn">Strength</span>     <span id="s-str" class="sv">0</span></div>
-          <div class="stat-row"><span class="si int">💎</span><span class="sn">Intelligence</span> <span id="s-int" class="sv">0</span></div>
-          <div class="stat-row"><span class="si wil">🌿</span><span class="sn">Willpower</span>    <span id="s-wil" class="sv">0</span></div>
-          <div class="stat-div"></div>
-          <div class="stat-row"><span class="si">❤</span><span class="sn">Max Life</span>          <span id="s-life" class="sv bonus">+0</span></div>
-          <div class="stat-row"><span class="si">🛡</span><span class="sn">Armor</span>             <span id="s-armor" class="sv bonus">+0</span></div>
-          <div class="stat-div"></div>
-          <div class="stat-row"><span class="si">⚔</span><span class="sn">Damage</span>            <span id="s-dmg" class="sv bonus">+0%</span></div>
-          <div class="stat-row"><span class="si">💢</span><span class="sn">Vulnerable Dmg</span>   <span id="s-vuln" class="sv bonus">+0%</span></div>
-          <div class="stat-row"><span class="si">✦</span><span class="sn">Crit Dmg</span>          <span id="s-crit" class="sv bonus">+0%</span></div>
-          <div class="stat-row"><span class="si">☠</span><span class="sn">Poison Dmg</span>        <span id="s-poison" class="sv bonus">+0%</span></div>
-          <div class="stat-row"><span class="si">💣</span><span class="sn">Trap Dmg</span>          <span id="s-trap" class="sv bonus">+0%</span></div>
-        </div>
-      </div>
-
-      <!-- Glyph slot -->
-      <div class="sidebar-section" id="glyph-panel">
-        <h3 class="sidebar-title">Glyph Socket</h3>
-        <div id="glyph-empty-msg" class="dim-msg">Click a Glyph Socket ⬡ on the board to equip a glyph.</div>
-        <div id="glyph-controls" class="hidden">
-          <div class="glyph-board-lbl" id="glyph-board-lbl"></div>
-          <select id="glyph-select" class="glyph-select"></select>
-          <div id="glyph-info-box" class="glyph-info hidden">
-            <div class="gi-name" id="gi-name"></div>
-            <div class="gi-row"><span>Radius:</span><span id="gi-radius" class="gi-val"></span></div>
-            <div class="gi-desc" id="gi-desc"></div>
-            <div class="gi-bonus" id="gi-bonus"></div>
-            <div class="gi-req"   id="gi-req"></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Active Legendaries -->
-      <div class="sidebar-section">
-        <h3 class="sidebar-title">Legendaries Unlocked</h3>
-        <div id="legendary-list"><div class="dim-msg">Activate a Legendary node to unlock its power.</div></div>
-      </div>
-
-    </aside>
-  </div>
-</div><!-- #app -->
-
-<!-- ═══════════ MODALS ═══════════ -->
-<div id="modal-overlay" class="modal-overlay hidden" role="dialog">
-
-  <!-- Board Selection (gate click) -->
-  <div id="modal-board-select" class="modal hidden">
-    <div class="modal-header">
-      <h2 id="modal-board-title">Choose Board to Attach</h2>
-      <button class="modal-x" data-close="board-select">✕</button>
-    </div>
-    <div class="modal-body">
-      <p class="modal-sub" id="modal-board-sub"></p>
-      <div id="board-choice-list" class="board-choice-list"></div>
+  <!-- BOARD CHIPS STRIP -->
+  <div class="chips-strip" id="chips-strip">
+    <div class="chips-scroll" id="chips-scroll">
+      <!-- chips rendered by JS -->
+      <button class="chip chip-add" id="btn-add-board">
+        <span>+</span>&nbsp;Add Board
+      </button>
     </div>
   </div>
 
-  <!-- Glyph Selection -->
-  <div id="modal-glyph-select" class="modal hidden">
-    <div class="modal-header">
-      <h2>Equip Glyph</h2>
-      <button class="modal-x" data-close="glyph-select">✕</button>
+  <!-- MAIN BOARD CARDS -->
+  <main class="boards-list" id="boards-list">
+    <!-- board cards rendered by JS -->
+  </main>
+
+  <!-- BOTTOM STATS BAR -->
+  <div class="stats-bar" id="stats-bar">
+    <div class="stats-collapsed" id="stats-collapsed">
+      <span class="stats-bar-label">&#x1F4CA; Stats</span>
+      <span class="stats-summary" id="stats-summary"></span>
+      <span class="stats-chevron" id="stats-chevron">&#9650;</span>
     </div>
-    <div class="modal-body">
-      <p class="modal-sub" id="modal-glyph-sub"></p>
-      <button class="btn btn-secondary glyph-none-btn" id="glyph-none-btn">— Remove Glyph —</button>
-      <div id="glyph-choice-list" class="glyph-choice-list"></div>
+    <div class="stats-expanded" id="stats-expanded" hidden>
+      <div class="stats-grid" id="stats-grid"></div>
     </div>
   </div>
 
-  <!-- Export -->
-  <div id="modal-export" class="modal hidden">
-    <div class="modal-header">
-      <h2>Export Build</h2>
-      <button class="modal-x" data-close="export">✕</button>
+  <!-- MODAL OVERLAY -->
+  <div class="modal-overlay" id="modal-overlay" hidden></div>
+
+  <!-- ADD BOARD MODAL (bottom sheet) -->
+  <div class="bottom-sheet" id="sheet-add-board" hidden>
+    <div class="sheet-handle"></div>
+    <div class="sheet-header">
+      <h2 class="sheet-title">Add Board</h2>
+      <button class="btn-icon" id="btn-close-add-board" aria-label="Close">&#x2715;</button>
     </div>
-    <div class="modal-body">
-      <label class="field-lbl">Share Code</label>
-      <div class="row-copy">
-        <input id="share-code" class="code-input" readonly>
-        <button class="btn btn-secondary" id="btn-copy-code">Copy</button>
-      </div>
-      <label class="field-lbl">JSON</label>
-      <textarea id="export-json" class="json-area" readonly></textarea>
-      <button class="btn btn-secondary" id="btn-copy-json">Copy JSON</button>
+    <div class="sheet-body" id="add-board-list">
+      <!-- populated by JS -->
     </div>
   </div>
 
-  <!-- Import -->
-  <div id="modal-import" class="modal hidden">
-    <div class="modal-header">
-      <h2>Import Build</h2>
-      <button class="modal-x" data-close="import">✕</button>
+  <!-- SHARE MODAL (bottom sheet) -->
+  <div class="bottom-sheet" id="sheet-share" hidden>
+    <div class="sheet-handle"></div>
+    <div class="sheet-header">
+      <h2 class="sheet-title">Share / Import</h2>
+      <button class="btn-icon" id="btn-close-share" aria-label="Close">&#x2715;</button>
     </div>
-    <div class="modal-body">
-      <label class="field-lbl">Share Code</label>
-      <div class="row-copy">
-        <input id="import-code" class="code-input" placeholder="Paste code…">
-        <button class="btn btn-primary" id="btn-load-code">Load</button>
-      </div>
-      <label class="field-lbl">Or paste JSON</label>
-      <textarea id="import-json" class="json-area" placeholder="Paste JSON…"></textarea>
-      <button class="btn btn-primary" id="btn-load-json">Import JSON</button>
-      <div id="import-err" class="import-err hidden"></div>
+    <div class="sheet-body">
+      <section class="share-section">
+        <label class="share-label">Your build code</label>
+        <div class="share-row">
+          <input type="text" class="share-input" id="share-code-out" readonly>
+          <button class="btn-copy" id="btn-copy-code">Copy</button>
+        </div>
+        <div class="copy-confirm" id="copy-confirm" hidden>Copied!</div>
+      </section>
+      <section class="share-section">
+        <label class="share-label">Import a build code</label>
+        <div class="share-row">
+          <input type="text" class="share-input" id="share-code-in" placeholder="Paste code here...">
+          <button class="btn-copy" id="btn-load-code">Load</button>
+        </div>
+        <div class="share-error" id="share-error" hidden></div>
+      </section>
     </div>
   </div>
 
-</div><!-- #modal-overlay -->
-
-<script src="app.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>
