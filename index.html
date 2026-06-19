@@ -2,322 +2,251 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
   <title>D4 Rogue Paragon Planner — Vessel of Hatred</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div id="app">
-    <!-- Header -->
-    <header id="header">
-      <div class="header-left">
-        <div class="logo">
-          <span class="logo-icon">⚔</span>
-          <span class="logo-text">Rogue Paragon Planner</span>
-          <span class="logo-sub">Vessel of Hatred</span>
+<div id="app">
+
+  <!-- ── Header ── -->
+  <header id="header">
+    <div class="header-left">
+      <div class="logo">
+        <span class="logo-icon">⚔</span>
+        <span class="logo-text">Rogue Paragon Planner</span>
+        <span class="logo-sub">Vessel of Hatred</span>
+      </div>
+    </div>
+    <div class="header-center">
+      <div class="paragon-counter">
+        <span class="counter-label">Points Used</span>
+        <span id="points-used" class="counter-value">0</span>
+        <span class="counter-sep">/</span>
+        <span id="points-total" class="counter-value">300</span>
+      </div>
+    </div>
+    <div class="header-right">
+      <button class="btn btn-secondary" id="btn-reset">Reset</button>
+      <button class="btn btn-secondary" id="btn-import">Import</button>
+      <button class="btn btn-primary"   id="btn-export">Export</button>
+    </div>
+  </header>
+
+  <div id="main-layout">
+
+    <!-- ── Left Sidebar ── -->
+    <aside id="sidebar-left">
+
+      <div class="sidebar-section">
+        <h3 class="sidebar-title">Active Boards</h3>
+        <div id="board-list"></div>
+      </div>
+
+      <div class="sidebar-section">
+        <h3 class="sidebar-title">Selected Board</h3>
+        <div id="info-board-name" class="board-info-name">Starting Board</div>
+        <div class="rotation-row">
+          <span class="info-label">Rotation:</span>
+          <div id="rotation-btns" class="rotation-btns">
+            <button class="rot-btn active" data-rotation="0">0°</button>
+            <button class="rot-btn" data-rotation="90">90°</button>
+            <button class="rot-btn" data-rotation="180">180°</button>
+            <button class="rot-btn" data-rotation="270">270°</button>
+          </div>
         </div>
       </div>
-      <div class="header-center">
-        <div class="paragon-counter">
-          <span class="counter-label">Paragon Points</span>
-          <span id="points-used" class="counter-value">0</span>
-          <span class="counter-sep">/</span>
-          <span id="points-total" class="counter-value">300</span>
+
+      <div class="sidebar-section">
+        <h3 class="sidebar-title">Instructions</h3>
+        <div class="instructions">
+          <p>1. Click nodes to allocate paragon points.</p>
+          <p>2. Reach a <span class="hl-gate">Gate ◈</span> to connect a new board.</p>
+          <p>3. Click the gate to choose which board attaches.</p>
+          <p>4. Rotate boards at 0°/90°/180°/270° to align gates.</p>
+          <p>5. Click a <span class="hl-glyph">Glyph ⬡</span> socket to equip a glyph.</p>
         </div>
       </div>
-      <div class="header-right">
-        <button class="btn btn-secondary" id="btn-reset" title="Reset all nodes">Reset</button>
-        <button class="btn btn-secondary" id="btn-import" title="Import build">Import</button>
-        <button class="btn btn-primary" id="btn-export" title="Export build">Export</button>
+    </aside>
+
+    <!-- ── Canvas ── -->
+    <main id="canvas-container">
+      <div id="canvas-toolbar">
+        <div class="toolbar-group">
+          <button class="tool-btn" id="btn-zoom-in"  title="Zoom in">+</button>
+          <button class="tool-btn" id="btn-zoom-out" title="Zoom out">−</button>
+          <button class="tool-btn" id="btn-zoom-fit" title="Fit all boards">⊡</button>
+        </div>
+        <span class="toolbar-sep"></span>
+        <span id="zoom-label" class="zoom-label">100%</span>
       </div>
-    </header>
 
-    <div id="main-layout">
-      <!-- Left Sidebar: Board List -->
-      <aside id="sidebar-left">
-        <div class="sidebar-section">
-          <h3 class="sidebar-title">Boards</h3>
-          <div id="board-list" class="board-list"></div>
+      <div id="svg-wrapper">
+        <svg id="paragon-canvas" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <!-- Glow filters -->
+            <filter id="glow-leg" x="-50%" y="-50%" width="200%" height="200%">
+              <feGaussianBlur stdDeviation="5" result="b"/>
+              <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+            <filter id="glow-rare" x="-40%" y="-40%" width="180%" height="180%">
+              <feGaussianBlur stdDeviation="3" result="b"/>
+              <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+            <filter id="glow-magic" x="-30%" y="-30%" width="160%" height="160%">
+              <feGaussianBlur stdDeviation="2" result="b"/>
+              <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+            <filter id="glow-gate" x="-40%" y="-40%" width="180%" height="180%">
+              <feGaussianBlur stdDeviation="3" result="b"/>
+              <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+            <!-- Board background pattern -->
+            <pattern id="board-bg" patternUnits="userSpaceOnUse" width="44" height="44">
+              <rect width="44" height="44" fill="#0e060c"/>
+              <rect x="1" y="1" width="42" height="42" fill="#130a10" stroke="#1c0f18" stroke-width="0.5"/>
+            </pattern>
+          </defs>
+          <g id="canvas-root">
+            <g id="layer-bg"></g>
+            <g id="layer-connectors"></g>
+            <g id="layer-glyph-radius"></g>
+            <g id="layer-connections"></g>
+            <g id="layer-nodes"></g>
+            <g id="layer-labels"></g>
+          </g>
+        </svg>
+      </div>
+
+      <!-- Floating node tooltip -->
+      <div id="tooltip" class="tooltip hidden">
+        <div class="tt-header">
+          <span class="tt-name"></span>
+          <span class="tt-badge"></span>
         </div>
+        <div class="tt-stat"></div>
+        <div class="tt-effect"></div>
+        <div class="tt-hint"></div>
+      </div>
+    </main>
 
-        <div class="sidebar-section">
-          <h3 class="sidebar-title">Active Board</h3>
-          <div id="active-board-info">
-            <div class="board-info-name" id="info-board-name">Starting Board</div>
-            <div class="board-rotation-controls">
-              <span class="info-label">Rotation:</span>
-              <div class="rotation-btns" id="rotation-btns">
-                <button class="rot-btn active" data-rotation="0">0°</button>
-                <button class="rot-btn" data-rotation="90">90°</button>
-                <button class="rot-btn" data-rotation="180">180°</button>
-                <button class="rot-btn" data-rotation="270">270°</button>
-              </div>
-            </div>
+    <!-- ── Right Sidebar ── -->
+    <aside id="sidebar-right">
+
+      <!-- Stats -->
+      <div class="sidebar-section">
+        <h3 class="sidebar-title">Stats</h3>
+        <div class="stats-panel">
+          <div class="stat-row"><span class="si dex">👣</span><span class="sn">Dexterity</span>    <span id="s-dex" class="sv">0</span></div>
+          <div class="stat-row"><span class="si str">🛡</span><span class="sn">Strength</span>     <span id="s-str" class="sv">0</span></div>
+          <div class="stat-row"><span class="si int">💎</span><span class="sn">Intelligence</span> <span id="s-int" class="sv">0</span></div>
+          <div class="stat-row"><span class="si wil">🌿</span><span class="sn">Willpower</span>    <span id="s-wil" class="sv">0</span></div>
+          <div class="stat-div"></div>
+          <div class="stat-row"><span class="si">❤</span><span class="sn">Max Life</span>          <span id="s-life" class="sv bonus">+0</span></div>
+          <div class="stat-row"><span class="si">🛡</span><span class="sn">Armor</span>             <span id="s-armor" class="sv bonus">+0</span></div>
+          <div class="stat-div"></div>
+          <div class="stat-row"><span class="si">⚔</span><span class="sn">Damage</span>            <span id="s-dmg" class="sv bonus">+0%</span></div>
+          <div class="stat-row"><span class="si">💢</span><span class="sn">Vulnerable Dmg</span>   <span id="s-vuln" class="sv bonus">+0%</span></div>
+          <div class="stat-row"><span class="si">✦</span><span class="sn">Crit Dmg</span>          <span id="s-crit" class="sv bonus">+0%</span></div>
+          <div class="stat-row"><span class="si">☠</span><span class="sn">Poison Dmg</span>        <span id="s-poison" class="sv bonus">+0%</span></div>
+          <div class="stat-row"><span class="si">💣</span><span class="sn">Trap Dmg</span>          <span id="s-trap" class="sv bonus">+0%</span></div>
+        </div>
+      </div>
+
+      <!-- Glyph slot -->
+      <div class="sidebar-section" id="glyph-panel">
+        <h3 class="sidebar-title">Glyph Socket</h3>
+        <div id="glyph-empty-msg" class="dim-msg">Click a Glyph Socket ⬡ on the board to equip a glyph.</div>
+        <div id="glyph-controls" class="hidden">
+          <div class="glyph-board-lbl" id="glyph-board-lbl"></div>
+          <select id="glyph-select" class="glyph-select"></select>
+          <div id="glyph-info-box" class="glyph-info hidden">
+            <div class="gi-name" id="gi-name"></div>
+            <div class="gi-row"><span>Radius:</span><span id="gi-radius" class="gi-val"></span></div>
+            <div class="gi-desc" id="gi-desc"></div>
+            <div class="gi-bonus" id="gi-bonus"></div>
+            <div class="gi-req"   id="gi-req"></div>
           </div>
         </div>
+      </div>
 
-        <div class="sidebar-section">
-          <h3 class="sidebar-title">Add Board</h3>
-          <div id="available-boards" class="available-boards"></div>
-        </div>
-      </aside>
+      <!-- Active Legendaries -->
+      <div class="sidebar-section">
+        <h3 class="sidebar-title">Legendaries Unlocked</h3>
+        <div id="legendary-list"><div class="dim-msg">Activate a Legendary node to unlock its power.</div></div>
+      </div>
 
-      <!-- Center: Canvas -->
-      <main id="canvas-container">
-        <div id="canvas-toolbar">
-          <div class="toolbar-group">
-            <button class="tool-btn" id="btn-zoom-in" title="Zoom In">+</button>
-            <button class="tool-btn" id="btn-zoom-out" title="Zoom Out">−</button>
-            <button class="tool-btn" id="btn-zoom-fit" title="Fit to Screen">⊡</button>
-          </div>
-          <div class="toolbar-group">
-            <button class="tool-btn" id="btn-view-single" title="Single board view" data-view="single">⊞</button>
-            <button class="tool-btn" id="btn-view-all" title="All boards view" data-view="all">⊟</button>
-          </div>
-          <div class="toolbar-separator"></div>
-          <span id="zoom-label" class="zoom-label">100%</span>
-        </div>
+    </aside>
+  </div>
+</div><!-- #app -->
 
-        <div id="svg-wrapper">
-          <svg id="paragon-canvas" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-              <filter id="glow-legendary">
-                <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
-                <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
-              </filter>
-              <filter id="glow-rare">
-                <feGaussianBlur stdDeviation="2.5" result="coloredBlur"/>
-                <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
-              </filter>
-              <filter id="glow-magic">
-                <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
-                <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
-              </filter>
-              <filter id="glow-active">
-                <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
-                <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
-              </filter>
-              <radialGradient id="grad-legendary" cx="50%" cy="50%" r="50%">
-                <stop offset="0%" style="stop-color:#ff8c00;stop-opacity:1"/>
-                <stop offset="60%" style="stop-color:#c43c00;stop-opacity:1"/>
-                <stop offset="100%" style="stop-color:#6b1f00;stop-opacity:1"/>
-              </radialGradient>
-              <radialGradient id="grad-rare" cx="50%" cy="50%" r="50%">
-                <stop offset="0%" style="stop-color:#ffd700;stop-opacity:1"/>
-                <stop offset="60%" style="stop-color:#b8860b;stop-opacity:1"/>
-                <stop offset="100%" style="stop-color:#4a3000;stop-opacity:1"/>
-              </radialGradient>
-              <radialGradient id="grad-magic" cx="50%" cy="50%" r="50%">
-                <stop offset="0%" style="stop-color:#4090ff;stop-opacity:1"/>
-                <stop offset="60%" style="stop-color:#1040a0;stop-opacity:1"/>
-                <stop offset="100%" style="stop-color:#051030;stop-opacity:1"/>
-              </radialGradient>
-              <radialGradient id="grad-glyph" cx="50%" cy="50%" r="50%">
-                <stop offset="0%" style="stop-color:#9966ff;stop-opacity:1"/>
-                <stop offset="60%" style="stop-color:#4422aa;stop-opacity:1"/>
-                <stop offset="100%" style="stop-color:#1a0a3a;stop-opacity:1"/>
-              </radialGradient>
-              <radialGradient id="grad-normal" cx="50%" cy="50%" r="50%">
-                <stop offset="0%" style="stop-color:#3a3a3a;stop-opacity:1"/>
-                <stop offset="100%" style="stop-color:#1a1a1a;stop-opacity:1"/>
-              </radialGradient>
-              <radialGradient id="grad-gate" cx="50%" cy="50%" r="50%">
-                <stop offset="0%" style="stop-color:#2a3060;stop-opacity:1"/>
-                <stop offset="100%" style="stop-color:#0a0a1a;stop-opacity:1"/>
-              </radialGradient>
-              <pattern id="board-bg-pattern" patternUnits="userSpaceOnUse" width="44" height="44">
-                <rect width="44" height="44" fill="#12050a"/>
-                <rect width="43" height="43" fill="#160810" stroke="#1e0d14" stroke-width="1"/>
-              </pattern>
-            </defs>
-            <g id="canvas-root">
-              <g id="connections-layer"></g>
-              <g id="boards-layer"></g>
-              <g id="glyph-radius-layer"></g>
-            </g>
-          </svg>
-        </div>
+<!-- ═══════════ MODALS ═══════════ -->
+<div id="modal-overlay" class="modal-overlay hidden" role="dialog">
 
-        <!-- Tooltip -->
-        <div id="node-tooltip" class="tooltip hidden">
-          <div class="tooltip-header">
-            <span class="tooltip-name"></span>
-            <span class="tooltip-type"></span>
-          </div>
-          <div class="tooltip-body">
-            <div class="tooltip-stat"></div>
-            <div class="tooltip-effect"></div>
-          </div>
-          <div class="tooltip-footer">
-            <span class="tooltip-hint"></span>
-          </div>
-        </div>
-      </main>
-
-      <!-- Right Sidebar: Stats & Glyph -->
-      <aside id="sidebar-right">
-        <!-- Stats Panel -->
-        <div class="sidebar-section">
-          <h3 class="sidebar-title">Total Stats</h3>
-          <div id="stats-panel" class="stats-panel">
-            <div class="stat-row" data-stat="dexterity">
-              <span class="stat-icon stat-dex">🦶</span>
-              <span class="stat-name">Dexterity</span>
-              <span class="stat-value" id="stat-dexterity">0</span>
-            </div>
-            <div class="stat-row" data-stat="strength">
-              <span class="stat-icon stat-str">🛡</span>
-              <span class="stat-name">Strength</span>
-              <span class="stat-value" id="stat-strength">0</span>
-            </div>
-            <div class="stat-row" data-stat="intelligence">
-              <span class="stat-icon stat-int">💎</span>
-              <span class="stat-name">Intelligence</span>
-              <span class="stat-value" id="stat-intelligence">0</span>
-            </div>
-            <div class="stat-row" data-stat="willpower">
-              <span class="stat-icon stat-wil">🌿</span>
-              <span class="stat-name">Willpower</span>
-              <span class="stat-value" id="stat-willpower">0</span>
-            </div>
-            <div class="stat-divider"></div>
-            <div class="stat-row">
-              <span class="stat-icon">❤</span>
-              <span class="stat-name">Maximum Life</span>
-              <span class="stat-value" id="stat-life">0</span>
-            </div>
-            <div class="stat-row">
-              <span class="stat-icon">🛡</span>
-              <span class="stat-name">Armor</span>
-              <span class="stat-value" id="stat-armor">0</span>
-            </div>
-            <div class="stat-divider"></div>
-            <div class="stat-row bonus">
-              <span class="stat-icon">⚔</span>
-              <span class="stat-name">Damage Bonus</span>
-              <span class="stat-value" id="stat-damage">0%</span>
-            </div>
-            <div class="stat-row bonus">
-              <span class="stat-icon">💢</span>
-              <span class="stat-name">Vulnerable Dmg</span>
-              <span class="stat-value" id="stat-vulnerable">0%</span>
-            </div>
-            <div class="stat-row bonus">
-              <span class="stat-icon">✦</span>
-              <span class="stat-name">Critical Dmg</span>
-              <span class="stat-value" id="stat-critdmg">0%</span>
-            </div>
-            <div class="stat-row bonus">
-              <span class="stat-icon">☠</span>
-              <span class="stat-name">Poison Dmg</span>
-              <span class="stat-value" id="stat-poison">0%</span>
-            </div>
-            <div class="stat-row bonus">
-              <span class="stat-icon">💣</span>
-              <span class="stat-name">Trap Dmg</span>
-              <span class="stat-value" id="stat-trap">0%</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Glyph Panel -->
-        <div class="sidebar-section" id="glyph-panel">
-          <h3 class="sidebar-title">Glyph Socket</h3>
-          <div id="glyph-selector-wrapper">
-            <div id="no-glyph-msg" class="glyph-empty-msg">
-              Select a Glyph Socket on the board to assign a glyph
-            </div>
-            <div id="glyph-controls" class="hidden">
-              <div class="glyph-current">
-                <div class="glyph-board-name" id="glyph-board-label">Board: —</div>
-                <select id="glyph-select" class="glyph-select">
-                  <option value="">— None —</option>
-                </select>
-              </div>
-              <div id="glyph-info" class="glyph-info hidden">
-                <div class="glyph-name" id="glyph-info-name"></div>
-                <div class="glyph-radius-row">
-                  <span>Radius: </span>
-                  <span id="glyph-info-radius" class="glyph-radius-value"></span>
-                </div>
-                <div class="glyph-desc" id="glyph-info-desc"></div>
-                <div class="glyph-bonus" id="glyph-info-bonus"></div>
-                <div class="glyph-req" id="glyph-info-req"></div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Legendary Effects -->
-        <div class="sidebar-section" id="legendary-panel">
-          <h3 class="sidebar-title">Active Legendaries</h3>
-          <div id="legendary-list" class="legendary-list">
-            <div class="empty-msg">Allocate the Legendary Node on each board to unlock its power.</div>
-          </div>
-        </div>
-      </aside>
+  <!-- Board Selection (gate click) -->
+  <div id="modal-board-select" class="modal hidden">
+    <div class="modal-header">
+      <h2 id="modal-board-title">Choose Board to Attach</h2>
+      <button class="modal-x" data-close="board-select">✕</button>
+    </div>
+    <div class="modal-body">
+      <p class="modal-sub" id="modal-board-sub"></p>
+      <div id="board-choice-list" class="board-choice-list"></div>
     </div>
   </div>
 
-  <!-- Modals -->
-  <div id="modal-overlay" class="modal-overlay hidden">
-    <!-- Export Modal -->
-    <div id="modal-export" class="modal hidden">
-      <div class="modal-header">
-        <h2>Export Build</h2>
-        <button class="modal-close" data-modal="export">✕</button>
-      </div>
-      <div class="modal-body">
-        <div class="modal-section">
-          <label class="modal-label">Share Code</label>
-          <div class="share-code-row">
-            <input type="text" id="share-code-input" class="share-code-input" readonly>
-            <button class="btn btn-secondary" id="btn-copy-code">Copy</button>
-          </div>
-        </div>
-        <div class="modal-section">
-          <label class="modal-label">JSON Data</label>
-          <textarea id="export-json" class="export-json" readonly></textarea>
-          <button class="btn btn-secondary" id="btn-copy-json">Copy JSON</button>
-        </div>
-      </div>
+  <!-- Glyph Selection -->
+  <div id="modal-glyph-select" class="modal hidden">
+    <div class="modal-header">
+      <h2>Equip Glyph</h2>
+      <button class="modal-x" data-close="glyph-select">✕</button>
     </div>
-
-    <!-- Import Modal -->
-    <div id="modal-import" class="modal hidden">
-      <div class="modal-header">
-        <h2>Import Build</h2>
-        <button class="modal-close" data-modal="import">✕</button>
-      </div>
-      <div class="modal-body">
-        <div class="modal-section">
-          <label class="modal-label">Paste Share Code</label>
-          <div class="share-code-row">
-            <input type="text" id="import-code-input" class="share-code-input" placeholder="Paste code here...">
-            <button class="btn btn-primary" id="btn-import-code">Load</button>
-          </div>
-        </div>
-        <div class="modal-section">
-          <label class="modal-label">Or paste JSON</label>
-          <textarea id="import-json" class="export-json" placeholder="Paste JSON here..."></textarea>
-          <button class="btn btn-primary" id="btn-import-json">Import JSON</button>
-        </div>
-        <div id="import-error" class="import-error hidden"></div>
-      </div>
-    </div>
-
-    <!-- Glyph Select Modal (mobile) -->
-    <div id="modal-glyph" class="modal hidden">
-      <div class="modal-header">
-        <h2>Select Glyph</h2>
-        <button class="modal-close" data-modal="glyph">✕</button>
-      </div>
-      <div class="modal-body">
-        <div id="modal-glyph-list" class="modal-glyph-list"></div>
-      </div>
+    <div class="modal-body">
+      <p class="modal-sub" id="modal-glyph-sub"></p>
+      <button class="btn btn-secondary glyph-none-btn" id="glyph-none-btn">— Remove Glyph —</button>
+      <div id="glyph-choice-list" class="glyph-choice-list"></div>
     </div>
   </div>
 
-  <script src="app.js"></script>
+  <!-- Export -->
+  <div id="modal-export" class="modal hidden">
+    <div class="modal-header">
+      <h2>Export Build</h2>
+      <button class="modal-x" data-close="export">✕</button>
+    </div>
+    <div class="modal-body">
+      <label class="field-lbl">Share Code</label>
+      <div class="row-copy">
+        <input id="share-code" class="code-input" readonly>
+        <button class="btn btn-secondary" id="btn-copy-code">Copy</button>
+      </div>
+      <label class="field-lbl">JSON</label>
+      <textarea id="export-json" class="json-area" readonly></textarea>
+      <button class="btn btn-secondary" id="btn-copy-json">Copy JSON</button>
+    </div>
+  </div>
+
+  <!-- Import -->
+  <div id="modal-import" class="modal hidden">
+    <div class="modal-header">
+      <h2>Import Build</h2>
+      <button class="modal-x" data-close="import">✕</button>
+    </div>
+    <div class="modal-body">
+      <label class="field-lbl">Share Code</label>
+      <div class="row-copy">
+        <input id="import-code" class="code-input" placeholder="Paste code…">
+        <button class="btn btn-primary" id="btn-load-code">Load</button>
+      </div>
+      <label class="field-lbl">Or paste JSON</label>
+      <textarea id="import-json" class="json-area" placeholder="Paste JSON…"></textarea>
+      <button class="btn btn-primary" id="btn-load-json">Import JSON</button>
+      <div id="import-err" class="import-err hidden"></div>
+    </div>
+  </div>
+
+</div><!-- #modal-overlay -->
+
+<script src="app.js"></script>
 </body>
 </html>

@@ -1,1071 +1,1352 @@
 'use strict';
+// ═══════════════════════════════════════════════
+//  CONSTANTS
+// ═══════════════════════════════════════════════
+const G   = 44;    // grid spacing px (node center-to-center)
+const R   = 18;    // default node radius px
+const BOARD_GAP = G * 2.5;   // gap between connected boards
 
-// ─────────────────────────────────────────────────
-//  BOARD SHAPE DEFINITIONS
-//  rowRanges: [minCol, maxCol] per row (null = skip)
-//  specialNodes: { "col,row": nodeSpec }
-// ─────────────────────────────────────────────────
+const OPP = { north:'south', south:'north', east:'west', west:'east' };
+const DIR_ARROW = { north:'▲', south:'▼', east:'▶', west:'◀' };
+const DIR_LABEL = { north:'N', south:'S', east:'E', west:'W' };
 
-const NODE_SIZE = 20;   // radius in px
-const NODE_GAP  = 44;   // center-to-center px
+// Stat colours
+const SCOL = { dexterity:'#3a90d0', strength:'#d06030', intelligence:'#9060d0', willpower:'#40a870' };
+const SICON = { dexterity:'👣', strength:'🛡', intelligence:'💎', willpower:'🌿' };
 
-// Stat distribution helper: deterministic per position
-function getDefaultStat(col, row, boardId) {
-  const h = ((col * 31 + row * 17 + (boardId.length * 7)) % 12);
-  if (h < 5)  return 'dexterity';   // ~42% dex (Rogue primary)
-  if (h < 8)  return 'strength';
-  if (h < 11) return 'intelligence';
-  return 'willpower';
-}
-
-// Magic node stat similarly varied
-function getMagicStat(col, row, boardId) {
-  const h = ((col * 13 + row * 29 + boardId.length) % 4);
-  return ['dexterity','strength','intelligence','willpower'][h];
-}
-
+// ═══════════════════════════════════════════════
+//  BOARD DEFINITIONS
+//  rowRanges[row] = [minCol, maxCol] | null
+//  specialNodes   = { 'col,row': {type, ...} }
+// ═══════════════════════════════════════════════
 const BOARD_DEFS = {
+
+  /* ── Starting Board ── 13 wide × 15 tall diamond shape */
   starting: {
-    name: 'Starting Board',
-    isStarting: true,
+    name: 'Starting Board', isStarting: true,
     width: 13, height: 15,
-    // rowRanges[row] = [minCol, maxCol] or null
     rowRanges: [
-      [6,6],[5,7],[4,8],[3,9],[2,10],[2,10],
-      [1,11],[1,11],[1,11],[2,10],[3,9],[4,8],
-      [5,7],[5,7],[6,6]
+      [6,6],  // 0  – start node
+      [5,7],  // 1
+      [4,8],  // 2
+      [3,9],  // 3
+      [2,10], // 4
+      [2,10], // 5
+      [1,11], // 6
+      [1,11], // 7  – legendary
+      [1,11], // 8
+      [2,10], // 9  – glyph socket
+      [3,9],  // 10
+      [4,8],  // 11
+      [5,7],  // 12
+      [5,7],  // 13
+      [6,6],  // 14 – south gate
     ],
     specialNodes: {
-      '6,0':  { type:'start', name:'Start' },
+      '6,0':  { type:'start' },
       '6,7':  { type:'legendary', id:'starting_legendary' },
       '6,9':  { type:'glyph' },
-      '6,14': { type:'gate', direction:'south', connects:'south' },
-      // Magic nodes
-      '3,4':  { type:'magic' }, '9,4':  { type:'magic' },
-      '2,6':  { type:'magic' }, '10,6': { type:'magic' },
-      '1,8':  { type:'magic' }, '11,8': { type:'magic' },
-      '3,10': { type:'magic' }, '9,10': { type:'magic' },
+      '6,14': { type:'gate', direction:'south' },
+      // Magic nodes (scattered across board)
+      '3,3':{ type:'magic' }, '9,3': { type:'magic' },
+      '2,5':{ type:'magic' }, '10,5':{ type:'magic' },
+      '1,7':{ type:'magic' }, '11,7':{ type:'magic' },
+      '2,9':{ type:'magic' }, '10,9':{ type:'magic' },
+      '4,11':{ type:'magic' },'8,11':{ type:'magic' },
       // Rare nodes
-      '4,5':  { type:'rare', id:'rare_starting_1' },
-      '8,5':  { type:'rare', id:'rare_starting_2' },
-      '4,10': { type:'rare', id:'rare_starting_3' },
-      '8,10': { type:'rare', id:'rare_starting_4' },
+      '4,4': { type:'rare', id:'rare_starting_1' },
+      '8,4': { type:'rare', id:'rare_starting_2' },
+      '4,10':{ type:'rare', id:'rare_starting_3' },
+      '8,10':{ type:'rare', id:'rare_starting_4' },
     },
-    gates: [
-      { id:'gate_s', col:6, row:14, direction:'south' }
-    ]
+    gates: [{ id:'gate_s', col:6, row:14, direction:'south' }],
   },
 
+  /* ── Standard additional boards: 21 × 21 cross shape ─────────────────
+     Cross arms 5 wide, full horizontal in center rows 8-12, transition rows.
+     Gate positions: N(10,0) S(10,20) W(0,10) E(20,10)
+  ──────────────────────────────────────────────────────────────────────── */
   deadly_ambush: {
-    name: 'Deadly Ambush',
-    width: 21, height: 21,
-    rowRanges: [
-      null,[9,11],[9,11],[9,11],[9,11],[9,11],[9,11],[9,11],[9,11],
-      [0,20],[0,20],[0,20],
-      [9,11],[9,11],[9,11],[9,11],[9,11],[9,11],[9,11],[9,11],null
-    ],
-    specialNodes: {
-      '10,0':  { type:'gate', direction:'north', connects:'north' },
-      '10,20': { type:'gate', direction:'south', connects:'south' },
-      '0,10':  { type:'gate', direction:'west',  connects:'west' },
-      '20,10': { type:'gate', direction:'east',  connects:'east' },
-      '10,10': { type:'legendary', id:'deadly_ambush_legendary' },
-      '10,4':  { type:'glyph' },
-      // Magic nodes
-      '9,2':  { type:'magic' }, '11,2': { type:'magic' },
-      '9,6':  { type:'magic' }, '11,6': { type:'magic' },
-      '3,9':  { type:'magic' }, '17,9': { type:'magic' },
-      '3,11': { type:'magic' }, '17,11':{ type:'magic' },
-      '9,13': { type:'magic' }, '11,13':{ type:'magic' },
-      '9,17': { type:'magic' }, '11,17':{ type:'magic' },
-      // Rare
-      '9,3':  { type:'rare', id:'rare_deadly_ambush_1' },
-      '11,3': { type:'rare', id:'rare_deadly_ambush_2' },
-      '5,10': { type:'rare', id:'rare_deadly_ambush_3' },
+    name:'Deadly Ambush', width:21, height:21,
+    rowRanges:_cross(),
+    specialNodes:{
+      '10,0': { type:'gate', direction:'north' },
+      '10,20':{ type:'gate', direction:'south' },
+      '0,10': { type:'gate', direction:'west'  },
+      '20,10':{ type:'gate', direction:'east'  },
+      '10,10':{ type:'legendary', id:'deadly_ambush_legendary' },
+      '10,4': { type:'glyph' },
+      '9,2':{ type:'magic' },'11,2':{ type:'magic' },
+      '9,7':{ type:'magic' },'11,7':{ type:'magic' },
+      '3,9':{ type:'magic' },'17,9':{ type:'magic' },
+      '3,11':{ type:'magic' },'17,11':{ type:'magic' },
+      '9,14':{ type:'magic' },'11,14':{ type:'magic' },
+      '9,18':{ type:'magic' },'11,18':{ type:'magic' },
+      '9,3': { type:'rare', id:'rare_deadly_ambush_1' },
+      '11,3':{ type:'rare', id:'rare_deadly_ambush_2' },
+      '5,10':{ type:'rare', id:'rare_deadly_ambush_3' },
       '15,10':{ type:'rare', id:'rare_deadly_ambush_4' },
-      '9,16': { type:'rare', id:'rare_deadly_ambush_5' },
+      '9,16':{ type:'rare', id:'rare_deadly_ambush_5' },
     },
-    gates: [
+    gates:[
       { id:'gate_n', col:10, row:0,  direction:'north' },
       { id:'gate_s', col:10, row:20, direction:'south' },
-      { id:'gate_w', col:0,  row:10, direction:'west' },
-      { id:'gate_e', col:20, row:10, direction:'east' },
-    ]
+      { id:'gate_w', col:0,  row:10, direction:'west'  },
+      { id:'gate_e', col:20, row:10, direction:'east'  },
+    ],
   },
 
   eldritch_bounty: {
-    name: 'Eldritch Bounty',
-    width: 21, height: 21,
-    rowRanges: [
-      null,[9,11],[9,11],[9,11],[9,11],[9,11],[9,11],[9,11],[9,11],
-      [0,20],[0,20],[0,20],
-      [9,11],[9,11],[9,11],[9,11],[9,11],[9,11],[9,11],[9,11],null
-    ],
-    specialNodes: {
-      '10,0':  { type:'gate', direction:'north', connects:'north' },
-      '10,20': { type:'gate', direction:'south', connects:'south' },
-      '0,10':  { type:'gate', direction:'west',  connects:'west' },
-      '20,10': { type:'gate', direction:'east',  connects:'east' },
-      '10,10': { type:'legendary', id:'eldritch_bounty_legendary' },
-      '10,16': { type:'glyph' },
-      '10,5':  { type:'magic' }, '9,5': { type:'magic' }, '11,5': { type:'magic' },
-      '2,9':   { type:'magic' }, '18,9': { type:'magic' },
-      '2,11':  { type:'magic' }, '18,11':{ type:'magic' },
-      '9,15':  { type:'magic' }, '11,15':{ type:'magic' },
-      '7,10':  { type:'rare', id:'rare_eldritch_bounty_1' },
-      '13,10': { type:'rare', id:'rare_eldritch_bounty_2' },
-      '10,7':  { type:'rare', id:'rare_eldritch_bounty_3' },
-      '10,13': { type:'rare', id:'rare_eldritch_bounty_4' },
-      '4,10':  { type:'rare', id:'rare_eldritch_bounty_5' },
+    name:'Eldritch Bounty', width:21, height:21,
+    rowRanges:_cross(),
+    specialNodes:{
+      '10,0': { type:'gate', direction:'north' },
+      '10,20':{ type:'gate', direction:'south' },
+      '0,10': { type:'gate', direction:'west'  },
+      '20,10':{ type:'gate', direction:'east'  },
+      '10,10':{ type:'legendary', id:'eldritch_bounty_legendary' },
+      '10,16':{ type:'glyph' },
+      '10,3':{ type:'magic' },
+      '9,6':{ type:'magic' },'11,6':{ type:'magic' },
+      '2,9':{ type:'magic' },'18,9':{ type:'magic' },
+      '2,11':{ type:'magic' },'18,11':{ type:'magic' },
+      '9,15':{ type:'magic' },'11,15':{ type:'magic' },
+      '9,19':{ type:'magic' },'11,19':{ type:'magic' },
+      '7,10':{ type:'rare', id:'rare_eldritch_bounty_1' },
+      '13,10':{ type:'rare', id:'rare_eldritch_bounty_2' },
+      '10,7': { type:'rare', id:'rare_eldritch_bounty_3' },
+      '10,13':{ type:'rare', id:'rare_eldritch_bounty_4' },
+      '4,10': { type:'rare', id:'rare_eldritch_bounty_5' },
     },
-    gates: [
+    gates:[
       { id:'gate_n', col:10, row:0,  direction:'north' },
       { id:'gate_s', col:10, row:20, direction:'south' },
-      { id:'gate_w', col:0,  row:10, direction:'west' },
-      { id:'gate_e', col:20, row:10, direction:'east' },
-    ]
+      { id:'gate_w', col:0,  row:10, direction:'west'  },
+      { id:'gate_e', col:20, row:10, direction:'east'  },
+    ],
   },
 
   cheap_shot: {
-    name: 'Cheap Shot',
-    width: 21, height: 21,
-    rowRanges: [
-      null,[9,11],[9,11],[9,11],[9,11],[9,11],[9,11],[9,11],[9,11],
-      [0,20],[0,20],[0,20],
-      [9,11],[9,11],[9,11],[9,11],[9,11],[9,11],[9,11],[9,11],null
-    ],
-    specialNodes: {
-      '10,0':  { type:'gate', direction:'north', connects:'north' },
-      '10,20': { type:'gate', direction:'south', connects:'south' },
-      '0,10':  { type:'gate', direction:'west',  connects:'west' },
-      '20,10': { type:'gate', direction:'east',  connects:'east' },
-      '10,10': { type:'legendary', id:'cheap_shot_legendary' },
-      '10,7':  { type:'glyph' },
-      '9,1':  { type:'magic' }, '11,1': { type:'magic' },
-      '10,3': { type:'magic' },
-      '4,9':  { type:'magic' }, '16,9': { type:'magic' },
-      '4,11': { type:'magic' }, '16,11':{ type:'magic' },
-      '10,12':{ type:'magic' }, '10,18':{ type:'magic' },
-      '9,8':  { type:'rare', id:'rare_cheap_shot_1' },
-      '11,8': { type:'rare', id:'rare_cheap_shot_2' },
-      '6,10': { type:'rare', id:'rare_cheap_shot_3' },
+    name:'Cheap Shot', width:21, height:21,
+    rowRanges:_cross(),
+    specialNodes:{
+      '10,0': { type:'gate', direction:'north' },
+      '10,20':{ type:'gate', direction:'south' },
+      '0,10': { type:'gate', direction:'west'  },
+      '20,10':{ type:'gate', direction:'east'  },
+      '10,10':{ type:'legendary', id:'cheap_shot_legendary' },
+      '10,7': { type:'glyph' },
+      '10,2':{ type:'magic' },
+      '9,5':{ type:'magic' },'11,5':{ type:'magic' },
+      '4,9':{ type:'magic' },'16,9':{ type:'magic' },
+      '4,11':{ type:'magic' },'16,11':{ type:'magic' },
+      '9,12':{ type:'magic' },'11,12':{ type:'magic' },
+      '10,17':{ type:'magic' },
+      '9,8':{ type:'rare', id:'rare_cheap_shot_1' },
+      '11,8':{ type:'rare', id:'rare_cheap_shot_2' },
+      '6,10':{ type:'rare', id:'rare_cheap_shot_3' },
       '14,10':{ type:'rare', id:'rare_cheap_shot_4' },
       '10,14':{ type:'rare', id:'rare_cheap_shot_5' },
     },
-    gates: [
+    gates:[
       { id:'gate_n', col:10, row:0,  direction:'north' },
       { id:'gate_s', col:10, row:20, direction:'south' },
-      { id:'gate_w', col:0,  row:10, direction:'west' },
-      { id:'gate_e', col:20, row:10, direction:'east' },
-    ]
+      { id:'gate_w', col:0,  row:10, direction:'west'  },
+      { id:'gate_e', col:20, row:10, direction:'east'  },
+    ],
   },
 
   no_witnesses: {
-    name: 'No Witnesses',
-    width: 21, height: 21,
-    rowRanges: [
-      null,[9,11],[9,11],[9,11],[9,11],[9,11],[9,11],[9,11],[9,11],
-      [0,20],[0,20],[0,20],
-      [9,11],[9,11],[9,11],[9,11],[9,11],[9,11],[9,11],[9,11],null
-    ],
-    specialNodes: {
-      '10,0':  { type:'gate', direction:'north', connects:'north' },
-      '10,20': { type:'gate', direction:'south', connects:'south' },
-      '0,10':  { type:'gate', direction:'west',  connects:'west' },
-      '20,10': { type:'gate', direction:'east',  connects:'east' },
-      '10,10': { type:'legendary', id:'no_witnesses_legendary' },
-      '10,14': { type:'glyph' },
-      '10,2': { type:'magic' },
-      '9,4':  { type:'magic' }, '11,4': { type:'magic' },
-      '1,10': { type:'magic' }, '19,10':{ type:'magic' },
-      '6,9':  { type:'magic' }, '14,9': { type:'magic' },
-      '6,11': { type:'magic' }, '14,11':{ type:'magic' },
-      '10,16':{ type:'magic' },
-      '9,7':  { type:'rare', id:'rare_no_witnesses_1' },
-      '11,7': { type:'rare', id:'rare_no_witnesses_2' },
-      '3,10': { type:'rare', id:'rare_no_witnesses_3' },
+    name:'No Witnesses', width:21, height:21,
+    rowRanges:_cross(),
+    specialNodes:{
+      '10,0': { type:'gate', direction:'north' },
+      '10,20':{ type:'gate', direction:'south' },
+      '0,10': { type:'gate', direction:'west'  },
+      '20,10':{ type:'gate', direction:'east'  },
+      '10,10':{ type:'legendary', id:'no_witnesses_legendary' },
+      '10,14':{ type:'glyph' },
+      '10,1':{ type:'magic' },
+      '9,4':{ type:'magic' },'11,4':{ type:'magic' },
+      '1,10':{ type:'magic' },'19,10':{ type:'magic' },
+      '6,9':{ type:'magic' },'14,9':{ type:'magic' },
+      '6,11':{ type:'magic' },'14,11':{ type:'magic' },
+      '10,17':{ type:'magic' },
+      '9,7':{ type:'rare', id:'rare_no_witnesses_1' },
+      '11,7':{ type:'rare', id:'rare_no_witnesses_2' },
+      '3,10':{ type:'rare', id:'rare_no_witnesses_3' },
       '17,10':{ type:'rare', id:'rare_no_witnesses_4' },
       '10,19':{ type:'rare', id:'rare_no_witnesses_5' },
     },
-    gates: [
+    gates:[
       { id:'gate_n', col:10, row:0,  direction:'north' },
       { id:'gate_s', col:10, row:20, direction:'south' },
-      { id:'gate_w', col:0,  row:10, direction:'west' },
-      { id:'gate_e', col:20, row:10, direction:'east' },
-    ]
+      { id:'gate_w', col:0,  row:10, direction:'west'  },
+      { id:'gate_e', col:20, row:10, direction:'east'  },
+    ],
   },
 
   cunning_stratagem: {
-    name: 'Cunning Stratagem',
-    width: 21, height: 21,
-    rowRanges: [
-      null,[9,11],[9,11],[9,11],[9,11],[9,11],[9,11],[9,11],[9,11],
-      [0,20],[0,20],[0,20],
-      [9,11],[9,11],[9,11],[9,11],[9,11],[9,11],[9,11],[9,11],null
-    ],
-    specialNodes: {
-      '10,0':  { type:'gate', direction:'north', connects:'north' },
-      '10,20': { type:'gate', direction:'south', connects:'south' },
-      '0,10':  { type:'gate', direction:'west',  connects:'west' },
-      '20,10': { type:'gate', direction:'east',  connects:'east' },
-      '10,10': { type:'legendary', id:'cunning_stratagem_legendary' },
-      '10,4':  { type:'glyph' },
-      '9,2':   { type:'magic' }, '11,2': { type:'magic' },
-      '10,6':  { type:'magic' },
-      '2,10':  { type:'magic' }, '18,10':{ type:'magic' },
-      '5,9':   { type:'magic' }, '15,9': { type:'magic' },
-      '5,11':  { type:'magic' }, '15,11':{ type:'magic' },
-      '10,15': { type:'magic' },
-      '9,5':   { type:'rare', id:'rare_cunning_stratagem_1' },
-      '11,5':  { type:'rare', id:'rare_cunning_stratagem_2' },
-      '4,10':  { type:'rare', id:'rare_cunning_stratagem_3' },
-      '16,10': { type:'rare', id:'rare_cunning_stratagem_4' },
-      '10,17': { type:'rare', id:'rare_cunning_stratagem_5' },
+    name:'Cunning Stratagem', width:21, height:21,
+    rowRanges:_cross(),
+    specialNodes:{
+      '10,0': { type:'gate', direction:'north' },
+      '10,20':{ type:'gate', direction:'south' },
+      '0,10': { type:'gate', direction:'west'  },
+      '20,10':{ type:'gate', direction:'east'  },
+      '10,10':{ type:'legendary', id:'cunning_stratagem_legendary' },
+      '10,4': { type:'glyph' },
+      '9,1':{ type:'magic' },'11,1':{ type:'magic' },
+      '10,6':{ type:'magic' },
+      '2,10':{ type:'magic' },'18,10':{ type:'magic' },
+      '5,9':{ type:'magic' },'15,9':{ type:'magic' },
+      '5,11':{ type:'magic' },'15,11':{ type:'magic' },
+      '10,16':{ type:'magic' },
+      '9,5':{ type:'rare', id:'rare_cunning_stratagem_1' },
+      '11,5':{ type:'rare', id:'rare_cunning_stratagem_2' },
+      '4,10':{ type:'rare', id:'rare_cunning_stratagem_3' },
+      '16,10':{ type:'rare', id:'rare_cunning_stratagem_4' },
+      '10,18':{ type:'rare', id:'rare_cunning_stratagem_5' },
     },
-    gates: [
+    gates:[
       { id:'gate_n', col:10, row:0,  direction:'north' },
       { id:'gate_s', col:10, row:20, direction:'south' },
-      { id:'gate_w', col:0,  row:10, direction:'west' },
-      { id:'gate_e', col:20, row:10, direction:'east' },
-    ]
+      { id:'gate_w', col:0,  row:10, direction:'west'  },
+      { id:'gate_e', col:20, row:10, direction:'east'  },
+    ],
   },
 
   tricks_of_trade: {
-    name: 'Tricks of the Trade',
-    width: 21, height: 21,
-    rowRanges: [
-      null,[9,11],[9,11],[9,11],[9,11],[9,11],[9,11],[9,11],[9,11],
-      [0,20],[0,20],[0,20],
-      [9,11],[9,11],[9,11],[9,11],[9,11],[9,11],[9,11],[9,11],null
-    ],
-    specialNodes: {
-      '10,0':  { type:'gate', direction:'north', connects:'north' },
-      '10,20': { type:'gate', direction:'south', connects:'south' },
-      '0,10':  { type:'gate', direction:'west',  connects:'west' },
-      '20,10': { type:'gate', direction:'east',  connects:'east' },
-      '10,10': { type:'legendary', id:'tricks_legendary' },
-      '10,6':  { type:'glyph' },
-      '10,1':  { type:'magic' },
-      '9,3':   { type:'magic' }, '11,3': { type:'magic' },
-      '3,9':   { type:'magic' }, '17,9': { type:'magic' },
-      '3,11':  { type:'magic' }, '17,11':{ type:'magic' },
-      '9,13':  { type:'magic' }, '11,13':{ type:'magic' },
-      '10,18': { type:'magic' },
-      '10,8':  { type:'rare', id:'rare_tricks_1' },
-      '8,10':  { type:'rare', id:'rare_tricks_2' },
-      '12,10': { type:'rare', id:'rare_tricks_3' },
-      '9,11':  { type:'rare', id:'rare_tricks_4' },
-      '11,11': { type:'rare', id:'rare_tricks_5' },
+    name:'Tricks of the Trade', width:21, height:21,
+    rowRanges:_cross(),
+    specialNodes:{
+      '10,0': { type:'gate', direction:'north' },
+      '10,20':{ type:'gate', direction:'south' },
+      '0,10': { type:'gate', direction:'west'  },
+      '20,10':{ type:'gate', direction:'east'  },
+      '10,10':{ type:'legendary', id:'tricks_legendary' },
+      '10,6': { type:'glyph' },
+      '9,2':{ type:'magic' },'11,2':{ type:'magic' },
+      '9,5':{ type:'magic' },'11,5':{ type:'magic' },
+      '3,9':{ type:'magic' },'17,9':{ type:'magic' },
+      '3,11':{ type:'magic' },'17,11':{ type:'magic' },
+      '9,14':{ type:'magic' },'11,14':{ type:'magic' },
+      '10,18':{ type:'magic' },
+      '10,8':{ type:'rare', id:'rare_tricks_1' },
+      '8,10':{ type:'rare', id:'rare_tricks_2' },
+      '12,10':{ type:'rare', id:'rare_tricks_3' },
+      '9,11':{ type:'rare', id:'rare_tricks_4' },
+      '11,11':{ type:'rare', id:'rare_tricks_5' },
     },
-    gates: [
+    gates:[
       { id:'gate_n', col:10, row:0,  direction:'north' },
       { id:'gate_s', col:10, row:20, direction:'south' },
-      { id:'gate_w', col:0,  row:10, direction:'west' },
-      { id:'gate_e', col:20, row:10, direction:'east' },
-    ]
+      { id:'gate_w', col:0,  row:10, direction:'west'  },
+      { id:'gate_e', col:20, row:10, direction:'east'  },
+    ],
   },
 
   exploit_weakness: {
-    name: 'Exploit Weakness',
-    width: 21, height: 21,
-    rowRanges: [
-      null,[9,11],[9,11],[9,11],[9,11],[9,11],[9,11],[9,11],[9,11],
-      [0,20],[0,20],[0,20],
-      [9,11],[9,11],[9,11],[9,11],[9,11],[9,11],[9,11],[9,11],null
-    ],
-    specialNodes: {
-      '10,0':  { type:'gate', direction:'north', connects:'north' },
-      '10,20': { type:'gate', direction:'south', connects:'south' },
-      '0,10':  { type:'gate', direction:'west',  connects:'west' },
-      '20,10': { type:'gate', direction:'east',  connects:'east' },
-      '10,10': { type:'legendary', id:'exploit_legendary' },
-      '10,16': { type:'glyph' },
-      '9,2':   { type:'magic' }, '11,2': { type:'magic' },
-      '10,5':  { type:'magic' },
-      '1,9':   { type:'magic' }, '19,9': { type:'magic' },
-      '1,11':  { type:'magic' }, '19,11':{ type:'magic' },
-      '10,12': { type:'magic' }, '9,14': { type:'magic' }, '11,14':{ type:'magic' },
-      '9,9':   { type:'rare', id:'rare_exploit_weakness_1' },
-      '11,9':  { type:'rare', id:'rare_exploit_weakness_2' },
-      '5,10':  { type:'rare', id:'rare_exploit_weakness_3' },
-      '15,10': { type:'rare', id:'rare_exploit_weakness_4' },
-      '10,11': { type:'rare', id:'rare_exploit_weakness_5' },
+    name:'Exploit Weakness', width:21, height:21,
+    rowRanges:_cross(),
+    specialNodes:{
+      '10,0': { type:'gate', direction:'north' },
+      '10,20':{ type:'gate', direction:'south' },
+      '0,10': { type:'gate', direction:'west'  },
+      '20,10':{ type:'gate', direction:'east'  },
+      '10,10':{ type:'legendary', id:'exploit_legendary' },
+      '10,16':{ type:'glyph' },
+      '9,2':{ type:'magic' },'11,2':{ type:'magic' },
+      '10,5':{ type:'magic' },
+      '1,9':{ type:'magic' },'19,9':{ type:'magic' },
+      '1,11':{ type:'magic' },'19,11':{ type:'magic' },
+      '10,13':{ type:'magic' },
+      '9,15':{ type:'magic' },'11,15':{ type:'magic' },
+      '9,9':{ type:'rare', id:'rare_exploit_weakness_1' },
+      '11,9':{ type:'rare', id:'rare_exploit_weakness_2' },
+      '5,10':{ type:'rare', id:'rare_exploit_weakness_3' },
+      '15,10':{ type:'rare', id:'rare_exploit_weakness_4' },
+      '10,11':{ type:'rare', id:'rare_exploit_weakness_5' },
     },
-    gates: [
+    gates:[
       { id:'gate_n', col:10, row:0,  direction:'north' },
       { id:'gate_s', col:10, row:20, direction:'south' },
-      { id:'gate_w', col:0,  row:10, direction:'west' },
-      { id:'gate_e', col:20, row:10, direction:'east' },
-    ]
+      { id:'gate_w', col:0,  row:10, direction:'west'  },
+      { id:'gate_e', col:20, row:10, direction:'east'  },
+    ],
   },
 };
 
-// ─────────────────────────────────────────────────
-//  STAT VALUES PER NODE TYPE
-// ─────────────────────────────────────────────────
-const STAT_VALUES = {
-  normal: { dexterity:5, strength:2, intelligence:2, willpower:2 },
-  magic:  { dexterity:8, strength:4, intelligence:4, willpower:4, life:36, armor:28, damage:3, critdmg:5, vulnerable:3, poison:3, trap:3 },
-};
+/* Generate cross rowRanges for 21×21 boards */
+function _cross() {
+  return Array.from({ length:21 }, (_,r) => {
+    if (r === 0 || r === 20)  return [10,10];
+    if (r >= 1  && r <= 7)   return [8,12];
+    if (r === 8 || r === 12) return [6,14];
+    return [0,20]; // rows 9,10,11
+  });
+}
 
-// Node colours
-const NODE_COLORS = {
-  start:     { fill:'#3d0a06', stroke:'#cc2200', active:'#7a1a10', activeStroke:'#ff4422' },
-  gate:      { fill:'#0a1020', stroke:'#304080', active:'#142040', activeStroke:'#5070c0' },
-  normal:    { fill:'#1a0f12', stroke:'#4a3040', active:'#2a1a22', activeStroke:'#9a6070' },
-  magic:     { fill:'#0a1228', stroke:'#1a3080', active:'#152040', activeStroke:'#3060d0' },
-  rare:      { fill:'#201400', stroke:'#806000', active:'#302000', activeStroke:'#d0a000' },
-  legendary: { fill:'#3d0a00', stroke:'#c04000', active:'#5a1a00', activeStroke:'#ff6600' },
-  glyph:     { fill:'#150828', stroke:'#6633bb', active:'#220e3a', activeStroke:'#9944ff' },
-};
-
-const STAT_COLORS = {
-  dexterity:    '#3a90d0',
-  strength:     '#d06030',
-  intelligence: '#9060d0',
-  willpower:    '#40a870',
-};
-
-const STAT_ICONS = {
-  dexterity: '👣', strength: '🛡', intelligence: '💎', willpower: '🌿',
-};
-
-// ─────────────────────────────────────────────────
-//  APPLICATION STATE
-// ─────────────────────────────────────────────────
-let DATA = null;   // loaded from paragon-data.json
-
+// ═══════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════
 const state = {
-  // Which boards are in the build and their order
-  activeBoards: ['starting'],
-  // Per-board state: activatedNodes, rotation, glyph
-  boards: {
-    starting: { activatedNodes: new Set(), rotation: 0, glyphId: null }
+  // boardId -> { activated: Set<key>, rotation: 0|90|180|270, glyphId: null|string }
+  boardStates: {
+    starting: { activated: new Set(['6,0']), rotation:0, glyphId:null }
   },
-  // Currently selected board (for highlighting / glyph panel)
+  // 'boardId:direction' -> connectedBoardId
+  connections: {},
+  // Board we're currently showing in the sidebar info
   selectedBoard: 'starting',
-  // Currently hovered glyph socket: {boardId, nodeKey}
+  // Pending gate when board selection modal is open
+  pendingGate: null,
+  // Selected glyph socket (for right panel)
   selectedGlyphSocket: null,
-  // Generated node lists per board (cached)
-  _nodeCache: {},
   // Pan / zoom
-  pan: { x: 0, y: 0 },
-  zoom: 1,
-  isPanning: false,
-  panStart: { x: 0, y: 0 },
-  viewMode: 'all',  // 'all' | 'single'
+  pan:{ x:0, y:0 }, zoom:1,
+  isPanning:false, _panStart:{ x:0, y:0 },
 };
 
-// ─────────────────────────────────────────────────
-//  NODE GENERATION
-// ─────────────────────────────────────────────────
+// ═══════════════════════════════════════════════
+//  GAME DATA (loaded from JSON)
+// ═══════════════════════════════════════════════
+let DATA = { glyphs:[], legendaryNodes:{}, rareNodes:{} };
+
+// ═══════════════════════════════════════════════
+//  NODE GENERATION  (cached per board)
+// ═══════════════════════════════════════════════
+const _nodeCache = {};
+
 function generateNodes(boardId) {
-  if (state._nodeCache[boardId]) return state._nodeCache[boardId];
+  if (_nodeCache[boardId]) return _nodeCache[boardId];
   const def = BOARD_DEFS[boardId];
-  if (!def) return [];
   const nodes = [];
   def.rowRanges.forEach((range, row) => {
     if (!range) return;
-    const [minCol, maxCol] = range;
-    for (let col = minCol; col <= maxCol; col++) {
+    const [mc, xc] = range;
+    for (let col = mc; col <= xc; col++) {
       const key = `${col},${row}`;
-      const special = def.specialNodes[key];
-      let nodeType, stat, id;
-      if (special) {
-        nodeType = special.type;
-        stat = special.stat || (nodeType === 'magic' ? getMagicStat(col, row, boardId) : null);
-        id = special.id || key;
+      const sp  = def.specialNodes[key];
+      let type, stat, id;
+      if (sp) {
+        type = sp.type;
+        stat = sp.stat || (type === 'magic' ? _magicStat(col, row, boardId) : null);
+        id   = sp.id || key;
       } else {
-        nodeType = 'normal';
-        stat = getDefaultStat(col, row, boardId);
-        id = key;
+        type = 'normal';
+        stat = _defaultStat(col, row, boardId);
+        id   = key;
       }
-      nodes.push({ id, key, col, row, type: nodeType, stat, special: special || null });
+      nodes.push({ id, key, col, row, type, stat, sp: sp||null });
     }
   });
-  state._nodeCache[boardId] = nodes;
+  _nodeCache[boardId] = nodes;
   return nodes;
 }
 
-function getNodeByKey(boardId, key) {
+function _defaultStat(c, r, bid) {
+  const h = (c*31 + r*17 + bid.length*7) % 12;
+  return h<5 ? 'dexterity' : h<8 ? 'strength' : h<11 ? 'intelligence' : 'willpower';
+}
+function _magicStat(c, r, bid) {
+  return ['dexterity','strength','intelligence','willpower'][(c*13+r*29+bid.length)%4];
+}
+
+function nodeByKey(boardId, key) {
   return generateNodes(boardId).find(n => n.key === key);
 }
 
-// Check if a node key is adjacent to another key (4-directional)
-function getAdjacentKeys(key) {
-  const [c, r] = key.split(',').map(Number);
-  return [`${c},${r-1}`, `${c},${r+1}`, `${c-1},${r}`, `${c+1},${r}`];
+function adjacentKeys(key) {
+  const [c,r] = key.split(',').map(Number);
+  return [`${c},${r-1}`,`${c},${r+1}`,`${c-1},${r}`,`${c+1},${r}`];
 }
 
-// Return all keys reachable from the start of a board through active nodes
-function getReachableKeys(boardId) {
-  const def = BOARD_DEFS[boardId];
-  const bState = state.boards[boardId];
-  const activated = bState.activatedNodes;
-  const allNodes = new Set(generateNodes(boardId).map(n => n.key));
+// ═══════════════════════════════════════════════
+//  BOARD TREE HELPERS
+// ═══════════════════════════════════════════════
+function activeBoardIds() {
+  return Object.keys(state.boardStates);
+}
 
-  // Find starting key (type=start or type=gate we entered from)
-  let seedKeys;
-  if (def.isStarting) {
-    seedKeys = ['6,0'];
-  } else {
-    // Any activated gate in the board is a seed
-    seedKeys = generateNodes(boardId)
-      .filter(n => n.type === 'gate' && activated.has(n.key))
-      .map(n => n.key);
-    if (seedKeys.length === 0) return new Set();
-  }
+function connectedBoard(boardId, dir) {
+  return state.connections[`${boardId}:${dir}`] || null;
+}
 
-  const reachable = new Set();
-  const queue = [...seedKeys.filter(k => activated.has(k) || def.isStarting)];
-  if (def.isStarting) {
-    // start node is always reachable
-    queue.push('6,0');
-  }
+// All boards in BFS order from starting
+function orderedBoards() {
+  const result = [];
+  const seen = new Set();
+  const queue = ['starting'];
   while (queue.length) {
-    const k = queue.shift();
-    if (reachable.has(k)) continue;
-    reachable.add(k);
-    getAdjacentKeys(k).forEach(adj => {
-      if (!reachable.has(adj) && activated.has(adj) && allNodes.has(adj)) {
-        queue.push(adj);
-      }
-    });
-  }
-  return reachable;
-}
-
-// ─────────────────────────────────────────────────
-//  BOARD LAYOUT  (positions for full multi-board view)
-// ─────────────────────────────────────────────────
-// Returns {x, y} pixel offset for each boardId in the canvas
-function getBoardLayouts() {
-  const layouts = {};
-  const gap = NODE_GAP;
-  // Starting board centred at origin
-  // Additional boards placed to the right, then below, then left, then above
-  const offsets = [
-    { dx: 0, dy: 0 },    // starting always first
-    { dx: 1, dy: 0 },
-    { dx: 2, dy: 0 },
-    { dx: 0, dy: 1 },
-    { dx: 1, dy: 1 },
-    { dx: -1, dy: 0 },
-    { dx: 0, dy: -1 },
-    { dx: 2, dy: 1 },
-  ];
-  state.activeBoards.forEach((bid, i) => {
+    const bid = queue.shift();
+    if (seen.has(bid)) continue;
+    seen.add(bid); result.push(bid);
     const def = BOARD_DEFS[bid];
-    const o = offsets[i] || { dx: i, dy: 0 };
-    // board width/height in px
-    const bw = (def.width - 1) * gap;
-    const bh = (def.height - 1) * gap;
-    const boardSpacingX = bw + gap * 4;
-    const boardSpacingY = bh + gap * 4;
-    layouts[bid] = {
-      x: o.dx * boardSpacingX,
-      y: o.dy * boardSpacingY,
-      bw, bh
-    };
-  });
-  return layouts;
-}
-
-// Convert node col/row to svg pixel coords within a board
-function nodeToSVG(col, row, boardOffset, rotation, boardDef) {
-  const gap = NODE_GAP;
-  let x = col * gap;
-  let y = row * gap;
-  // Apply rotation around board center
-  const cx = ((boardDef.width - 1) / 2) * gap;
-  const cy = ((boardDef.height - 1) / 2) * gap;
-  if (rotation !== 0) {
-    const dx = x - cx, dy = y - cy;
-    const rad = rotation * Math.PI / 180;
-    const cos = Math.cos(rad), sin = Math.sin(rad);
-    x = cx + dx * cos - dy * sin;
-    y = cy + dx * sin + dy * cos;
-  }
-  return { x: boardOffset.x + x, y: boardOffset.y + y };
-}
-
-// ─────────────────────────────────────────────────
-//  RENDERING
-// ─────────────────────────────────────────────────
-const svg = document.getElementById('paragon-canvas');
-const boardsLayer = document.getElementById('boards-layer');
-const connectionsLayer = document.getElementById('connections-layer');
-const glyphRadiusLayer = document.getElementById('glyph-radius-layer');
-const canvasRoot = document.getElementById('canvas-root');
-
-function render() {
-  renderBoards();
-  renderConnections();
-  renderGlyphRadius();
-  updateStatsPanel();
-  updateLegendaryPanel();
-  updateBoardList();
-  updatePointsCounter();
-}
-
-function renderBoards() {
-  boardsLayer.innerHTML = '';
-  const layouts = getBoardLayouts();
-
-  state.activeBoards.forEach(boardId => {
-    const layout = layouts[boardId];
-    const def = BOARD_DEFS[boardId];
-    const bState = state.boards[boardId];
-    const rotation = bState.rotation;
-    const nodes = generateNodes(boardId);
-    const activated = bState.activatedNodes;
-    const reachable = getReachableKeys(boardId);
-
-    const g = svgEl('g', { class: 'board-group', 'data-board': boardId });
-
-    // Board background
-    const bw = layout.bw + NODE_GAP * 1.5;
-    const bh = layout.bh + NODE_GAP * 1.5;
-    const bgRect = svgEl('rect', {
-      x: layout.x - NODE_GAP * 0.75,
-      y: layout.y - NODE_GAP * 0.75,
-      width: bw, height: bh,
-      fill: 'url(#board-bg-pattern)',
-      stroke: boardId === state.selectedBoard ? '#6b2d3a' : '#1e0d14',
-      'stroke-width': boardId === state.selectedBoard ? 2 : 1,
-      rx: 4
-    });
-    g.appendChild(bgRect);
-
-    // Board label
-    const lbl = svgEl('text', {
-      x: layout.x + layout.bw / 2,
-      y: layout.y - NODE_GAP * 0.4,
-      class: 'board-label',
-    });
-    lbl.textContent = def.name;
-    g.appendChild(lbl);
-
-    // Render each node
-    nodes.forEach(node => {
-      const pos = nodeToSVG(node.col, node.row, layout, rotation, def);
-      const isActive = activated.has(node.key);
-      const isReachable = node.type === 'start' || isActive;
-      const canActivate = !isActive && (
-        node.type === 'start' ||
-        getAdjacentKeys(node.key).some(adj => activated.has(adj) || (def.isStarting && adj === '6,-1')) ||
-        (def.isStarting && node.key === '6,0')
-      );
-
-      const ng = svgEl('g', {
-        class: `node node-${node.type}`,
-        'data-board': boardId,
-        'data-key': node.key,
-        'data-type': node.type,
-        style: 'cursor:pointer'
-      });
-
-      const colors = NODE_COLORS[node.type] || NODE_COLORS.normal;
-      const fill = isActive ? colors.active : colors.fill;
-      const stroke = isActive ? colors.activeStroke : colors.stroke;
-      const r = getNodeRadius(node.type);
-      const sw = getStrokeWidth(node.type, isActive);
-      const opacity = (!def.isStarting && !isReachable && node.type !== 'gate' && !canActivate) ? 0.4 : 1;
-
-      // Outer ring (for legendary/rare/magic)
-      if (node.type === 'legendary') {
-        const ring = svgEl('circle', { cx: pos.x, cy: pos.y, r: r + 6, fill: 'none', stroke: '#ff6600', 'stroke-width': 1, opacity: 0.5 });
-        if (isActive) ring.setAttribute('filter', 'url(#glow-legendary)');
-        ng.appendChild(ring);
-      }
-      if (node.type === 'rare') {
-        const ring = svgEl('circle', { cx: pos.x, cy: pos.y, r: r + 4, fill: 'none', stroke: '#d0a000', 'stroke-width': 1, opacity: 0.6 });
-        ng.appendChild(ring);
-      }
-
-      // Main circle
-      const circle = svgEl('circle', {
-        cx: pos.x, cy: pos.y, r,
-        fill, stroke, 'stroke-width': sw, opacity
-      });
-      if (isActive) {
-        if (node.type === 'legendary') circle.setAttribute('filter', 'url(#glow-legendary)');
-        else if (node.type === 'rare') circle.setAttribute('filter', 'url(#glow-rare)');
-        else if (node.type === 'magic') circle.setAttribute('filter', 'url(#glow-magic)');
-      }
-      ng.appendChild(circle);
-
-      // Node icon / symbol
-      const icon = getNodeIcon(node);
-      if (icon) {
-        const txt = svgEl('text', {
-          x: pos.x, y: pos.y,
-          class: 'node-icon',
-          fill: getIconColor(node, isActive),
-          'font-size': getIconSize(node.type),
-          opacity
-        });
-        txt.textContent = icon;
-        ng.appendChild(txt);
-      }
-
-      // Stat colour bar (bottom of normal/magic nodes)
-      if ((node.type === 'normal' || node.type === 'magic') && node.stat) {
-        const bar = svgEl('rect', {
-          x: pos.x - r * 0.6, y: pos.y + r - 5,
-          width: r * 1.2, height: 3,
-          fill: STAT_COLORS[node.stat] || '#888',
-          rx: 1.5, opacity: opacity * (isActive ? 1 : 0.5)
-        });
-        ng.appendChild(bar);
-      }
-
-      // Active indicator dot (top)
-      if (isActive && node.type !== 'gate' && node.type !== 'start') {
-        const dot = svgEl('circle', {
-          cx: pos.x, cy: pos.y - r + 3, r: 3,
-          fill: colors.activeStroke, opacity: 0.9
-        });
-        ng.appendChild(dot);
-      }
-
-      ng.addEventListener('click', (e) => { e.stopPropagation(); onNodeClick(boardId, node.key); });
-      ng.addEventListener('mouseenter', (e) => showTooltip(e, boardId, node));
-      ng.addEventListener('mouseleave', hideTooltip);
-
-      g.appendChild(ng);
-    });
-
-    boardsLayer.appendChild(g);
-  });
-}
-
-function renderConnections() {
-  connectionsLayer.innerHTML = '';
-  const layouts = getBoardLayouts();
-
-  state.activeBoards.forEach(boardId => {
-    const layout = layouts[boardId];
-    const def = BOARD_DEFS[boardId];
-    const bState = state.boards[boardId];
-    const activated = bState.activatedNodes;
-    const rotation = bState.rotation;
-    const nodes = generateNodes(boardId);
-
-    nodes.forEach(node => {
-      if (!activated.has(node.key)) return;
-      // Draw lines to adjacent activated nodes (only down/right to avoid duplication)
-      [{ dc: 1, dr: 0 }, { dc: 0, dr: 1 }].forEach(({ dc, dr }) => {
-        const adjKey = `${node.col + dc},${node.row + dr}`;
-        if (activated.has(adjKey)) {
-          const pos1 = nodeToSVG(node.col, node.row, layout, rotation, def);
-          const [ac, ar] = adjKey.split(',').map(Number);
-          const pos2 = nodeToSVG(ac, ar, layout, rotation, def);
-          const line = svgEl('line', {
-            x1: pos1.x, y1: pos1.y, x2: pos2.x, y2: pos2.y,
-            stroke: '#c84020', 'stroke-width': 3, opacity: 0.7,
-            'stroke-linecap': 'round'
-          });
-          connectionsLayer.appendChild(line);
-        }
-      });
-    });
-  });
-
-  // Draw board-to-board connector lines
-  renderBoardConnectors(layouts);
-}
-
-function renderBoardConnectors(layouts) {
-  const pairs = getBoardGatePairs();
-  pairs.forEach(pair => {
-    if (!layouts[pair.b1] || !layouts[pair.b2]) return;
-    const def1 = BOARD_DEFS[pair.b1];
-    const def2 = BOARD_DEFS[pair.b2];
-    const rot1 = state.boards[pair.b1].rotation;
-    const rot2 = state.boards[pair.b2].rotation;
-    const p1 = nodeToSVG(pair.g1col, pair.g1row, layouts[pair.b1], rot1, def1);
-    const p2 = nodeToSVG(pair.g2col, pair.g2row, layouts[pair.b2], rot2, def2);
-    const both = state.boards[pair.b1].activatedNodes.has(pair.g1key)
-               && state.boards[pair.b2].activatedNodes.has(pair.g2key);
-    const line = svgEl('line', {
-      x1: p1.x, y1: p1.y, x2: p2.x, y2: p2.y,
-      stroke: both ? '#c84020' : '#2a1520',
-      'stroke-width': 2,
-      'stroke-dasharray': both ? 'none' : '6,4',
-      opacity: both ? 0.7 : 0.4
-    });
-    connectionsLayer.appendChild(line);
-  });
-}
-
-function getBoardGatePairs() {
-  // Simple linear connection: each board connects to the next via south->north
-  const pairs = [];
-  for (let i = 0; i < state.activeBoards.length - 1; i++) {
-    const b1 = state.activeBoards[i];
-    const b2 = state.activeBoards[i + 1];
-    const def1 = BOARD_DEFS[b1];
-    const def2 = BOARD_DEFS[b2];
-    // Find south gate of b1 and north gate of b2
-    const g1 = def1.gates.find(g => g.direction === 'south') || def1.gates[0];
-    const g2 = def2.gates ? (def2.gates.find(g => g.direction === 'north') || def2.gates[0]) : null;
-    if (g1 && g2) {
-      pairs.push({
-        b1, b2,
-        g1col: g1.col, g1row: g1.row, g1key: `${g1.col},${g1.row}`,
-        g2col: g2.col, g2row: g2.row, g2key: `${g2.col},${g2.row}`,
+    if (def && def.gates) {
+      def.gates.forEach(g => {
+        const nb = connectedBoard(bid, g.direction);
+        if (nb && !seen.has(nb)) queue.push(nb);
       });
     }
   }
-  return pairs;
+  return result;
 }
 
-function renderGlyphRadius() {
-  glyphRadiusLayer.innerHTML = '';
-  const layouts = getBoardLayouts();
+// ═══════════════════════════════════════════════
+//  BOARD POSITIONS  (tree-based layout)
+// ═══════════════════════════════════════════════
+function computePositions() {
+  const pos = {};
+  const visited = new Set();
+  const queue = [{ bid:'starting', px:0, py:0 }];
 
-  state.activeBoards.forEach(boardId => {
-    const bState = state.boards[boardId];
-    const glyphId = bState.glyphId;
-    if (!glyphId || !DATA) return;
-    const glyph = DATA.glyphs.find(g => g.id === glyphId);
-    if (!glyph) return;
-
-    // Find glyph socket in board
-    const def = BOARD_DEFS[boardId];
-    const glyphNode = generateNodes(boardId).find(n => n.type === 'glyph');
-    if (!glyphNode) return;
-
-    const layout = layouts[boardId];
-    const rotation = bState.rotation;
-    const center = nodeToSVG(glyphNode.col, glyphNode.row, layout, rotation, def);
-    const radius = glyph.radius;
-    const radiusPx = radius * NODE_GAP;
-
-    // Draw radius circle
-    const rc = svgEl('circle', {
-      cx: center.x, cy: center.y, r: radiusPx,
-      fill: 'rgba(100,50,200,0.06)',
-      stroke: '#7744cc',
-      'stroke-width': 1,
-      'stroke-dasharray': '4,3',
-      opacity: 0.6,
-      class: 'glyph-radius-circle'
-    });
-    glyphRadiusLayer.appendChild(rc);
-  });
-}
-
-// ─────────────────────────────────────────────────
-//  NODE INTERACTION
-// ─────────────────────────────────────────────────
-function onNodeClick(boardId, key) {
-  const def = BOARD_DEFS[boardId];
-  const bState = state.boards[boardId];
-  const node = getNodeByKey(boardId, key);
-  if (!node) return;
-
-  // Select glyph socket
-  if (node.type === 'glyph') {
-    selectGlyphSocket(boardId, key);
-    state.selectedBoard = boardId;
-    render();
-    return;
-  }
-
-  // Gates: activate to enable board connection
-  if (node.type === 'gate') {
-    toggleNode(boardId, key);
-    render();
-    return;
-  }
-
-  // Start node: always active for starting board
-  if (node.type === 'start') {
-    bState.activatedNodes.add(key);
-    render();
-    return;
-  }
-
-  // For non-starting boards, must have at least one gate active to be accessible
-  if (!def.isStarting) {
-    const hasActiveGate = def.gates.some(g => bState.activatedNodes.has(`${g.col},${g.row}`));
-    if (!hasActiveGate) {
-      // Auto-activate entry gate
-      const entryGate = def.gates.find(g => g.direction === 'north') || def.gates[0];
-      if (entryGate) bState.activatedNodes.add(`${entryGate.col},${entryGate.row}`);
-    }
-  }
-
-  const activated = bState.activatedNodes;
-
-  // Check adjacency for activation
-  if (!activated.has(key)) {
-    // Can only activate if adjacent to already-active node
-    const isAdjacentToActive = getAdjacentKeys(key).some(adj => activated.has(adj)) ||
-      (def.isStarting && key === '6,0');
-    if (!isAdjacentToActive && !def.isStarting) return;
-    if (def.isStarting && !isAdjacentToActive && key !== '6,0') return;
-    activated.add(key);
-  } else {
-    // Deactivate: cannot deactivate if it would disconnect other active nodes
-    if (!canDeactivate(boardId, key)) {
-      flashNode(boardId, key);
-      return;
-    }
-    activated.delete(key);
-    // Also handle glyph socket deselect
-    if (state.selectedGlyphSocket && state.selectedGlyphSocket.boardId === boardId
-        && state.selectedGlyphSocket.key === key) {
-      state.selectedGlyphSocket = null;
-    }
-  }
-
-  state.selectedBoard = boardId;
-  render();
-}
-
-function toggleNode(boardId, key) {
-  const bState = state.boards[boardId];
-  if (bState.activatedNodes.has(key)) {
-    if (!canDeactivate(boardId, key)) return;
-    bState.activatedNodes.delete(key);
-  } else {
-    bState.activatedNodes.add(key);
-  }
-}
-
-function canDeactivate(boardId, key) {
-  const def = BOARD_DEFS[boardId];
-  const bState = state.boards[boardId];
-  const activated = bState.activatedNodes;
-
-  // Temporarily remove the node and check connectivity
-  const testSet = new Set(activated);
-  testSet.delete(key);
-
-  // Find seeds
-  let seedKeys;
-  if (def.isStarting) {
-    seedKeys = ['6,0'];
-  } else {
-    seedKeys = def.gates.filter(g => testSet.has(`${g.col},${g.row}`)).map(g => `${g.col},${g.row}`);
-    if (seedKeys.length === 0) return true;
-  }
-
-  // BFS from seeds
-  const reachable = new Set();
-  const queue = [...seedKeys.filter(k => testSet.has(k))];
-  if (def.isStarting) queue.push('6,0');
-  const allNodes = new Set(generateNodes(boardId).map(n => n.key));
   while (queue.length) {
-    const k = queue.shift();
-    if (reachable.has(k)) continue;
-    reachable.add(k);
-    getAdjacentKeys(k).forEach(adj => {
-      if (!reachable.has(adj) && testSet.has(adj) && allNodes.has(adj)) queue.push(adj);
+    const { bid, px, py } = queue.shift();
+    if (visited.has(bid)) continue;
+    visited.add(bid);
+    pos[bid] = { x:px, y:py };
+
+    const def = BOARD_DEFS[bid];
+    const bst = state.boardStates[bid];
+    if (!def || !bst) continue;
+
+    def.gates.forEach(gate => {
+      const nbId = connectedBoard(bid, gate.direction);
+      if (!nbId || visited.has(nbId)) return;
+      const ndef = BOARD_DEFS[nbId];
+      if (!ndef) return;
+
+      // Gate position in current board (pixel offset within board)
+      const rot = bst.rotation;
+      const gp  = rotatePoint(gate.col * G, gate.row * G,
+                              (def.width-1)*G/2, (def.height-1)*G/2, rot);
+
+      // Entry gate in the new board (opposite direction)
+      const entryDir  = OPP[gate.direction];
+      const entryGate = ndef.gates.find(g => g.direction === entryDir) || ndef.gates[0];
+      const nrot = state.boardStates[nbId]?.rotation || 0;
+      const ep   = rotatePoint(entryGate.col*G, entryGate.row*G,
+                               (ndef.width-1)*G/2, (ndef.height-1)*G/2, nrot);
+
+      // The gate of the new board aligns to (px + gp) in world coords
+      const gx = px + gp.x;
+      const gy = py + gp.y;
+
+      // Push new board so its entry gate lands at (gx + delta, gy + delta)
+      const margin = BOARD_GAP;
+      let nx, ny;
+      switch (gate.direction) {
+        case 'south': nx = gx - ep.x; ny = gy + margin; break;
+        case 'north': nx = gx - ep.x; ny = gy - (ndef.height-1)*G - margin; break;
+        case 'east':  nx = gx + margin; ny = gy - ep.y; break;
+        case 'west':  nx = gx - (ndef.width-1)*G - margin; ny = gy - ep.y; break;
+      }
+      queue.push({ bid:nbId, px:nx, py:ny });
+    });
+  }
+  return pos;
+}
+
+function rotatePoint(x, y, cx, cy, deg) {
+  if (!deg) return { x, y };
+  const rad = deg * Math.PI / 180;
+  const dx = x - cx, dy = y - cy;
+  return {
+    x: cx + dx*Math.cos(rad) - dy*Math.sin(rad),
+    y: cy + dx*Math.sin(rad) + dy*Math.cos(rad),
+  };
+}
+
+function nodeWorldPos(boardId, col, row) {
+  const pos = _posCache[boardId];
+  if (!pos) return { x:0, y:0 };
+  const def = BOARD_DEFS[boardId];
+  const rot = state.boardStates[boardId]?.rotation || 0;
+  const p = rotatePoint(col*G, row*G, (def.width-1)*G/2, (def.height-1)*G/2, rot);
+  return { x: pos.x + p.x, y: pos.y + p.y };
+}
+
+// Cache positions (invalidated on state change)
+let _posCache = {};
+function refreshPositions() { _posCache = computePositions(); }
+
+// ═══════════════════════════════════════════════
+//  NODE COLOURS
+// ═══════════════════════════════════════════════
+const NC = {
+  start:     { f:'#2a0600', s:'#aa1800', af:'#4a0e00', as:'#ff3020' },
+  gate:      { f:'#080c1a', s:'#2a4080', af:'#142040', as:'#5080d0' },
+  'gate-avail':{ f:'#0a2010',s:'#208040',af:'#153015',as:'#40e080' },
+  'gate-conn': { f:'#0a2010',s:'#40e080',af:'#183020',as:'#60ffa0' },
+  normal:    { f:'#160a0e', s:'#4a2a38', af:'#2a1820', as:'#9a6070' },
+  magic:     { f:'#080e22', s:'#1a3090', af:'#182040', as:'#4080e0' },
+  rare:      { f:'#1c1000', s:'#907000', af:'#302000', as:'#e0b000' },
+  legendary: { f:'#3a0a00', s:'#c03800', af:'#5a1800', as:'#ff7020' },
+  glyph:     { f:'#110828', s:'#6633bb', af:'#201040', as:'#aa55ff' },
+};
+
+function nodeColors(node, isActive, isGate, gateState) {
+  let key = node.type;
+  if (isGate) {
+    if      (gateState === 'connected')  key = 'gate-conn';
+    else if (gateState === 'available')  key = 'gate-avail';
+    else                                 key = 'gate';
+  }
+  const c = NC[key] || NC.normal;
+  return isActive ? { fill:c.af, stroke:c.as } : { fill:c.f, stroke:c.s };
+}
+
+// ═══════════════════════════════════════════════
+//  PATH VALIDATION
+// ═══════════════════════════════════════════════
+// Returns Set<key> of all keys reachable from seeds through activated nodes
+function reachableFrom(boardId) {
+  const def  = BOARD_DEFS[boardId];
+  const bs   = state.boardStates[boardId];
+  if (!bs) return new Set();
+  const act  = bs.activated;
+  const all  = new Set(generateNodes(boardId).map(n=>n.key));
+
+  const seeds = [];
+  if (def.isStarting) {
+    seeds.push('6,0');
+  } else {
+    // Entry gates (already activated from parent connection)
+    def.gates.forEach(g => {
+      const k = `${g.col},${g.row}`;
+      if (act.has(k)) seeds.push(k);
     });
   }
 
-  // All activated nodes (minus the removed one) must still be reachable
-  for (const k of testSet) {
-    if (!reachable.has(k)) return false;
+  const reach = new Set();
+  const q = [...seeds];
+  while (q.length) {
+    const k = q.shift();
+    if (reach.has(k)) continue;
+    reach.add(k);
+    adjacentKeys(k).forEach(adj => {
+      if (!reach.has(adj) && act.has(adj) && all.has(adj)) q.push(adj);
+    });
   }
+  return reach;
+}
+
+// Can we deactivate 'key' without disconnecting any other active node?
+function canDeactivate(boardId, key) {
+  const bs   = state.boardStates[boardId];
+  const def  = BOARD_DEFS[boardId];
+  const test = new Set(bs.activated);
+  test.delete(key);
+  const all  = new Set(generateNodes(boardId).map(n=>n.key));
+
+  const seeds = [];
+  if (def.isStarting) { seeds.push('6,0'); }
+  else {
+    def.gates.forEach(g => { const k=`${g.col},${g.row}`; if(test.has(k)) seeds.push(k); });
+  }
+
+  const reach = new Set();
+  const q = [...seeds];
+  while (q.length) {
+    const k = q.shift();
+    if (reach.has(k)) continue;
+    reach.add(k);
+    adjacentKeys(k).forEach(adj => {
+      if (!reach.has(adj) && test.has(adj) && all.has(adj)) q.push(adj);
+    });
+  }
+  for (const k of test) { if (!reach.has(k)) return false; }
   return true;
 }
 
-function flashNode(boardId, key) {
-  const el = boardsLayer.querySelector(`[data-board="${boardId}"][data-key="${key}"]`);
-  if (!el) return;
-  el.style.transition = 'opacity 0.1s';
-  el.style.opacity = '0.3';
-  setTimeout(() => { el.style.opacity = ''; }, 200);
+// When a node is deactivated, cascade-remove any nodes that become unreachable
+function cascadeRemove(boardId) {
+  const bs  = state.boardStates[boardId];
+  const reach = reachableFrom(boardId);
+  const toRemove = [...bs.activated].filter(k => !reach.has(k));
+  toRemove.forEach(k => bs.activated.delete(k));
 }
 
-// ─────────────────────────────────────────────────
-//  GLYPH SYSTEM
-// ─────────────────────────────────────────────────
-function selectGlyphSocket(boardId, key) {
-  state.selectedGlyphSocket = { boardId, key };
-  updateGlyphPanel();
+// ═══════════════════════════════════════════════
+//  BOARD MANAGEMENT
+// ═══════════════════════════════════════════════
+function attachBoard(parentBoardId, parentDir, newBoardId) {
+  const entryDir = OPP[parentDir];
+  state.connections[`${parentBoardId}:${parentDir}`] = newBoardId;
+  state.connections[`${newBoardId}:${entryDir}`]     = parentBoardId;
+
+  // Init board state + auto-activate entry gate
+  if (!state.boardStates[newBoardId]) {
+    state.boardStates[newBoardId] = { activated: new Set(), rotation:0, glyphId:null };
+  }
+  const entryGate = BOARD_DEFS[newBoardId].gates.find(g => g.direction === entryDir);
+  if (entryGate) {
+    state.boardStates[newBoardId].activated.add(`${entryGate.col},${entryGate.row}`);
+  }
+  state.selectedBoard = newBoardId;
 }
 
-function updateGlyphPanel() {
-  const noMsg = document.getElementById('no-glyph-msg');
-  const controls = document.getElementById('glyph-controls');
-  const glyphInfo = document.getElementById('glyph-info');
+function removeBoard(boardId) {
+  if (boardId === 'starting') return;
+  _removeBoardRecursive(boardId, null);
+  // Also remove the connection pointing to this board from its parent
+  Object.keys(state.connections).forEach(k => {
+    if (state.connections[k] === boardId && !k.startsWith(boardId+':')) {
+      delete state.connections[k];
+    }
+  });
+  if (state.selectedBoard === boardId) state.selectedBoard = 'starting';
+  if (state.selectedGlyphSocket?.boardId === boardId) state.selectedGlyphSocket = null;
+}
 
-  if (!state.selectedGlyphSocket || !DATA) {
-    noMsg.classList.remove('hidden');
-    controls.classList.add('hidden');
+function _removeBoardRecursive(boardId, parentId) {
+  const def = BOARD_DEFS[boardId];
+  if (def && def.gates) {
+    def.gates.forEach(g => {
+      const nb = state.connections[`${boardId}:${g.direction}`];
+      if (nb && nb !== parentId) _removeBoardRecursive(nb, boardId);
+    });
+  }
+  Object.keys(state.connections).forEach(k => {
+    if (k.startsWith(boardId+':') || state.connections[k] === boardId) delete state.connections[k];
+  });
+  delete state.boardStates[boardId];
+}
+
+function usedBoardIds() { return new Set(Object.keys(state.boardStates)); }
+
+// ═══════════════════════════════════════════════
+//  CLICK HANDLING
+// ═══════════════════════════════════════════════
+function onNodeClick(boardId, key) {
+  const node = nodeByKey(boardId, key);
+  if (!node) return;
+  state.selectedBoard = boardId;
+
+  // Glyph socket → open glyph modal
+  if (node.type === 'glyph') {
+    state.selectedGlyphSocket = { boardId, key };
+    openGlyphModal(boardId, key);
+    updateGlyphPanel();
+    updateBoardInfoPanel();
+    render();
     return;
   }
 
-  noMsg.classList.add('hidden');
+  // Gate → board selection or navigation
+  if (node.type === 'gate') {
+    const dir  = node.sp?.direction;
+    const conn = connectedBoard(boardId, dir);
+    const bs   = state.boardStates[boardId];
+
+    if (conn) {
+      // Already connected → navigate to that board
+      state.selectedBoard = conn;
+    } else {
+      // Gate must be reached (activated) to connect a board
+      if (!bs.activated.has(key) && !BOARD_DEFS[boardId].isStarting) {
+        // Activate the gate first if adjacent to active nodes
+        const canReach = adjacentKeys(key).some(adj => bs.activated.has(adj));
+        if (!canReach) return;
+        bs.activated.add(key);
+      } else if (BOARD_DEFS[boardId].isStarting) {
+        bs.activated.add(key);
+      } else {
+        bs.activated.add(key);
+      }
+      // Show board selection modal
+      const used = usedBoardIds();
+      const available = Object.keys(BOARD_DEFS)
+        .filter(id => !BOARD_DEFS[id].isStarting && !used.has(id));
+
+      if (available.length === 0) {
+        updateBoardInfoPanel(); render(); return;
+      }
+      state.pendingGate = { boardId, direction: dir, gateKey: key };
+      openBoardSelectModal(boardId, dir, available);
+    }
+    updateBoardInfoPanel();
+    render();
+    return;
+  }
+
+  // Start node → always active
+  if (node.type === 'start') {
+    state.boardStates[boardId].activated.add(key);
+    render(); return;
+  }
+
+  // Normal / magic / rare / legendary nodes
+  const bs  = state.boardStates[boardId];
+  if (!bs) return;
+
+  // For non-starting boards, ensure there's an active entry gate
+  const def = BOARD_DEFS[boardId];
+  if (!def.isStarting) {
+    const hasGate = def.gates.some(g => bs.activated.has(`${g.col},${g.row}`));
+    if (!hasGate) return;
+  }
+
+  const act = bs.activated;
+
+  if (act.has(key)) {
+    // DEACTIVATE – only if it doesn't disconnect the path
+    if (node.type === 'start') return;
+    if (!canDeactivate(boardId, key)) {
+      _flash(boardId, key);
+      return;
+    }
+    act.delete(key);
+    cascadeRemove(boardId);
+  } else {
+    // ACTIVATE – must be adjacent to at least one active node
+    const isAdj = def.isStarting
+      ? (key === '6,0' || adjacentKeys(key).some(k2 => act.has(k2)))
+      : adjacentKeys(key).some(k2 => act.has(k2));
+    if (!isAdj) { _flash(boardId, key); return; }
+    act.add(key);
+  }
+
+  updateBoardInfoPanel();
+  render();
+}
+
+function _flash(boardId, key) {
+  const el = document.querySelector(
+    `[data-board="${boardId}"][data-key="${key}"] circle`);
+  if (!el) return;
+  el.style.transition = 'opacity .08s';
+  el.style.opacity = '.2';
+  setTimeout(() => { el.style.opacity = ''; }, 200);
+}
+
+// ═══════════════════════════════════════════════
+//  MODALS
+// ═══════════════════════════════════════════════
+function openBoardSelectModal(fromBoardId, dir, available) {
+  const overlay = document.getElementById('modal-overlay');
+  overlay.classList.remove('hidden');
+  document.getElementById('modal-board-select').classList.remove('hidden');
+  document.getElementById('modal-export').classList.add('hidden');
+  document.getElementById('modal-import').classList.add('hidden');
+  document.getElementById('modal-glyph-select').classList.add('hidden');
+
+  document.getElementById('modal-board-title').textContent =
+    `Attach Board — ${BOARD_DEFS[fromBoardId].name} (${DIR_LABEL[dir]} Gate)`;
+  document.getElementById('modal-board-sub').textContent =
+    `Choose a board to connect at the ${dir.toUpperCase()} gate.`;
+
+  const list = document.getElementById('board-choice-list');
+  list.innerHTML = '';
+  available.forEach(bid => {
+    const def = BOARD_DEFS[bid];
+    const btn = document.createElement('button');
+    btn.className = 'board-choice-btn';
+    btn.innerHTML = `<span class="bc-name">${def.name}</span>
+                     <span class="bc-sub">4 gates · 1 Legendary · 1 Glyph</span>`;
+    btn.addEventListener('click', () => {
+      attachBoard(fromBoardId, dir, bid);
+      state.pendingGate = null;
+      closeModal();
+      refreshPositions();
+      render();
+      fitToScreen();
+    });
+    list.appendChild(btn);
+  });
+}
+
+function openGlyphModal(boardId, key) {
+  const overlay = document.getElementById('modal-overlay');
+  overlay.classList.remove('hidden');
+  document.getElementById('modal-glyph-select').classList.remove('hidden');
+  document.getElementById('modal-board-select').classList.add('hidden');
+  document.getElementById('modal-export').classList.add('hidden');
+  document.getElementById('modal-import').classList.add('hidden');
+
+  document.getElementById('modal-glyph-sub').textContent =
+    `Board: ${BOARD_DEFS[boardId].name}`;
+
+  const list = document.getElementById('glyph-choice-list');
+  list.innerHTML = '';
+  const equipped = state.boardStates[boardId]?.glyphId;
+
+  DATA.glyphs.forEach(g => {
+    const btn = document.createElement('button');
+    btn.className = 'glyph-choice-btn' + (g.id === equipped ? ' equipped' : '');
+    btn.innerHTML = `<span class="gc-name">${g.name}</span>
+                     <span class="gc-radius">Radius ${g.radius}</span>
+                     <span class="gc-desc">${(g.description||'').slice(0,60)}…</span>`;
+    btn.addEventListener('click', () => {
+      state.boardStates[boardId].glyphId = g.id;
+      state.selectedGlyphSocket = { boardId, key };
+      closeModal();
+      updateGlyphPanel();
+      render();
+    });
+    list.appendChild(btn);
+  });
+}
+
+function closeModal() {
+  document.getElementById('modal-overlay').classList.add('hidden');
+  document.querySelectorAll('.modal').forEach(m => m.classList.add('hidden'));
+}
+
+// ═══════════════════════════════════════════════
+//  RENDERING
+// ═══════════════════════════════════════════════
+const SVG = document.getElementById('paragon-canvas');
+const L_BG    = document.getElementById('layer-bg');
+const L_CONN  = document.getElementById('layer-connectors');
+const L_GRAD  = document.getElementById('layer-glyph-radius');
+const L_EDGES = document.getElementById('layer-connections');
+const L_NODES = document.getElementById('layer-nodes');
+const L_LBLS  = document.getElementById('layer-labels');
+const ROOT    = document.getElementById('canvas-root');
+
+function render() {
+  refreshPositions();
+  L_BG.innerHTML = '';
+  L_CONN.innerHTML = '';
+  L_GRAD.innerHTML = '';
+  L_EDGES.innerHTML = '';
+  L_NODES.innerHTML = '';
+  L_LBLS.innerHTML = '';
+
+  const bids = orderedBoards();
+  bids.forEach(bid => renderBoard(bid));
+  renderGateBridges(bids);
+}
+
+function renderBoard(boardId) {
+  const def  = BOARD_DEFS[boardId];
+  const bs   = state.boardStates[boardId];
+  if (!def || !bs) return;
+  const pos  = _posCache[boardId];
+  if (!pos) return;
+  const act  = bs.activated;
+  const rot  = bs.rotation;
+  const nodes = generateNodes(boardId);
+  const reach = reachableFrom(boardId);
+  const isSelected = boardId === state.selectedBoard;
+
+  // Board background
+  const bw  = (def.width-1)  * G + G*1.2;
+  const bh  = (def.height-1) * G + G*1.2;
+  const bg  = el('rect', {
+    x: pos.x - G*0.6, y: pos.y - G*0.6, width: bw, height: bh,
+    fill: 'url(#board-bg)',
+    stroke: isSelected ? '#7a3060' : '#1e0d1a',
+    'stroke-width': isSelected ? 2 : 1, rx: 5,
+  });
+  L_BG.appendChild(bg);
+
+  // Board label
+  const lbl = el('text', {
+    x: pos.x + (def.width-1)*G/2,
+    y: pos.y - G*0.3,
+    class: 'board-label-svg',
+    fill: isSelected ? '#c09020' : '#705040',
+  });
+  lbl.textContent = def.name;
+  L_LBLS.appendChild(lbl);
+
+  // Node connections (edges between adjacent activated nodes)
+  nodes.forEach(n => {
+    if (!act.has(n.key)) return;
+    [{ dc:1,dr:0 },{ dc:0,dr:1 }].forEach(({ dc,dr }) => {
+      const adjKey = `${n.col+dc},${n.row+dr}`;
+      if (!act.has(adjKey)) return;
+      const p1 = nodeWorldPos(boardId, n.col, n.row);
+      const [ac,ar] = adjKey.split(',').map(Number);
+      const p2 = nodeWorldPos(boardId, ac, ar);
+      const line = el('line',{
+        x1:p1.x,y1:p1.y, x2:p2.x,y2:p2.y,
+        stroke:'#c83030','stroke-width':3,opacity:.75,'stroke-linecap':'round',
+      });
+      L_EDGES.appendChild(line);
+    });
+  });
+
+  // Glyph radius ring
+  const glyphNode = nodes.find(n => n.type === 'glyph');
+  if (glyphNode && bs.glyphId) {
+    const glyph = DATA.glyphs.find(g => g.id === bs.glyphId);
+    if (glyph) {
+      const wp = nodeWorldPos(boardId, glyphNode.col, glyphNode.row);
+      const ring = el('circle',{
+        cx:wp.x, cy:wp.y, r: glyph.radius * G,
+        class:'glyph-radius-ring',
+      });
+      L_GRAD.appendChild(ring);
+    }
+  }
+
+  // Render nodes
+  nodes.forEach(n => {
+    const wp     = nodeWorldPos(boardId, n.col, n.row);
+    const isAct  = act.has(n.key);
+    const isGate = n.type === 'gate';
+    const dir    = n.sp?.direction;
+    const conn   = isGate ? connectedBoard(boardId, dir) : null;
+    const gateState = isGate
+      ? (conn ? 'connected' : (isAct ? 'available' : 'inactive'))
+      : null;
+
+    const col  = nodeColors(n, isAct, isGate, gateState);
+    const nr   = nodeRadius(n.type);
+    const sw   = isAct ? 2.5 : 1.5;
+
+    const opacity = (!def.isStarting && !reach.has(n.key) && !isGate && n.type!=='glyph') ? 0.35 : 1;
+
+    const g = el('g', {
+      'data-board': boardId, 'data-key': n.key,
+      class: `node node-${n.type}`,
+      style: 'cursor:pointer',
+    });
+
+    // Outer glow ring for special nodes
+    if (n.type === 'legendary' && isAct) {
+      const ring = el('circle',{ cx:wp.x,cy:wp.y,r:nr+7,fill:'none',stroke:'#ff7020','stroke-width':1,opacity:.4,filter:'url(#glow-leg)' });
+      g.appendChild(ring);
+    }
+    if (n.type === 'rare' && isAct) {
+      const ring = el('circle',{ cx:wp.x,cy:wp.y,r:nr+5,fill:'none',stroke:'#e0b000','stroke-width':1,opacity:.5,filter:'url(#glow-rare)' });
+      g.appendChild(ring);
+    }
+    if (isGate && gateState !== 'inactive') {
+      const ring = el('circle',{ cx:wp.x,cy:wp.y,r:nr+5,fill:'none',stroke:gateState==='connected'?'#40e080':'#5080d0','stroke-width':1.5,opacity:.6,filter:'url(#glow-gate)' });
+      g.appendChild(ring);
+    }
+
+    // Main circle
+    const circle = el('circle',{
+      cx:wp.x, cy:wp.y, r:nr,
+      fill:col.fill, stroke:col.stroke, 'stroke-width':sw, opacity,
+    });
+    if (n.type==='legendary' && isAct) circle.setAttribute('filter','url(#glow-leg)');
+    else if (n.type==='magic' && isAct) circle.setAttribute('filter','url(#glow-magic)');
+    g.appendChild(circle);
+
+    // Node icon
+    const icon = nodeIcon(n, boardId, bs, gateState);
+    if (icon) {
+      const t = el('text',{
+        x:wp.x, y:wp.y,
+        'font-size': iconSize(n.type),
+        fill: iconColor(n, isAct, gateState),
+        'dominant-baseline':'central','text-anchor':'middle',
+        'pointer-events':'none', opacity,
+      });
+      t.textContent = icon;
+      g.appendChild(t);
+    }
+
+    // Stat colour bar
+    if ((n.type==='normal'||n.type==='magic') && n.stat) {
+      const bar = el('rect',{
+        x:wp.x-nr*.55, y:wp.y+nr-5,
+        width:nr*1.1, height:3,
+        fill:SCOL[n.stat]||'#888', rx:1.5,
+        opacity: opacity*(isAct?1:.4),
+      });
+      g.appendChild(bar);
+    }
+
+    // Gate: direction label + connected board name
+    if (isGate) {
+      // Direction arrow
+      const arr = el('text',{
+        x:wp.x, y:wp.y + nr + 12,
+        class:'gate-dir-label',
+        fill: gateState==='connected' ? '#60ffa0'
+            : gateState==='available' ? '#5080d0' : '#2a4080',
+      });
+      arr.textContent = DIR_ARROW[dir] + ' ' + DIR_LABEL[dir];
+      L_LBLS.appendChild(arr);
+
+      if (conn) {
+        const cl = el('text',{
+          x:wp.x, y:wp.y + nr + 22,
+          class:'gate-conn-label',
+        });
+        cl.textContent = BOARD_DEFS[conn]?.name?.slice(0,12) || conn;
+        L_LBLS.appendChild(cl);
+      } else if (gateState === 'available') {
+        const cl = el('text',{
+          x:wp.x, y:wp.y + nr + 22,
+          class:'gate-conn-label',
+          fill:'#4090c0',
+        });
+        cl.textContent = '[ Click to add ]';
+        L_LBLS.appendChild(cl);
+      }
+    }
+
+    g.addEventListener('click', e => { e.stopPropagation(); onNodeClick(boardId, n.key); });
+    g.addEventListener('mouseenter', e => showTooltip(e, boardId, n, gateState));
+    g.addEventListener('mouseleave', hideTooltip);
+    L_NODES.appendChild(g);
+  });
+}
+
+function renderGateBridges(bids) {
+  bids.forEach(bid => {
+    const def = BOARD_DEFS[bid];
+    if (!def.gates) return;
+    def.gates.forEach(gate => {
+      const nb = connectedBoard(bid, gate.direction);
+      if (!nb) return;
+      const gp  = nodeWorldPos(bid, gate.col, gate.row);
+      const def2 = BOARD_DEFS[nb];
+      if (!def2) return;
+      const entryDir = OPP[gate.direction];
+      const eg = def2.gates.find(g=>g.direction===entryDir);
+      if (!eg) return;
+      const ep = nodeWorldPos(nb, eg.col, eg.row);
+      const bs1 = state.boardStates[bid];
+      const bs2 = state.boardStates[nb];
+      const both = bs1?.activated.has(`${gate.col},${gate.row}`) &&
+                   bs2?.activated.has(`${eg.col},${eg.row}`);
+      const line = el('line',{
+        x1:gp.x,y1:gp.y, x2:ep.x,y2:ep.y,
+        stroke: both ? '#60e080' : '#2a4040',
+        'stroke-width': 2,
+        'stroke-dasharray': both ? 'none' : '5,4',
+        opacity: both ? .8 : .4,
+      });
+      L_CONN.appendChild(line);
+    });
+  });
+}
+
+// ═══════════════════════════════════════════════
+//  NODE VISUAL HELPERS
+// ═══════════════════════════════════════════════
+function nodeRadius(type) {
+  return { start:18,gate:17,legendary:19,glyph:17,rare:15,magic:14,normal:13 }[type]||13;
+}
+function nodeIcon(n, boardId, bs, gateState) {
+  if (n.type==='start')     return '⚔';
+  if (n.type==='gate') {
+    const dir = n.sp?.direction;
+    const conn = connectedBoard(boardId, dir);
+    return conn ? '⬡' : (gateState==='available' ? '◈' : '◇');
+  }
+  if (n.type==='legendary') return '★';
+  if (n.type==='glyph') {
+    const gid = bs.glyphId;
+    return gid ? '⬡' : '⬡';
+  }
+  if (n.type==='rare')  return '◆';
+  if (n.type==='magic') return SICON[n.stat]||'○';
+  return SICON[n.stat]||'·';
+}
+function iconColor(n, isAct, gateState) {
+  if (n.type==='legendary') return isAct ? '#ffaa00' : '#c04000';
+  if (n.type==='rare')      return isAct ? '#ffd700' : '#a08000';
+  if (n.type==='glyph')     return isAct ? '#bb88ff' : '#7744cc';
+  if (n.type==='start')     return isAct ? '#ff8866' : '#cc4422';
+  if (n.type==='gate') {
+    if (gateState==='connected') return '#60ffa0';
+    if (gateState==='available') return '#80b0ff';
+    return '#304060';
+  }
+  if (n.stat) return isAct ? SCOL[n.stat] : SCOL[n.stat]+'88';
+  return isAct ? '#888' : '#333';
+}
+function iconSize(type) {
+  return { start:12,gate:12,legendary:14,glyph:13,rare:10,magic:9,normal:8 }[type]||8;
+}
+
+// ═══════════════════════════════════════════════
+//  SVG UTILITY
+// ═══════════════════════════════════════════════
+function el(tag, attrs={}) {
+  const e = document.createElementNS('http://www.w3.org/2000/svg', tag);
+  Object.entries(attrs).forEach(([k,v]) => e.setAttribute(k,v));
+  return e;
+}
+
+// ═══════════════════════════════════════════════
+//  TOOLTIP
+// ═══════════════════════════════════════════════
+const TT = document.getElementById('tooltip');
+function showTooltip(e, boardId, n, gateState) {
+  const wr   = document.getElementById('svg-wrapper').getBoundingClientRect();
+  const name = getNodeName(boardId, n);
+  const type = getTypeLabel(n.type, gateState);
+  const stat = getStatLine(n);
+  const eff  = getEffectLine(boardId, n);
+  const hint = getHint(n, boardId, gateState);
+
+  TT.querySelector('.tt-name').textContent    = name;
+  TT.querySelector('.tt-badge').textContent   = type;
+  TT.querySelector('.tt-badge').className     = `tt-badge ${getBadgeClass(n.type, gateState)}`;
+  TT.querySelector('.tt-stat').textContent    = stat;
+  TT.querySelector('.tt-effect').textContent  = eff;
+  TT.querySelector('.tt-hint').textContent    = hint;
+  TT.classList.remove('hidden');
+
+  let tx = e.clientX - wr.left + 12;
+  let ty = e.clientY - wr.top  - 10;
+  if (tx + 260 > wr.width)  tx = e.clientX - wr.left - 270;
+  if (ty + 150 > wr.height) ty = e.clientY - wr.top  - 160;
+  TT.style.left = tx+'px'; TT.style.top = ty+'px';
+}
+function hideTooltip() { TT.classList.add('hidden'); }
+
+function getNodeName(boardId, n) {
+  if (n.type==='start')     return 'Starting Node';
+  if (n.type==='glyph')     return state.boardStates[boardId]?.glyphId
+    ? (DATA.glyphs.find(g=>g.id===state.boardStates[boardId].glyphId)?.name || 'Glyph Socket')
+    : 'Glyph Socket';
+  if (n.type==='legendary') return DATA.legendaryNodes?.[n.id]?.name || 'Legendary Node';
+  if (n.type==='rare')      return DATA.rareNodes?.[n.id]?.name || 'Rare Node';
+  if (n.type==='gate') {
+    const dir = n.sp?.direction;
+    const conn = connectedBoard(boardId, dir);
+    return conn ? `Gate → ${BOARD_DEFS[conn]?.name}` : `Gate (${dir?.toUpperCase()})`;
+  }
+  if (n.stat) return cap(n.stat)+' Node';
+  return 'Paragon Node';
+}
+function getTypeLabel(type, gs) {
+  if (type==='gate') return gs==='connected' ? 'Connected' : gs==='available' ? 'Available Gate' : 'Gate';
+  return { start:'Start',normal:'Normal',magic:'Magic',rare:'Rare',legendary:'Legendary',glyph:'Glyph' }[type]||type;
+}
+function getBadgeClass(type, gs) {
+  if (type==='gate') return gs==='available'||gs==='connected' ? 'gate-avail' : 'gate';
+  return type;
+}
+function getStatLine(n) {
+  if (n.type==='normal'&&n.stat) return `+5 ${cap(n.stat)}`;
+  if (n.type==='magic' &&n.stat) return `+8 ${cap(n.stat)} + bonuses`;
+  return '';
+}
+function getEffectLine(boardId, n) {
+  if (n.type==='legendary') return DATA.legendaryNodes?.[n.id]?.description || 'Powerful legendary effect';
+  if (n.type==='rare')      return DATA.rareNodes?.[n.id]?.description || 'Rare bonus';
+  if (n.type==='glyph') {
+    const gid = state.boardStates[boardId]?.glyphId;
+    const g = gid ? DATA.glyphs.find(g=>g.id===gid) : null;
+    return g ? g.description : 'Click to assign a Glyph to this socket';
+  }
+  if (n.type==='gate') {
+    const dir = n.sp?.direction;
+    const conn = connectedBoard(boardId, dir);
+    return conn ? `Connected to: ${BOARD_DEFS[conn]?.name}` : 'Reach this gate to attach a new board';
+  }
+  return '';
+}
+function getHint(n, boardId, gs) {
+  const act = state.boardStates[boardId]?.activated;
+  const isAct = act?.has(n.key);
+  if (n.type==='glyph') return 'Click to equip / change glyph';
+  if (n.type==='gate' && gs==='connected') return 'Click to navigate to connected board';
+  if (n.type==='gate' && gs==='available') return 'Click to choose a board to attach';
+  if (n.type==='gate') return 'Activate nodes to reach this gate';
+  if (isAct) return 'Click to deactivate';
+  return 'Click to activate (must connect to existing path)';
+}
+function cap(s) { return s?s[0].toUpperCase()+s.slice(1):''; }
+
+// ═══════════════════════════════════════════════
+//  STATS CALCULATION
+// ═══════════════════════════════════════════════
+function calcStats() {
+  const t = { dexterity:0,strength:0,intelligence:0,willpower:0,
+               life:0,armor:0,damage:0,vulnerable:0,critdmg:0,poison:0,trap:0 };
+
+  orderedBoards().forEach(bid => {
+    const bs = state.boardStates[bid];
+    if (!bs) return;
+    generateNodes(bid).forEach(n => {
+      if (!bs.activated.has(n.key)) return;
+      if (n.type==='normal'&&n.stat)  { t[n.stat]=(t[n.stat]||0)+5; }
+      if (n.type==='magic' &&n.stat)  { t[n.stat]=(t[n.stat]||0)+8; t.life+=8; t.armor+=5; }
+      if (n.type==='rare') {
+        const rd = DATA.rareNodes?.[n.id];
+        if (rd?.bonus) Object.entries(rd.bonus).forEach(([k,v]) => { t[k]=(t[k]||0)+v; });
+      }
+    });
+    // Glyph bonus
+    if (bs.glyphId) {
+      const g = DATA.glyphs.find(g=>g.id===bs.glyphId);
+      if (g) applyGlyph(g, t);
+    }
+  });
+
+  // Derived
+  t.damage     += Math.floor(t.dexterity*.12);
+  t.critdmg    += Math.floor(t.dexterity*.09);
+  t.vulnerable += Math.floor(t.intelligence*.07);
+  t.life       += Math.floor(t.willpower*2);
+  t.armor      += Math.floor(t.strength*.6);
+  t.poison     += Math.floor((t.dexterity+t.intelligence)*.04);
+  t.trap       += Math.floor(t.dexterity*.07);
+  return t;
+}
+
+function applyGlyph(g, t) {
+  const b = 17;
+  const m = { ambush:'trap',cutthroat:'damage',marksman:'damage',bladedancer:'damage',
+              control:'damage',exploit:'vulnerable',efficacy:'damage',domination:'damage',
+              turf:'armor',revenge:'damage',imp:'poison',territorial:'dexterity',
+              torch:'damage',elementalist:'intelligence',ranger:'damage',subtlety:'damage' };
+  const k = m[g.id]||'damage';
+  t[k] = (t[k]||0)+b;
+}
+
+// ═══════════════════════════════════════════════
+//  UI UPDATES
+// ═══════════════════════════════════════════════
+function updateAll() {
+  updateBoardList();
+  updateBoardInfoPanel();
+  updateGlyphPanel();
+  updateStatsPanel();
+  updateLegendaryPanel();
+  updatePointsCounter();
+}
+
+function updateBoardList() {
+  const list = document.getElementById('board-list');
+  list.innerHTML = '';
+  orderedBoards().forEach(bid => {
+    const def = BOARD_DEFS[bid];
+    const bs  = state.boardStates[bid];
+    const cnt = bs ? bs.activated.size : 0;
+    const div = document.createElement('div');
+    div.className = 'board-item'+(bid===state.selectedBoard?' active':'');
+    div.dataset.board = bid;
+    div.innerHTML = `
+      <div class="board-item-dot"></div>
+      <span class="board-item-name">${def.name}</span>
+      <span class="board-item-count">${cnt}</span>
+      ${!def.isStarting ? `<button class="board-item-remove" data-remove="${bid}" title="Remove board">✕</button>` : ''}
+    `;
+    div.addEventListener('click', e => {
+      if (e.target.dataset.remove) return;
+      state.selectedBoard = bid;
+      updateBoardInfoPanel();
+      render();
+    });
+    list.appendChild(div);
+  });
+
+  // Remove board buttons
+  list.querySelectorAll('[data-remove]').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      const bid = e.target.dataset.remove;
+      if (!bid) return;
+      const name = BOARD_DEFS[bid]?.name || bid;
+      if (!confirm(`Remove "${name}" and all boards connected through it?`)) return;
+      removeBoard(bid);
+      refreshPositions();
+      updateAll();
+      render();
+      fitToScreen();
+    });
+  });
+}
+
+function updateBoardInfoPanel() {
+  const bid = state.selectedBoard;
+  const def = BOARD_DEFS[bid];
+  document.getElementById('info-board-name').textContent = def?.name || '';
+  const rot = state.boardStates[bid]?.rotation || 0;
+  const isStart = def?.isStarting;
+  document.querySelectorAll('.rot-btn').forEach(b => {
+    const r = parseInt(b.dataset.rotation);
+    b.classList.toggle('active', r === rot);
+    b.disabled = isStart;
+    b.style.opacity = isStart ? '.3' : '1';
+  });
+}
+
+function updateGlyphPanel() {
+  const emptyMsg = document.getElementById('glyph-empty-msg');
+  const controls = document.getElementById('glyph-controls');
+  const infoBox  = document.getElementById('glyph-info-box');
+
+  if (!state.selectedGlyphSocket) {
+    emptyMsg.classList.remove('hidden');
+    controls.classList.add('hidden');
+    return;
+  }
+  emptyMsg.classList.add('hidden');
   controls.classList.remove('hidden');
 
   const { boardId } = state.selectedGlyphSocket;
-  const bState = state.boards[boardId];
-  document.getElementById('glyph-board-label').textContent = `Board: ${BOARD_DEFS[boardId].name}`;
+  const bs  = state.boardStates[boardId];
+  document.getElementById('glyph-board-lbl').textContent =
+    `Board: ${BOARD_DEFS[boardId]?.name}`;
 
   const sel = document.getElementById('glyph-select');
   sel.innerHTML = '<option value="">— None —</option>';
-  (DATA.glyphs || []).forEach(g => {
-    const opt = document.createElement('option');
-    opt.value = g.id;
-    opt.textContent = `${g.name} (r${g.radius})`;
-    if (bState.glyphId === g.id) opt.selected = true;
-    sel.appendChild(opt);
+  DATA.glyphs.forEach(g => {
+    const o = document.createElement('option');
+    o.value = g.id;
+    o.textContent = `${g.name} (r${g.radius})`;
+    if (bs?.glyphId === g.id) o.selected = true;
+    sel.appendChild(o);
   });
 
-  // Show glyph info
-  const glyphId = bState.glyphId;
-  if (glyphId && DATA) {
-    const glyph = DATA.glyphs.find(g => g.id === glyphId);
-    if (glyph) {
-      glyphInfo.classList.remove('hidden');
-      document.getElementById('glyph-info-name').textContent = glyph.name;
-      document.getElementById('glyph-info-radius').textContent = glyph.radius;
-      document.getElementById('glyph-info-desc').textContent = glyph.description || '';
-      document.getElementById('glyph-info-bonus').textContent = glyph.bonusEffect || '';
-      const req = document.getElementById('glyph-info-req');
-      const threshold = glyph.bonusThreshold || 0;
-      const inRadius = countStatInRadius(boardId, glyphId, glyph.bonusStat, glyph.radius);
-      if (threshold > 0) {
-        req.textContent = `Requires ${threshold} ${glyph.bonusStat || 'attribute'} in radius (${inRadius}/${threshold})`;
-        req.className = 'glyph-req ' + (inRadius >= threshold ? 'met' : 'unmet');
-      } else {
-        req.textContent = '';
-      }
-    } else {
-      glyphInfo.classList.add('hidden');
-    }
+  const gid   = bs?.glyphId;
+  const glyph = gid ? DATA.glyphs.find(g=>g.id===gid) : null;
+  if (glyph) {
+    infoBox.classList.remove('hidden');
+    document.getElementById('gi-name').textContent   = glyph.name;
+    document.getElementById('gi-radius').textContent = glyph.radius;
+    document.getElementById('gi-desc').textContent   = glyph.description||'';
+    document.getElementById('gi-bonus').textContent  = glyph.bonusEffect||'';
+    const thr   = glyph.bonusThreshold||0;
+    const inR   = countStatInRadius(boardId, glyph);
+    const req   = document.getElementById('gi-req');
+    if (thr>0) {
+      req.textContent = `Requires ${thr} ${glyph.bonusStat||'attribute'} in radius (${inR}/${thr})`;
+      req.className   = 'gi-req '+(inR>=thr?'met':'unmet');
+    } else { req.textContent=''; }
   } else {
-    glyphInfo.classList.add('hidden');
+    infoBox.classList.add('hidden');
   }
 }
 
-function countStatInRadius(boardId, glyphId, stat, radius) {
-  if (!stat) return 0;
-  const glyphNode = generateNodes(boardId).find(n => n.type === 'glyph');
-  if (!glyphNode) return 0;
-  const bState = state.boards[boardId];
-  const activated = bState.activatedNodes;
-  return generateNodes(boardId).filter(n => {
-    if (!activated.has(n.key)) return false;
-    const dist = Math.abs(n.col - glyphNode.col) + Math.abs(n.row - glyphNode.row);
-    return dist <= radius && n.stat === stat;
-  }).reduce((sum, n) => {
-    return sum + (STAT_VALUES.normal[n.stat] || 0);
-  }, 0);
-}
-
-// ─────────────────────────────────────────────────
-//  STAT CALCULATION
-// ─────────────────────────────────────────────────
-function calculateStats() {
-  const totals = {
-    dexterity: 0, strength: 0, intelligence: 0, willpower: 0,
-    life: 0, armor: 0, damage: 0, vulnerable: 0, critdmg: 0, poison: 0, trap: 0
-  };
-
-  state.activeBoards.forEach(boardId => {
-    const bState = state.boards[boardId];
-    const activated = bState.activatedNodes;
-    generateNodes(boardId).forEach(node => {
-      if (!activated.has(node.key)) return;
-      if (node.type === 'normal' && node.stat) {
-        totals[node.stat] = (totals[node.stat] || 0) + (STAT_VALUES.normal[node.stat] || 0);
-        // Secondary stats from normal nodes
-        const secondaryVal = 2;
-        ['dexterity','strength','intelligence','willpower'].forEach(s => {
-          if (s !== node.stat) totals[s] = (totals[s] || 0) + (secondaryVal * 0.1 | 0); // small secondary
-        });
-      } else if (node.type === 'magic' && node.stat) {
-        totals[node.stat] = (totals[node.stat] || 0) + (STAT_VALUES.magic[node.stat] || 5);
-        // Magic nodes also give secondary bonuses from their type
-      } else if (node.type === 'rare' && DATA) {
-        const rareData = DATA.rareNodes && DATA.rareNodes[node.id];
-        if (rareData && rareData.bonus) {
-          Object.entries(rareData.bonus).forEach(([k, v]) => {
-            totals[k] = (totals[k] || 0) + v;
-          });
-        }
-      }
-      // Life / armor from magic nodes
-      if (node.type === 'magic') {
-        totals.life  += 6;
-        totals.armor += 4;
-      }
-    });
-
-    // Glyph bonus
-    const glyphId = bState.glyphId;
-    if (glyphId && DATA) {
-      const glyph = DATA.glyphs.find(g => g.id === glyphId);
-      if (glyph) {
-        // Apply glyph effects based on type
-        applyGlyphStats(glyph, boardId, totals);
-      }
-    }
-  });
-
-  // Derive bonuses from primary stats
-  totals.damage    += Math.floor(totals.dexterity * 0.1);
-  totals.critdmg   += Math.floor(totals.dexterity * 0.08);
-  totals.vulnerable+= Math.floor(totals.intelligence * 0.06);
-  totals.life      += Math.floor(totals.willpower * 1.5);
-  totals.armor     += Math.floor(totals.strength * 0.5);
-  totals.poison    += Math.floor(totals.dexterity * 0.04 + totals.intelligence * 0.04);
-  totals.trap      += Math.floor(totals.dexterity * 0.06);
-
-  return totals;
-}
-
-function applyGlyphStats(glyph, boardId, totals) {
-  const level = 1; // Glyphs at level 1 for now
-  const baseEffect = 15 + level * 2;
-  switch (glyph.id) {
-    case 'ambush':     totals.trap      += baseEffect; break;
-    case 'cutthroat':  totals.damage    += baseEffect; break;
-    case 'marksman':   totals.damage    += baseEffect; break;
-    case 'bladedancer':totals.damage    += baseEffect - 3; totals.dexterity += 8; break;
-    case 'control':    totals.damage    += baseEffect; break;
-    case 'exploit':    totals.vulnerable+= baseEffect + 5; break;
-    case 'efficacy':   totals.damage    += baseEffect - 5; break;
-    case 'domination': totals.damage    += baseEffect; break;
-    case 'turf':       totals.armor     += 30; totals.dexterity += 5; break;
-    case 'revenge':    totals.damage    += baseEffect - 5; break;
-    case 'imp':        totals.poison    += baseEffect; break;
-    case 'territorial':totals.dexterity += 10; totals.strength  += 5; break;
-    case 'torch':      totals.damage    += baseEffect; break;
-    case 'elementalist':totals.intelligence += 10; totals.damage += 10; break;
-    case 'ranger':     totals.damage    += baseEffect; break;
-    case 'subtlety':   totals.damage    += baseEffect; break;
-    default:           totals.damage    += 10; break;
-  }
+function countStatInRadius(boardId, glyph) {
+  if (!glyph?.bonusStat) return 0;
+  const glNode = generateNodes(boardId).find(n=>n.type==='glyph');
+  if (!glNode) return 0;
+  const bs = state.boardStates[boardId];
+  return generateNodes(boardId)
+    .filter(n => bs?.activated.has(n.key) && n.stat===glyph.bonusStat
+              && Math.abs(n.col-glNode.col)+Math.abs(n.row-glNode.row) <= glyph.radius)
+    .reduce((s,n)=>s+5, 0);
 }
 
 function updateStatsPanel() {
-  const stats = calculateStats();
-  document.getElementById('stat-dexterity').textContent    = stats.dexterity;
-  document.getElementById('stat-strength').textContent     = stats.strength;
-  document.getElementById('stat-intelligence').textContent = stats.intelligence;
-  document.getElementById('stat-willpower').textContent    = stats.willpower;
-  document.getElementById('stat-life').textContent         = '+' + stats.life;
-  document.getElementById('stat-armor').textContent        = '+' + stats.armor;
-  document.getElementById('stat-damage').textContent       = '+' + stats.damage + '%';
-  document.getElementById('stat-vulnerable').textContent   = '+' + stats.vulnerable + '%';
-  document.getElementById('stat-critdmg').textContent      = '+' + stats.critdmg + '%';
-  document.getElementById('stat-poison').textContent       = '+' + stats.poison + '%';
-  document.getElementById('stat-trap').textContent         = '+' + stats.trap + '%';
+  const s = calcStats();
+  document.getElementById('s-dex').textContent   = s.dexterity;
+  document.getElementById('s-str').textContent   = s.strength;
+  document.getElementById('s-int').textContent   = s.intelligence;
+  document.getElementById('s-wil').textContent   = s.willpower;
+  document.getElementById('s-life').textContent  = '+'+s.life;
+  document.getElementById('s-armor').textContent = '+'+s.armor;
+  document.getElementById('s-dmg').textContent   = '+'+s.damage+'%';
+  document.getElementById('s-vuln').textContent  = '+'+s.vulnerable+'%';
+  document.getElementById('s-crit').textContent  = '+'+s.critdmg+'%';
+  document.getElementById('s-poison').textContent= '+'+s.poison+'%';
+  document.getElementById('s-trap').textContent  = '+'+s.trap+'%';
 }
 
 function updatePointsCounter() {
   let used = 0;
-  state.activeBoards.forEach(bid => {
-    used += state.boards[bid].activatedNodes.size;
+  orderedBoards().forEach(bid => {
+    const bs = state.boardStates[bid];
+    if (bs) used += bs.activated.size;
   });
   document.getElementById('points-used').textContent = used;
 }
@@ -1073,602 +1354,326 @@ function updatePointsCounter() {
 function updateLegendaryPanel() {
   const list = document.getElementById('legendary-list');
   list.innerHTML = '';
-  const legendaries = [];
-
-  state.activeBoards.forEach(boardId => {
-    const bState = state.boards[boardId];
-    const legNode = generateNodes(boardId).find(n => n.type === 'legendary');
-    if (legNode && bState.activatedNodes.has(legNode.key) && DATA) {
-      const legData = DATA.legendaryNodes && DATA.legendaryNodes[legNode.id];
-      if (legData) {
-        legendaries.push({ boardId, data: legData });
-      }
+  const items = [];
+  orderedBoards().forEach(bid => {
+    const bs = state.boardStates[bid];
+    if (!bs) return;
+    const legNode = generateNodes(bid).find(n=>n.type==='legendary');
+    if (legNode && bs.activated.has(legNode.key)) {
+      const ld = DATA.legendaryNodes?.[legNode.id];
+      if (ld) items.push({ boardId:bid, data:ld });
     }
   });
-
-  if (legendaries.length === 0) {
-    list.innerHTML = '<div class="empty-msg">Allocate the Legendary Node on each board to unlock its power.</div>';
+  if (!items.length) {
+    list.innerHTML = '<div class="dim-msg">Activate a Legendary node to unlock its power.</div>';
     return;
   }
-
-  legendaries.forEach(({ boardId, data }) => {
-    const item = document.createElement('div');
-    item.className = 'legendary-item';
-    item.innerHTML = `
-      <div class="legendary-item-name">${data.name}</div>
-      <div class="legendary-item-board">${BOARD_DEFS[boardId].name}</div>
-      <div class="legendary-item-desc">${data.description}</div>
-    `;
-    list.appendChild(item);
+  items.forEach(({ boardId, data }) => {
+    const div = document.createElement('div');
+    div.className = 'leg-item';
+    div.innerHTML = `<div class="leg-name">${data.name}</div>
+                     <div class="leg-board">${BOARD_DEFS[boardId].name}</div>
+                     <div class="leg-desc">${data.description}</div>`;
+    list.appendChild(div);
   });
 }
 
-function updateBoardList() {
-  const list = document.getElementById('board-list');
-  list.innerHTML = '';
-  state.activeBoards.forEach(boardId => {
-    const def = BOARD_DEFS[boardId];
-    const bState = state.boards[boardId];
-    const count = bState.activatedNodes.size;
-    const item = document.createElement('div');
-    item.className = 'board-item' + (boardId === state.selectedBoard ? ' active' : '');
-    item.dataset.board = boardId;
-    item.innerHTML = `
-      <div class="board-item-dot"></div>
-      <span class="board-item-name">${def.name}</span>
-      <span class="board-item-nodes">${count}</span>
-    `;
-    item.addEventListener('click', () => {
-      state.selectedBoard = boardId;
-      updateBoardInfoPanel();
-      render();
-    });
-    list.appendChild(item);
-  });
-
-  updateAvailableBoards();
-}
-
-function updateAvailableBoards() {
-  const container = document.getElementById('available-boards');
-  container.innerHTML = '';
-  const allBoards = Object.keys(BOARD_DEFS).filter(id => !BOARD_DEFS[id].isStarting);
-  allBoards.forEach(boardId => {
-    const def = BOARD_DEFS[boardId];
-    const added = state.activeBoards.includes(boardId);
-    const btn = document.createElement('button');
-    btn.className = 'avail-board-btn' + (added ? ' added' : '');
-    btn.innerHTML = `<span class="add-icon">${added ? '✓' : '+'}</span>${def.name}`;
-    if (!added) {
-      btn.addEventListener('click', () => addBoard(boardId));
-    }
-    container.appendChild(btn);
-  });
-}
-
-function updateBoardInfoPanel() {
-  const boardId = state.selectedBoard;
-  const def = BOARD_DEFS[boardId];
-  document.getElementById('info-board-name').textContent = def.name;
-
-  // Update rotation buttons
-  const rotBtns = document.querySelectorAll('.rot-btn');
-  const currentRot = state.boards[boardId] ? state.boards[boardId].rotation : 0;
-  const isStarting = def.isStarting;
-  rotBtns.forEach(btn => {
-    btn.classList.toggle('active', parseInt(btn.dataset.rotation) === currentRot);
-    btn.disabled = isStarting;
-    btn.style.opacity = isStarting ? '0.4' : '1';
-  });
-}
-
-// ─────────────────────────────────────────────────
-//  BOARD MANAGEMENT
-// ─────────────────────────────────────────────────
-function addBoard(boardId) {
-  if (state.activeBoards.includes(boardId)) return;
-  state.activeBoards.push(boardId);
-  state.boards[boardId] = { activatedNodes: new Set(), rotation: 0, glyphId: null };
-  // Auto-activate entry gate
-  const def = BOARD_DEFS[boardId];
-  const entryGate = def.gates.find(g => g.direction === 'north') || def.gates[0];
-  if (entryGate) state.boards[boardId].activatedNodes.add(`${entryGate.col},${entryGate.row}`);
-  state.selectedBoard = boardId;
-  updateBoardInfoPanel();
-  render();
-}
-
-function removeBoard(boardId) {
-  if (boardId === 'starting') return;
-  state.activeBoards = state.activeBoards.filter(b => b !== boardId);
-  delete state.boards[boardId];
-  if (state.selectedBoard === boardId) {
-    state.selectedBoard = 'starting';
-  }
-  render();
-}
-
-// ─────────────────────────────────────────────────
+// ═══════════════════════════════════════════════
 //  ZOOM & PAN
-// ─────────────────────────────────────────────────
+// ═══════════════════════════════════════════════
 function applyTransform() {
-  canvasRoot.setAttribute('transform', `translate(${state.pan.x},${state.pan.y}) scale(${state.zoom})`);
-  document.getElementById('zoom-label').textContent = Math.round(state.zoom * 100) + '%';
+  ROOT.setAttribute('transform',
+    `translate(${state.pan.x},${state.pan.y}) scale(${state.zoom})`);
+  document.getElementById('zoom-label').textContent =
+    Math.round(state.zoom*100)+'%';
 }
 
 function fitToScreen() {
-  const wrapper = document.getElementById('svg-wrapper');
-  const rect = wrapper.getBoundingClientRect();
-  const layouts = getBoardLayouts();
-  if (state.activeBoards.length === 0) return;
-
-  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
-  state.activeBoards.forEach(bid => {
-    const l = layouts[bid];
-    minX = Math.min(minX, l.x - NODE_GAP);
-    minY = Math.min(minY, l.y - NODE_GAP);
-    maxX = Math.max(maxX, l.x + l.bw + NODE_GAP);
-    maxY = Math.max(maxY, l.y + l.bh + NODE_GAP);
+  const wr  = document.getElementById('svg-wrapper').getBoundingClientRect();
+  const pos = _posCache;
+  const bids = orderedBoards();
+  if (!bids.length) return;
+  let minX=1e9,minY=1e9,maxX=-1e9,maxY=-1e9;
+  bids.forEach(bid => {
+    const p  = pos[bid]; if (!p) return;
+    const d  = BOARD_DEFS[bid];
+    minX = Math.min(minX, p.x-G);
+    minY = Math.min(minY, p.y-G);
+    maxX = Math.max(maxX, p.x+(d.width-1)*G+G);
+    maxY = Math.max(maxY, p.y+(d.height-1)*G+G);
   });
-
-  const contentW = maxX - minX;
-  const contentH = maxY - minY;
-  const scaleX = rect.width / contentW;
-  const scaleY = rect.height / contentH;
-  state.zoom = Math.min(scaleX, scaleY, 2) * 0.9;
-  state.pan.x = (rect.width / 2)  - (minX + contentW / 2) * state.zoom;
-  state.pan.y = (rect.height / 2) - (minY + contentH / 2) * state.zoom;
+  const cw = maxX-minX, ch = maxY-minY;
+  if (cw<=0||ch<=0) return;
+  const z = Math.min(wr.width/cw, wr.height/ch, 2)*.88;
+  state.zoom  = z;
+  state.pan.x = wr.width/2  - (minX+cw/2)*z;
+  state.pan.y = wr.height/2 - (minY+ch/2)*z;
   applyTransform();
 }
 
-// ─────────────────────────────────────────────────
-//  TOOLTIP
-// ─────────────────────────────────────────────────
-const tooltip = document.getElementById('node-tooltip');
-
-function showTooltip(e, boardId, node) {
-  const wrapper = document.getElementById('svg-wrapper');
-  const wRect = wrapper.getBoundingClientRect();
-  const x = e.clientX - wRect.left;
-  const y = e.clientY - wRect.top;
-
-  tooltip.querySelector('.tooltip-name').textContent = getNodeDisplayName(boardId, node);
-  tooltip.querySelector('.tooltip-type').textContent = getTypeLabel(node.type);
-  tooltip.querySelector('.tooltip-type').className = 'tooltip-type ' + node.type;
-  tooltip.querySelector('.tooltip-stat').textContent  = getStatLine(node);
-  tooltip.querySelector('.tooltip-effect').textContent = getEffectText(boardId, node);
-  tooltip.querySelector('.tooltip-hint').textContent  = getHintText(node);
-
-  tooltip.classList.remove('hidden');
-  // Position avoiding edges
-  let tx = x + 12, ty = y - 10;
-  if (tx + 270 > wRect.width) tx = x - 270;
-  if (ty + 140 > wRect.height) ty = y - 140;
-  tooltip.style.left = tx + 'px';
-  tooltip.style.top  = ty + 'px';
-}
-
-function hideTooltip() { tooltip.classList.add('hidden'); }
-
-function getNodeDisplayName(boardId, node) {
-  if (node.type === 'start') return 'Starting Node';
-  if (node.type === 'gate') return 'Board Gate';
-  if (node.type === 'glyph') return 'Glyph Socket';
-  if (node.type === 'legendary' && DATA) {
-    const ld = DATA.legendaryNodes && DATA.legendaryNodes[node.id];
-    return ld ? ld.name : 'Legendary Node';
-  }
-  if (node.type === 'rare' && DATA) {
-    const rd = DATA.rareNodes && DATA.rareNodes[node.id];
-    return rd ? rd.name : 'Rare Node';
-  }
-  if (node.stat) return capitalize(node.stat) + ' Node';
-  return 'Paragon Node';
-}
-
-function getTypeLabel(type) {
-  const labels = { start:'Start', gate:'Gate', normal:'Normal', magic:'Magic',
-                   rare:'Rare', legendary:'Legendary', glyph:'Glyph' };
-  return labels[type] || type;
-}
-
-function getStatLine(node) {
-  if (node.type === 'normal' && node.stat) {
-    return `+${STAT_VALUES.normal[node.stat]} ${capitalize(node.stat)}`;
-  }
-  if (node.type === 'magic' && node.stat) {
-    return `+${STAT_VALUES.magic[node.stat] || 5} ${capitalize(node.stat)} + bonuses`;
-  }
-  return '';
-}
-
-function getEffectText(boardId, node) {
-  if (node.type === 'legendary' && DATA) {
-    const ld = DATA.legendaryNodes && DATA.legendaryNodes[node.id];
-    return ld ? ld.description : 'Powerful legendary effect';
-  }
-  if (node.type === 'rare' && DATA) {
-    const rd = DATA.rareNodes && DATA.rareNodes[node.id];
-    return rd ? rd.description : 'Rare bonus node';
-  }
-  if (node.type === 'glyph') return 'Click to assign a Glyph';
-  if (node.type === 'gate') return 'Connects to adjacent board';
-  if (node.type === 'magic') return '+Bonus stat effect';
-  return '';
-}
-
-function getHintText(node) {
-  const isActive = state.boards[state.selectedBoard]?.activatedNodes.has(node.key);
-  if (node.type === 'glyph') return 'Click to select glyph';
-  if (isActive) return 'Click to deactivate';
-  return 'Click to activate';
-}
-
-// ─────────────────────────────────────────────────
+// ═══════════════════════════════════════════════
 //  EXPORT / IMPORT
-// ─────────────────────────────────────────────────
+// ═══════════════════════════════════════════════
 function exportBuild() {
-  const data = {
-    version: '1.0',
-    class: 'rogue',
-    activeBoards: state.activeBoards,
-    boards: {}
-  };
-  state.activeBoards.forEach(bid => {
-    const bs = state.boards[bid];
+  const data = { version:'1.1', class:'rogue', connections:{...state.connections}, boards:{} };
+  orderedBoards().forEach(bid => {
+    const bs = state.boardStates[bid];
     data.boards[bid] = {
-      activatedNodes: [...bs.activatedNodes],
-      rotation: bs.rotation,
-      glyphId: bs.glyphId
+      activated: [...bs.activated],
+      rotation:  bs.rotation,
+      glyphId:   bs.glyphId,
     };
   });
   return data;
 }
 
 function importBuild(data) {
-  if (!data || data.class !== 'rogue') throw new Error('Invalid build data');
-  state.activeBoards = data.activeBoards || ['starting'];
-  state.boards = {};
-  state._nodeCache = {};
-  state.activeBoards.forEach(bid => {
-    const bs = data.boards[bid] || {};
-    state.boards[bid] = {
-      activatedNodes: new Set(bs.activatedNodes || []),
-      rotation: bs.rotation || 0,
-      glyphId: bs.glyphId || null
+  if (!data||data.class!=='rogue') throw new Error('Invalid build file (class must be rogue)');
+  state.connections = { ...(data.connections||{}) };
+  state.boardStates = {};
+  Object.entries(data.boards||{}).forEach(([bid, bs]) => {
+    state.boardStates[bid] = {
+      activated: new Set(bs.activated||[]),
+      rotation:  bs.rotation||0,
+      glyphId:   bs.glyphId||null,
     };
   });
-  state.selectedBoard = state.activeBoards[0];
-  updateBoardInfoPanel();
-}
-
-function generateShareCode(buildData) {
-  try {
-    const json = JSON.stringify(buildData);
-    return btoa(encodeURIComponent(json));
-  } catch { return ''; }
-}
-
-function decodeShareCode(code) {
-  try {
-    return JSON.parse(decodeURIComponent(atob(code)));
-  } catch { throw new Error('Invalid share code'); }
-}
-
-// ─────────────────────────────────────────────────
-//  HELPERS
-// ─────────────────────────────────────────────────
-function svgEl(tag, attrs = {}) {
-  const el = document.createElementNS('http://www.w3.org/2000/svg', tag);
-  Object.entries(attrs).forEach(([k, v]) => el.setAttribute(k, v));
-  return el;
-}
-
-function getNodeRadius(type) {
-  const radii = { start:18, gate:16, legendary:18, rare:16, magic:14, glyph:17, normal:13 };
-  return radii[type] || 13;
-}
-
-function getStrokeWidth(type, active) {
-  if (type === 'legendary') return active ? 3 : 2;
-  if (type === 'rare') return active ? 2.5 : 2;
-  if (type === 'magic') return active ? 2 : 1.5;
-  return active ? 2 : 1.5;
-}
-
-function getNodeIcon(node) {
-  switch (node.type) {
-    case 'start':     return '⚔';
-    case 'gate':      return '🏛';
-    case 'legendary': return '★';
-    case 'glyph':     return '◈';
-    case 'rare':      return '◆';
-    case 'magic':     return STAT_ICONS[node.stat] || '◉';
-    case 'normal':    return STAT_ICONS[node.stat] || '·';
-    default: return '';
+  if (!state.boardStates.starting) {
+    state.boardStates.starting = { activated:new Set(['6,0']), rotation:0, glyphId:null };
   }
+  state.selectedBoard = 'starting';
+  state.selectedGlyphSocket = null;
 }
 
-function getIconColor(node, isActive) {
-  if (node.type === 'legendary') return isActive ? '#ffaa00' : '#c04000';
-  if (node.type === 'rare')      return isActive ? '#ffd700' : '#a08000';
-  if (node.type === 'glyph')     return isActive ? '#bb88ff' : '#7744cc';
-  if (node.type === 'start')     return isActive ? '#ff8866' : '#cc4422';
-  if (node.type === 'gate')      return isActive ? '#8899dd' : '#445588';
-  if (node.stat) return isActive ? (STAT_COLORS[node.stat] + 'ff') : (STAT_COLORS[node.stat] + '88');
-  return isActive ? '#888' : '#444';
+function toShareCode(d) {
+  try { return btoa(encodeURIComponent(JSON.stringify(d))); } catch { return ''; }
+}
+function fromShareCode(s) {
+  try { return JSON.parse(decodeURIComponent(atob(s))); } catch { throw new Error('Invalid share code'); }
 }
 
-function getIconSize(type) {
-  const sizes = { start:12, gate:11, legendary:14, rare:10, glyph:13, magic:9, normal:8 };
-  return sizes[type] || 8;
+function copyText(t) {
+  if (navigator.clipboard) { navigator.clipboard.writeText(t).catch(()=>_fallbackCopy(t)); }
+  else _fallbackCopy(t);
+}
+function _fallbackCopy(t) {
+  const ta=document.createElement('textarea');
+  ta.value=t;ta.style.position='fixed';ta.style.opacity='0';
+  document.body.appendChild(ta);ta.select();document.execCommand('copy');
+  document.body.removeChild(ta);
 }
 
-function capitalize(s) { return s ? s[0].toUpperCase() + s.slice(1) : ''; }
-
-// ─────────────────────────────────────────────────
-//  EVENT WIRING
-// ─────────────────────────────────────────────────
+// ═══════════════════════════════════════════════
+//  EVENT SETUP
+// ═══════════════════════════════════════════════
 function setupEvents() {
-  // Zoom
+  // Zoom buttons
   document.getElementById('btn-zoom-in').addEventListener('click', () => {
-    state.zoom = Math.min(state.zoom * 1.2, 4);
-    applyTransform();
+    state.zoom = Math.min(state.zoom*1.2,4); applyTransform();
   });
   document.getElementById('btn-zoom-out').addEventListener('click', () => {
-    state.zoom = Math.max(state.zoom / 1.2, 0.2);
-    applyTransform();
+    state.zoom = Math.max(state.zoom/1.2,.2); applyTransform();
   });
   document.getElementById('btn-zoom-fit').addEventListener('click', fitToScreen);
 
   // Wheel zoom
-  const wrapper = document.getElementById('svg-wrapper');
-  wrapper.addEventListener('wheel', (e) => {
+  const wr = document.getElementById('svg-wrapper');
+  wr.addEventListener('wheel', e => {
     e.preventDefault();
-    const rect = wrapper.getBoundingClientRect();
-    const mx = e.clientX - rect.left;
-    const my = e.clientY - rect.top;
-    const factor = e.deltaY < 0 ? 1.1 : 0.9;
-    const newZoom = Math.min(Math.max(state.zoom * factor, 0.2), 4);
-    state.pan.x = mx - (mx - state.pan.x) * (newZoom / state.zoom);
-    state.pan.y = my - (my - state.pan.y) * (newZoom / state.zoom);
-    state.zoom = newZoom;
+    const rect = wr.getBoundingClientRect();
+    const mx = e.clientX-rect.left, my = e.clientY-rect.top;
+    const f  = e.deltaY<0?1.12:.9;
+    const nz = Math.min(Math.max(state.zoom*f,.2),4);
+    state.pan.x = mx-(mx-state.pan.x)*(nz/state.zoom);
+    state.pan.y = my-(my-state.pan.y)*(nz/state.zoom);
+    state.zoom  = nz;
     applyTransform();
-  }, { passive: false });
+  },{passive:false});
 
-  // Pan
-  wrapper.addEventListener('mousedown', (e) => {
+  // Mouse pan
+  wr.addEventListener('mousedown', e => {
     if (e.target.closest('.node')) return;
     state.isPanning = true;
-    state.panStart = { x: e.clientX - state.pan.x, y: e.clientY - state.pan.y };
-    wrapper.classList.add('dragging');
+    state._panStart = { x:e.clientX-state.pan.x, y:e.clientY-state.pan.y };
+    wr.classList.add('dragging');
   });
-  window.addEventListener('mousemove', (e) => {
+  window.addEventListener('mousemove', e => {
     if (!state.isPanning) return;
-    state.pan.x = e.clientX - state.panStart.x;
-    state.pan.y = e.clientY - state.panStart.y;
+    state.pan.x = e.clientX-state._panStart.x;
+    state.pan.y = e.clientY-state._panStart.y;
     applyTransform();
   });
   window.addEventListener('mouseup', () => {
-    state.isPanning = false;
-    wrapper.classList.remove('dragging');
+    state.isPanning=false;
+    wr.classList.remove('dragging');
   });
 
-  // Touch pan/zoom
-  let lastTouchDist = 0;
-  let lastTouchCenter = { x: 0, y: 0 };
-  wrapper.addEventListener('touchstart', (e) => {
-    if (e.touches.length === 1) {
-      state.isPanning = true;
-      state.panStart = { x: e.touches[0].clientX - state.pan.x, y: e.touches[0].clientY - state.pan.y };
-    } else if (e.touches.length === 2) {
-      const dx = e.touches[0].clientX - e.touches[1].clientX;
-      const dy = e.touches[0].clientY - e.touches[1].clientY;
-      lastTouchDist = Math.sqrt(dx*dx + dy*dy);
-      lastTouchCenter = {
-        x: (e.touches[0].clientX + e.touches[1].clientX) / 2,
-        y: (e.touches[0].clientY + e.touches[1].clientY) / 2
-      };
+  // Touch pan/pinch
+  let _td=0, _tc={x:0,y:0};
+  wr.addEventListener('touchstart', e => {
+    if (e.touches.length===1) {
+      state.isPanning=true;
+      state._panStart={x:e.touches[0].clientX-state.pan.x,y:e.touches[0].clientY-state.pan.y};
+    } else if (e.touches.length===2) {
+      const dx=e.touches[0].clientX-e.touches[1].clientX;
+      const dy=e.touches[0].clientY-e.touches[1].clientY;
+      _td=Math.sqrt(dx*dx+dy*dy);
+      _tc={x:(e.touches[0].clientX+e.touches[1].clientX)/2,y:(e.touches[0].clientY+e.touches[1].clientY)/2};
     }
-  }, { passive: true });
-  wrapper.addEventListener('touchmove', (e) => {
+  },{passive:true});
+  wr.addEventListener('touchmove', e => {
     e.preventDefault();
-    if (e.touches.length === 1 && state.isPanning) {
-      state.pan.x = e.touches[0].clientX - state.panStart.x;
-      state.pan.y = e.touches[0].clientY - state.panStart.y;
+    if (e.touches.length===1&&state.isPanning) {
+      state.pan.x=e.touches[0].clientX-state._panStart.x;
+      state.pan.y=e.touches[0].clientY-state._panStart.y;
       applyTransform();
-    } else if (e.touches.length === 2) {
-      const dx = e.touches[0].clientX - e.touches[1].clientX;
-      const dy = e.touches[0].clientY - e.touches[1].clientY;
-      const dist = Math.sqrt(dx*dx + dy*dy);
-      const factor = dist / (lastTouchDist || dist);
-      const rect = wrapper.getBoundingClientRect();
-      const cx = lastTouchCenter.x - rect.left;
-      const cy = lastTouchCenter.y - rect.top;
-      const newZoom = Math.min(Math.max(state.zoom * factor, 0.2), 4);
-      state.pan.x = cx - (cx - state.pan.x) * (newZoom / state.zoom);
-      state.pan.y = cy - (cy - state.pan.y) * (newZoom / state.zoom);
-      state.zoom = newZoom;
-      lastTouchDist = dist;
-      applyTransform();
+    } else if (e.touches.length===2) {
+      const dx=e.touches[0].clientX-e.touches[1].clientX;
+      const dy=e.touches[0].clientY-e.touches[1].clientY;
+      const d=Math.sqrt(dx*dx+dy*dy);
+      const f=d/(_td||d);
+      const rect=wr.getBoundingClientRect();
+      const cx=_tc.x-rect.left,cy=_tc.y-rect.top;
+      const nz=Math.min(Math.max(state.zoom*f,.2),4);
+      state.pan.x=cx-(cx-state.pan.x)*(nz/state.zoom);
+      state.pan.y=cy-(cy-state.pan.y)*(nz/state.zoom);
+      state.zoom=nz; _td=d; applyTransform();
     }
-  }, { passive: false });
-  wrapper.addEventListener('touchend', () => { state.isPanning = false; });
+  },{passive:false});
+  wr.addEventListener('touchend',()=>{state.isPanning=false;},{passive:true});
 
-  // Rotation buttons
-  document.getElementById('rotation-btns').addEventListener('click', (e) => {
+  // Rotation
+  document.getElementById('rotation-btns').addEventListener('click', e => {
     const btn = e.target.closest('.rot-btn');
     if (!btn) return;
-    const rotation = parseInt(btn.dataset.rotation);
-    const boardId = state.selectedBoard;
-    if (BOARD_DEFS[boardId].isStarting) return;
-    state.boards[boardId].rotation = rotation;
-    state._nodeCache[boardId] = null; // clear cache (rotation doesn't affect grid, only display)
+    const bid = state.selectedBoard;
+    if (BOARD_DEFS[bid]?.isStarting) return;
+    const rot = parseInt(btn.dataset.rotation);
+    state.boardStates[bid].rotation = rot;
     updateBoardInfoPanel();
+    refreshPositions();
     render();
   });
 
-  // Glyph select
-  document.getElementById('glyph-select').addEventListener('change', (e) => {
+  // Glyph select (right-panel dropdown)
+  document.getElementById('glyph-select').addEventListener('change', e => {
     if (!state.selectedGlyphSocket) return;
-    const { boardId } = state.selectedGlyphSocket;
-    state.boards[boardId].glyphId = e.target.value || null;
+    const bid = state.selectedGlyphSocket.boardId;
+    state.boardStates[bid].glyphId = e.target.value || null;
+    updateGlyphPanel();
+    updateStatsPanel();
+    render();
+  });
+
+  // Remove glyph button in modal
+  document.getElementById('glyph-none-btn').addEventListener('click', () => {
+    if (!state.selectedGlyphSocket) return;
+    const bid = state.selectedGlyphSocket.boardId;
+    state.boardStates[bid].glyphId = null;
+    closeModal();
     updateGlyphPanel();
     render();
+  });
+
+  // Modal close buttons
+  document.querySelectorAll('[data-close]').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      closeModal();
+    });
+  });
+  document.getElementById('modal-overlay').addEventListener('click', e => {
+    if (e.target === e.currentTarget) closeModal();
   });
 
   // Reset
   document.getElementById('btn-reset').addEventListener('click', () => {
-    if (!confirm('Reset all activated nodes?')) return;
-    state.activeBoards.forEach(bid => {
-      state.boards[bid].activatedNodes.clear();
-      if (bid === 'starting') state.boards[bid].activatedNodes.add('6,0');
-      else {
-        const def = BOARD_DEFS[bid];
-        const eg = def.gates.find(g => g.direction === 'north') || def.gates[0];
-        if (eg) state.boards[bid].activatedNodes.add(`${eg.col},${eg.row}`);
+    if (!confirm('Reset all activated nodes on all boards?')) return;
+    orderedBoards().forEach(bid => {
+      const bs = state.boardStates[bid];
+      const def = BOARD_DEFS[bid];
+      bs.activated.clear();
+      if (def.isStarting) {
+        bs.activated.add('6,0');
+      } else {
+        const eg = def.gates.find(g=>g.direction===
+          OPP[def.gates.find(g2=>connectedBoard(bid,OPP[g2.direction]))?.direction||'north']
+        ) || def.gates[0];
+        if (eg) bs.activated.add(`${eg.col},${eg.row}`);
       }
     });
     state.selectedGlyphSocket = null;
-    updateGlyphPanel();
-    render();
+    updateAll(); render();
   });
 
   // Export
   document.getElementById('btn-export').addEventListener('click', () => {
-    const buildData = exportBuild();
-    document.getElementById('export-json').value = JSON.stringify(buildData, null, 2);
-    document.getElementById('share-code-input').value = generateShareCode(buildData);
-    showModal('export');
+    const d = exportBuild();
+    document.getElementById('export-json').value = JSON.stringify(d, null, 2);
+    document.getElementById('share-code').value  = toShareCode(d);
+    document.getElementById('modal-overlay').classList.remove('hidden');
+    document.querySelectorAll('.modal').forEach(m=>m.classList.add('hidden'));
+    document.getElementById('modal-export').classList.remove('hidden');
   });
-  document.getElementById('btn-copy-code').addEventListener('click', () => {
-    copyText(document.getElementById('share-code-input').value);
-  });
-  document.getElementById('btn-copy-json').addEventListener('click', () => {
-    copyText(document.getElementById('export-json').value);
-  });
+  document.getElementById('btn-copy-code').addEventListener('click',()=>
+    copyText(document.getElementById('share-code').value));
+  document.getElementById('btn-copy-json').addEventListener('click',()=>
+    copyText(document.getElementById('export-json').value));
 
   // Import
-  document.getElementById('btn-import').addEventListener('click', () => showModal('import'));
-  document.getElementById('btn-import-code').addEventListener('click', () => {
-    const code = document.getElementById('import-code-input').value.trim();
+  document.getElementById('btn-import').addEventListener('click', () => {
+    document.getElementById('modal-overlay').classList.remove('hidden');
+    document.querySelectorAll('.modal').forEach(m=>m.classList.add('hidden'));
+    document.getElementById('modal-import').classList.remove('hidden');
+    document.getElementById('import-err').classList.add('hidden');
+  });
+  document.getElementById('btn-load-code').addEventListener('click', () => {
     try {
-      const data = decodeShareCode(code);
-      importBuild(data);
-      hideModal();
-      render();
-    } catch (err) {
-      showImportError(err.message);
-    }
+      const d = fromShareCode(document.getElementById('import-code').value.trim());
+      importBuild(d); closeModal(); refreshPositions(); updateAll(); render(); fitToScreen();
+    } catch(e) { showImportErr(e.message); }
   });
-  document.getElementById('btn-import-json').addEventListener('click', () => {
-    const json = document.getElementById('import-json').value.trim();
+  document.getElementById('btn-load-json').addEventListener('click', () => {
     try {
-      const data = JSON.parse(json);
-      importBuild(data);
-      hideModal();
-      render();
-    } catch (err) {
-      showImportError(err.message);
-    }
-  });
-
-  // Modal close
-  document.querySelectorAll('.modal-close').forEach(btn => {
-    btn.addEventListener('click', hideModal);
-  });
-  document.getElementById('modal-overlay').addEventListener('click', (e) => {
-    if (e.target === e.currentTarget) hideModal();
-  });
-
-  // View mode
-  document.getElementById('btn-view-single').addEventListener('click', () => {
-    state.viewMode = 'single';
-    document.getElementById('btn-view-single').classList.add('active');
-    document.getElementById('btn-view-all').classList.remove('active');
-    render();
-    fitToScreen();
-  });
-  document.getElementById('btn-view-all').addEventListener('click', () => {
-    state.viewMode = 'all';
-    document.getElementById('btn-view-all').classList.add('active');
-    document.getElementById('btn-view-single').classList.remove('active');
-    render();
-    fitToScreen();
+      const d = JSON.parse(document.getElementById('import-json').value.trim());
+      importBuild(d); closeModal(); refreshPositions(); updateAll(); render(); fitToScreen();
+    } catch(e) { showImportErr(e.message); }
   });
 }
 
-function showModal(name) {
-  document.getElementById('modal-overlay').classList.remove('hidden');
-  document.querySelectorAll('.modal').forEach(m => m.classList.add('hidden'));
-  document.getElementById(`modal-${name}`).classList.remove('hidden');
-}
-
-function hideModal() {
-  document.getElementById('modal-overlay').classList.add('hidden');
-  document.querySelectorAll('.modal').forEach(m => m.classList.add('hidden'));
-  document.getElementById('import-error').classList.add('hidden');
-}
-
-function showImportError(msg) {
-  const el = document.getElementById('import-error');
-  el.textContent = 'Error: ' + msg;
+function showImportErr(msg) {
+  const el = document.getElementById('import-err');
+  el.textContent = 'Error: '+msg;
   el.classList.remove('hidden');
 }
 
-function copyText(text) {
-  if (navigator.clipboard) {
-    navigator.clipboard.writeText(text).catch(() => fallbackCopy(text));
-  } else {
-    fallbackCopy(text);
-  }
-}
-
-function fallbackCopy(text) {
-  const ta = document.createElement('textarea');
-  ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
-  document.body.appendChild(ta); ta.select();
-  document.execCommand('copy');
-  document.body.removeChild(ta);
-}
-
-// ─────────────────────────────────────────────────
+// ═══════════════════════════════════════════════
 //  INIT
-// ─────────────────────────────────────────────────
+// ═══════════════════════════════════════════════
 async function init() {
-  // Load game data
   try {
-    const resp = await fetch('paragon-data.json');
-    DATA = await resp.json();
+    const r = await fetch('paragon-data.json');
+    DATA = await r.json();
   } catch (e) {
-    console.warn('Could not load paragon-data.json, using defaults:', e.message);
-    DATA = { glyphs: [], boards: [], legendaryNodes: {}, rareNodes: {} };
+    console.warn('Could not load paragon-data.json:', e.message);
+    DATA = { glyphs:[], legendaryNodes:{}, rareNodes:{} };
   }
 
-  // Populate glyph dropdown with data
-  if (DATA && DATA.glyphs && DATA.glyphs.length) {
-    const sel = document.getElementById('glyph-select');
-    sel.innerHTML = '<option value="">— None —</option>';
-    DATA.glyphs.forEach(g => {
-      const opt = document.createElement('option');
-      opt.value = g.id;
-      opt.textContent = `${g.name} (radius ${g.radius})`;
-      sel.appendChild(opt);
-    });
-  }
-
-  // Init starting board
-  state.boards.starting.activatedNodes.add('6,0');
+  // Populate right-panel glyph dropdown
+  const sel = document.getElementById('glyph-select');
+  sel.innerHTML = '<option value="">— None —</option>';
+  (DATA.glyphs||[]).forEach(g => {
+    const o = document.createElement('option');
+    o.value = g.id;
+    o.textContent = `${g.name} (r${g.radius})`;
+    sel.appendChild(o);
+  });
 
   setupEvents();
-  updateBoardInfoPanel();
-
-  // Initial render then fit
+  refreshPositions();
+  updateAll();
   render();
-  setTimeout(() => {
-    fitToScreen();
-    applyTransform();
-  }, 100);
+  setTimeout(() => { fitToScreen(); applyTransform(); }, 80);
 }
 
 document.addEventListener('DOMContentLoaded', init);
