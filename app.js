@@ -5,16 +5,30 @@
 // ============================================================
 
 const BOARD_META = {
-  starting:          { name: 'Starting Board',        icon: '⭐', legendaryId: 'starting_legendary',          rareIds: ['rare_starting_1','rare_starting_2','rare_starting_3','rare_starting_4'] },
-  deadly_ambush:     { name: 'Deadly Ambush',         icon: '💥', legendaryId: 'deadly_ambush_legendary',     rareIds: ['rare_deadly_ambush_1','rare_deadly_ambush_2','rare_deadly_ambush_3','rare_deadly_ambush_4','rare_deadly_ambush_5','rare_deadly_ambush_6'] },
-  eldritch_bounty:   { name: 'Eldritch Bounty',       icon: '✨', legendaryId: 'eldritch_bounty_legendary',   rareIds: ['rare_eldritch_bounty_1','rare_eldritch_bounty_2','rare_eldritch_bounty_3','rare_eldritch_bounty_4','rare_eldritch_bounty_5','rare_eldritch_bounty_6'] },
-  cheap_shot:        { name: 'Cheap Shot',            icon: '🎯', legendaryId: 'cheap_shot_legendary',        rareIds: ['rare_cheap_shot_1','rare_cheap_shot_2','rare_cheap_shot_3','rare_cheap_shot_4','rare_cheap_shot_5','rare_cheap_shot_6'] },
-  no_witnesses:      { name: 'No Witnesses',          icon: '☠️', legendaryId: 'no_witnesses_legendary',      rareIds: ['rare_no_witnesses_1','rare_no_witnesses_2','rare_no_witnesses_3','rare_no_witnesses_4','rare_no_witnesses_5','rare_no_witnesses_6'] },
-  cunning_stratagem: { name: 'Cunning Stratagem',     icon: '🧠', legendaryId: 'cunning_stratagem_legendary', rareIds: ['rare_cunning_stratagem_1','rare_cunning_stratagem_2','rare_cunning_stratagem_3','rare_cunning_stratagem_4','rare_cunning_stratagem_5','rare_cunning_stratagem_6'] },
-  tricks_of_trade:   { name: 'Tricks of the Trade',   icon: '🃏', legendaryId: 'tricks_legendary',            rareIds: ['rare_tricks_1','rare_tricks_2','rare_tricks_3','rare_tricks_4','rare_tricks_5','rare_tricks_6'] },
-  exploit_weakness:  { name: 'Exploit Weakness',      icon: '💢', legendaryId: 'exploit_legendary',           rareIds: ['rare_exploit_weakness_1','rare_exploit_weakness_2','rare_exploit_weakness_3','rare_exploit_weakness_4','rare_exploit_weakness_5','rare_exploit_weakness_6'] },
-  leyrana_instinct:  { name: "Leyrana's Instinct",    icon: '👁️', legendaryId: 'leyrana_instinct_legendary',  rareIds: ['rare_leyrana_instinct_1','rare_leyrana_instinct_2','rare_leyrana_instinct_3','rare_leyrana_instinct_4','rare_leyrana_instinct_5','rare_leyrana_instinct_6'] },
-  danse_macabre:     { name: 'Danse Macabre',         icon: '💃', legendaryId: 'danse_macabre_legendary',    rareIds: ['rare_danse_macabre_1','rare_danse_macabre_2','rare_danse_macabre_3','rare_danse_macabre_4','rare_danse_macabre_5','rare_danse_macabre_6'] },
+  starting:          { name: 'Starting Board',        icon: '⭐', legendaryId: 'starting_legendary',          rareIds: ['Generic_Rare_001','Generic_Rare_051','Generic_Rare_075','Rogue_Rare_037'] },
+  eldritch_bounty:   { name: 'Eldritch Bounty',       icon: '✨', legendaryId: 'eldritch_bounty_legendary',   rareIds: ['Generic_Rare_019','Generic_Rare_042','Rogue_Rare_009','Rogue_Rare_010','Rogue_Rare_012','Rogue_Rare_038'] },
+  tricks_of_trade:   { name: 'Tricks of the Trade',   icon: '🃏', legendaryId: 'tricks_legendary',            rareIds: ['Generic_Rare_007','Generic_Rare_046','Rogue_Rare_016','Rogue_Rare_018','Rogue_Rare_039','Rogue_Rare_040'] },
+  cheap_shot:        { name: 'Cheap Shot',            icon: '🎯', legendaryId: 'cheap_shot_legendary',        rareIds: ['Generic_Rare_011','Generic_Rare_016','Generic_Rare_018','Generic_Rare_021','Generic_Rare_096','Rogue_Rare_041'] },
+  deadly_ambush:     { name: 'Deadly Ambush',         icon: '💥', legendaryId: 'deadly_ambush_legendary',     rareIds: ['Generic_Rare_041','Rogue_Rare_008','Rogue_Rare_027','Rogue_Rare_028','Rogue_Rare_029','Rogue_Rare_042'] },
+  leyrana_instinct:  { name: "Leyrana's Instinct",    icon: '👁️', legendaryId: 'leyrana_instinct_legendary',  rareIds: ['Generic_Rare_002','Generic_Rare_019','Generic_Rare_041','Generic_Rare_042','Generic_Rare_100','Rogue_Rare_044'] },
+  no_witnesses:      { name: 'No Witnesses',          icon: '☠️', legendaryId: 'no_witnesses_legendary',      rareIds: ['Generic_Rare_006','Generic_Rare_030','Generic_Rare_033','Generic_Rare_051','Generic_Rare_082','Rogue_Rare_045'] },
+  exploit_weakness:  { name: 'Exploit Weakness',      icon: '💢', legendaryId: 'exploit_legendary',           rareIds: ['Generic_Rare_012','Generic_Rare_049','Generic_Rare_096','Generic_Rare_106','Necromancer_Rare_011','Rogue_Rare_046'] },
+  cunning_stratagem: { name: 'Cunning Stratagem',     icon: '🧠', legendaryId: 'cunning_stratagem_legendary', rareIds: ['Generic_Rare_067','Rogue_Rare_005','Rogue_Rare_011','Rogue_Rare_014','Rogue_Rare_040','Sorcerer_Rare_034'] },
+  danse_macabre:     { name: 'Danse Macabre',         icon: '💃', legendaryId: 'danse_macabre_legendary',     rareIds: ['Rogue_Rare_047','Rogue_Rare_048','Rogue_Rare_049','Rogue_Rare_050','Rogue_Rare_051','Rogue_Rare_052'] },
+};
+
+// Maps board IDs to their board-raw grid files (Rogue_09 not available)
+const BOARD_FILE_MAP = {
+  starting:          'board-raw/Rogue_00.json',
+  eldritch_bounty:   'board-raw/Rogue_01.json',
+  tricks_of_trade:   'board-raw/Rogue_02.json',
+  cheap_shot:        'board-raw/Rogue_03.json',
+  deadly_ambush:     'board-raw/Rogue_04.json',
+  leyrana_instinct:  'board-raw/Rogue_05.json',
+  no_witnesses:      'board-raw/Rogue_06.json',
+  exploit_weakness:  'board-raw/Rogue_07.json',
+  cunning_stratagem: 'board-raw/Rogue_08.json',
+  danse_macabre:     'board-raw/Rogue_09.json',
 };
 
 const MAX_POINTS = 300;
@@ -34,16 +48,128 @@ const state = {
 // Loaded paragon data
 let DATA = {};
 
+// Loaded board grid data: bid → { nWidth, arEntries, socketIdx }
+const BOARD_GRIDS = {};
+
+// ============================================================
+//  BOARD GRID RENDERING
+// ============================================================
+
+const GCELL = 15;
+const GPAD  = 4;
+
+function nodeCategory(name) {
+  if (!name) return null;
+  if (name.includes('StartNode'))    return 'start';
+  if (name.includes('_Gate'))        return 'gate';
+  if (name.includes('_Socket'))      return 'socket';
+  if (name.includes('_Legendary_')) return 'legendary';
+  if (name.includes('_Rare_'))       return 'rare';
+  if (name.includes('_Magic_'))      return 'magic';
+  return 'normal';
+}
+
+const GSTYLE = {
+  start:     { fill: '#22c55e', r: 6 },
+  gate:      { fill: '#22d3ee', r: 4, diamond: true },
+  socket:    { fill: '#a855f7', r: 5, hex: true },
+  legendary: { fill: '#f59e0b', r: 6, diamond: true },
+  rare:      { fill: '#eab308', r: 5 },
+  magic:     { fill: '#60a5fa', r: 3 },
+  normal:    { fill: '#4b5563', r: 2.5 },
+};
+
+function buildBoardSVG(gridData, activeRadius) {
+  const W = gridData.nWidth;
+  const E = gridData.arEntries;
+  const dim = W * GCELL + 2 * GPAD;
+  let out = '';
+
+  // Connection lines between adjacent filled cells
+  for (let i = 0; i < E.length; i++) {
+    if (!E[i]) continue;
+    const x = i % W;
+    const y = Math.floor(i / W);
+    const cx = GPAD + x * GCELL + GCELL / 2;
+    const cy = GPAD + y * GCELL + GCELL / 2;
+    if (x < W - 1 && E[i + 1]) {
+      out += '<line x1="' + cx + '" y1="' + cy + '" x2="' + (cx + GCELL) + '" y2="' + cy + '" stroke="#1e1216" stroke-width="2"/>';
+    }
+    if (y < W - 1 && E[i + W]) {
+      out += '<line x1="' + cx + '" y1="' + cy + '" x2="' + cx + '" y2="' + (cy + GCELL) + '" stroke="#1e1216" stroke-width="2"/>';
+    }
+  }
+
+  // Glyph radius ring around socket
+  if (activeRadius > 0 && gridData.socketIdx >= 0) {
+    const sx = gridData.socketIdx % W;
+    const sy = Math.floor(gridData.socketIdx / W);
+    const scx = GPAD + sx * GCELL + GCELL / 2;
+    const scy = GPAD + sy * GCELL + GCELL / 2;
+    const pr = activeRadius * GCELL;
+    out += '<circle cx="' + scx + '" cy="' + scy + '" r="' + pr + '" fill="rgba(168,85,247,0.08)" stroke="rgba(168,85,247,0.5)" stroke-width="1" stroke-dasharray="4,3"/>';
+  }
+
+  // Node shapes
+  for (let i = 0; i < E.length; i++) {
+    if (!E[i]) continue;
+    const cat = nodeCategory(E[i]);
+    if (!cat) continue;
+    const s = GSTYLE[cat];
+    const x = i % W;
+    const y = Math.floor(i / W);
+    const cx = GPAD + x * GCELL + GCELL / 2;
+    const cy = GPAD + y * GCELL + GCELL / 2;
+
+    if (s.diamond) {
+      const r = s.r;
+      out += '<polygon points="' + cx + ',' + (cy - r) + ' ' + (cx + r) + ',' + cy + ' ' + cx + ',' + (cy + r) + ' ' + (cx - r) + ',' + cy + '" fill="' + s.fill + '"/>';
+    } else if (s.hex) {
+      const pts = [];
+      for (let k = 0; k < 6; k++) {
+        const a = Math.PI / 6 + k * Math.PI / 3;
+        pts.push((cx + s.r * Math.cos(a)).toFixed(1) + ',' + (cy + s.r * Math.sin(a)).toFixed(1));
+      }
+      out += '<polygon points="' + pts.join(' ') + '" fill="' + s.fill + '"/>';
+    } else {
+      out += '<circle cx="' + cx + '" cy="' + cy + '" r="' + s.r + '" fill="' + s.fill + '"/>';
+    }
+  }
+
+  return '<svg xmlns="http://www.w3.org/2000/svg" width="' + dim + '" height="' + dim + '" viewBox="0 0 ' + dim + ' ' + dim + '">' + out + '</svg>';
+}
+
 // ============================================================
 //  LOAD DATA
 // ============================================================
 
+async function loadBoardGrids() {
+  await Promise.all(
+    Object.entries(BOARD_FILE_MAP).map(function(entry) {
+      const bid = entry[0];
+      const file = entry[1];
+      return fetch(file)
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+          BOARD_GRIDS[bid] = {
+            nWidth:    data.nWidth,
+            arEntries: data.arEntries,
+            socketIdx: data.arEntries.findIndex(function(e) { return e && e.includes('Socket'); }),
+          };
+        })
+        .catch(function(e) { console.warn('Grid load failed:', bid, e.message); });
+    })
+  );
+}
+
 async function loadData() {
   try {
-    const res = await fetch('paragon-data.json');
-    DATA = await res.json();
+    await Promise.all([
+      fetch('paragon-data.json').then(function(r) { return r.json(); }).then(function(d) { DATA = d; }),
+      loadBoardGrids(),
+    ]);
   } catch (e) {
-    DATA = { glyphs: [], legendaryNodes: {}, rareNodes: {} };
+    if (!DATA.glyphs) DATA = { glyphs: [], legendaryNodes: {}, rareNodes: {} };
   }
   init();
 }
@@ -98,7 +224,6 @@ function glyphRadius(level) {
 
 function applyGlyph(g, t, level) {
   const lvl = level || 1;
-  // Bonus scales roughly: starts ~17 at lvl 1, grows to ~85 at lvl 150
   const bonus = Math.round(17 * (1 + (lvl - 1) / 30));
   const map = {
     headhunter: 'damage', ambush: 'trap', bane_rogue: 'poison', canny: 'damage',
@@ -170,13 +295,12 @@ function render() {
 
 function renderChips() {
   const scroll = document.getElementById('chips-scroll');
-  // Remove all existing chips (but not the add button)
   const existing = scroll.querySelectorAll('.chip:not(.chip-add)');
   existing.forEach(function(el) { el.remove(); });
 
   const addBtn = scroll.querySelector('.chip-add');
 
-  state.boards.forEach(function(bid, idx) {
+  state.boards.forEach(function(bid) {
     const meta = BOARD_META[bid];
     if (!meta) return;
     const chip = document.createElement('button');
@@ -204,10 +328,14 @@ function renderBoards() {
 }
 
 function buildBoardCard(bid, idx) {
-  const meta = BOARD_META[bid];
-  const bdata = state.boardData[bid];
-  const legNode = DATA.legendaryNodes && DATA.legendaryNodes[meta.legendaryId];
+  const meta   = BOARD_META[bid];
+  const bdata  = state.boardData[bid];
+  const legNode  = DATA.legendaryNodes && DATA.legendaryNodes[meta.legendaryId];
   const isStarting = bid === 'starting';
+  const gridData = BOARD_GRIDS[bid];
+
+  // Forward-declare so glyph handlers can call it after grid section is built
+  let refreshGrid = null;
 
   const card = document.createElement('div');
   card.className = 'board-card';
@@ -234,7 +362,7 @@ function buildBoardCard(bid, idx) {
 
   const chevron = document.createElement('span');
   chevron.className = 'card-chevron';
-  chevron.textContent = '▾'; // down-pointing triangle
+  chevron.textContent = '▾';
 
   header.appendChild(badge);
   header.appendChild(icon);
@@ -265,7 +393,42 @@ function buildBoardCard(bid, idx) {
   const body = document.createElement('div');
   body.className = 'card-body';
 
-  // Legendary section
+  // --- Visual board grid (first in body) ---
+  if (gridData) {
+    const gridSec = document.createElement('div');
+    gridSec.className = 'card-section board-grid-section';
+
+    const gridLabel = document.createElement('div');
+    gridLabel.className = 'section-label';
+    gridLabel.textContent = 'Board Layout';
+
+    const gridWrap = document.createElement('div');
+    gridWrap.className = 'board-grid-wrap';
+
+    refreshGrid = function() {
+      const radius = bdata.glyphId ? glyphRadius(bdata.glyphLevel || 1) : 0;
+      gridWrap.innerHTML = buildBoardSVG(gridData, radius);
+    };
+    refreshGrid();
+
+    const gridLegend = document.createElement('div');
+    gridLegend.className = 'board-grid-legend';
+    gridLegend.innerHTML =
+      '<span class="legend-item"><span class="legend-node" style="background:#22c55e;border-radius:50%"></span>Start</span>' +
+      '<span class="legend-item"><span class="legend-node legend-diamond" style="background:#f59e0b"></span>Legendary</span>' +
+      '<span class="legend-item"><span class="legend-node" style="background:#eab308;border-radius:50%"></span>Rare</span>' +
+      '<span class="legend-item"><span class="legend-node" style="background:#60a5fa;border-radius:50%"></span>Magic</span>' +
+      '<span class="legend-item"><span class="legend-node" style="background:#4b5563;border-radius:50%"></span>Normal</span>' +
+      '<span class="legend-item"><span class="legend-node legend-diamond" style="background:#22d3ee"></span>Gate</span>' +
+      '<span class="legend-item"><span class="legend-node legend-hex" style="background:#a855f7"></span>Socket</span>';
+
+    gridSec.appendChild(gridLabel);
+    gridSec.appendChild(gridWrap);
+    gridSec.appendChild(gridLegend);
+    body.appendChild(gridSec);
+  }
+
+  // --- Legendary section ---
   if (legNode) {
     const legSec = document.createElement('div');
     legSec.className = 'card-section legendary-section';
@@ -288,7 +451,7 @@ function buildBoardCard(bid, idx) {
     body.appendChild(legSec);
   }
 
-  // Glyph section
+  // --- Glyph section ---
   const glyphSec = document.createElement('div');
   glyphSec.className = 'card-section';
 
@@ -352,13 +515,13 @@ function buildBoardCard(bid, idx) {
     state.boardData[bid].glyphLevel = newLvl;
     lvlVal.textContent = String(newLvl);
     updateRadiusBadge(newLvl);
+    if (refreshGrid) refreshGrid();
     renderStats();
   }
 
   lvlMinus.addEventListener('click', function() { setGlyphLevel((state.boardData[bid].glyphLevel || 1) - 1); });
   lvlPlus.addEventListener('click',  function() { setGlyphLevel((state.boardData[bid].glyphLevel || 1) + 1); });
 
-  // Long-press for fast increment
   let lvlInterval = null;
   function startHold(delta) { lvlInterval = setInterval(function() { setGlyphLevel((state.boardData[bid].glyphLevel || 1) + delta); }, 120); }
   function stopHold() { clearInterval(lvlInterval); }
@@ -408,13 +571,13 @@ function buildBoardCard(bid, idx) {
     }
   }
 
-  // Initial render
   if (bdata.glyphId) updateGlyphInfo(bdata.glyphId);
 
   glyphSelect.addEventListener('change', function() {
     const gid = glyphSelect.value || null;
     state.boardData[bid].glyphId = gid;
     updateGlyphInfo(gid);
+    if (refreshGrid) refreshGrid();
     renderStats();
   });
 
@@ -424,7 +587,7 @@ function buildBoardCard(bid, idx) {
   glyphSec.appendChild(glyphInfo);
   body.appendChild(glyphSec);
 
-  // Rare nodes section
+  // --- Rare nodes section ---
   if (meta.rareIds && meta.rareIds.length > 0) {
     const rareSec = document.createElement('div');
     rareSec.className = 'card-section';
@@ -503,7 +666,6 @@ function renderStats() {
   const stats = calcStats();
   updatePointsBar();
 
-  // Summary line
   const summary = document.getElementById('stats-summary');
   summary.textContent =
     'DEX ' + stats.dexterity +
@@ -511,22 +673,21 @@ function renderStats() {
     '  CRIT +' + stats.critdmg + '%' +
     '  VUL +' + stats.vulnerable + '%';
 
-  // Expanded grid
   const grid = document.getElementById('stats-grid');
   grid.innerHTML = '';
 
   const statDefs = [
-    { key: 'dexterity',   label: 'DEX',  fmt: function(v) { return String(v); } },
-    { key: 'strength',    label: 'STR',  fmt: function(v) { return String(v); } },
-    { key: 'intelligence',label: 'INT',  fmt: function(v) { return String(v); } },
-    { key: 'willpower',   label: 'WIL',  fmt: function(v) { return String(v); } },
-    { key: 'life',        label: 'LIFE', fmt: function(v) { return '+' + v; } },
-    { key: 'armor',       label: 'ARM',  fmt: function(v) { return '+' + v; } },
-    { key: 'damage',      label: 'DMG',  fmt: function(v) { return '+' + v + '%'; } },
-    { key: 'critdmg',     label: 'CRIT', fmt: function(v) { return '+' + v + '%'; } },
-    { key: 'vulnerable',  label: 'VUL',  fmt: function(v) { return '+' + v + '%'; } },
-    { key: 'poison',      label: 'PSN',  fmt: function(v) { return '+' + v + '%'; } },
-    { key: 'trap',        label: 'TRAP', fmt: function(v) { return '+' + v + '%'; } },
+    { key: 'dexterity',    label: 'DEX',  fmt: function(v) { return String(v); } },
+    { key: 'strength',     label: 'STR',  fmt: function(v) { return String(v); } },
+    { key: 'intelligence', label: 'INT',  fmt: function(v) { return String(v); } },
+    { key: 'willpower',    label: 'WIL',  fmt: function(v) { return String(v); } },
+    { key: 'life',         label: 'LIFE', fmt: function(v) { return '+' + v; } },
+    { key: 'armor',        label: 'ARM',  fmt: function(v) { return '+' + v; } },
+    { key: 'damage',       label: 'DMG',  fmt: function(v) { return '+' + v + '%'; } },
+    { key: 'critdmg',      label: 'CRIT', fmt: function(v) { return '+' + v + '%'; } },
+    { key: 'vulnerable',   label: 'VUL',  fmt: function(v) { return '+' + v + '%'; } },
+    { key: 'poison',       label: 'PSN',  fmt: function(v) { return '+' + v + '%'; } },
+    { key: 'trap',         label: 'TRAP', fmt: function(v) { return '+' + v + '%'; } },
   ];
 
   statDefs.forEach(function(def) {
@@ -644,9 +805,7 @@ function openAddBoardSheet() {
     }
 
     if (!alreadyAdded) {
-      row.addEventListener('click', function() {
-        addBoard(bid);
-      });
+      row.addEventListener('click', function() { addBoard(bid); });
     }
 
     list.appendChild(row);
@@ -684,14 +843,13 @@ function resetState() {
 function toggleStats() {
   statsExpanded = !statsExpanded;
   const bar = document.getElementById('stats-bar');
-  const collapsed = document.getElementById('stats-collapsed');
   const expanded = document.getElementById('stats-expanded');
   const chevron = document.getElementById('stats-chevron');
 
   if (statsExpanded) {
     bar.classList.add('expanded');
     expanded.hidden = false;
-    chevron.textContent = '▼'; // down arrow when expanded (chevron flipped by CSS)
+    chevron.textContent = '▼';
   } else {
     bar.classList.remove('expanded');
     expanded.hidden = true;
@@ -718,17 +876,14 @@ function checkUrlHash() {
 // ============================================================
 
 function wireEvents() {
-  // Header buttons
   document.getElementById('btn-share').addEventListener('click', openShareSheet);
   document.getElementById('btn-reset').addEventListener('click', resetState);
   document.getElementById('btn-add-board').addEventListener('click', openAddBoardSheet);
 
-  // Close sheets
   document.getElementById('btn-close-add-board').addEventListener('click', closeAllSheets);
   document.getElementById('btn-close-share').addEventListener('click', closeAllSheets);
   document.getElementById('modal-overlay').addEventListener('click', closeAllSheets);
 
-  // Share: copy
   document.getElementById('btn-copy-code').addEventListener('click', function() {
     const codeOut = document.getElementById('share-code-out');
     const confirmEl = document.getElementById('copy-confirm');
@@ -743,7 +898,6 @@ function wireEvents() {
     });
   });
 
-  // Share: load
   document.getElementById('btn-load-code').addEventListener('click', function() {
     const codeIn = document.getElementById('share-code-in');
     const errEl = document.getElementById('share-error');
@@ -760,7 +914,6 @@ function wireEvents() {
     }
   });
 
-  // Stats bar toggle
   document.getElementById('stats-bar').addEventListener('click', toggleStats);
 }
 
