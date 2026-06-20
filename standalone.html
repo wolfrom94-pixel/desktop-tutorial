@@ -558,22 +558,22 @@ input {
 
 /* --- Modal Overlay --- */
 .modal-overlay {
+  display: none;
   position: fixed;
   inset: 0;
   z-index: 200;
   background: rgba(0, 0, 0, 0.65);
   backdrop-filter: blur(2px);
   -webkit-backdrop-filter: blur(2px);
-  animation: fade-in 0.2s ease;
 }
 
-@keyframes fade-in {
-  from { opacity: 0; }
-  to   { opacity: 1; }
+.modal-overlay.is-open {
+  display: block;
 }
 
 /* --- Bottom Sheet --- */
 .bottom-sheet {
+  display: none;
   position: fixed;
   bottom: 0;
   left: 0;
@@ -584,15 +584,11 @@ input {
   border-top: 1px solid var(--bdr2);
   padding-bottom: env(safe-area-inset-bottom);
   max-height: 85dvh;
-  display: flex;
   flex-direction: column;
-  transform: translateY(0);
-  animation: slide-up var(--transition);
 }
 
-@keyframes slide-up {
-  from { transform: translateY(100%); }
-  to   { transform: translateY(0); }
+.bottom-sheet.is-open {
+  display: flex;
 }
 
 .sheet-handle {
@@ -882,16 +878,16 @@ input {
       <span class="stats-summary" id="stats-summary"></span>
       <span class="stats-chevron" id="stats-chevron">&#9650;</span>
     </div>
-    <div class="stats-expanded" id="stats-expanded" hidden>
+    <div class="stats-expanded" id="stats-expanded" style="display:none">
       <div class="stats-grid" id="stats-grid"></div>
     </div>
   </div>
 
   <!-- MODAL OVERLAY -->
-  <div class="modal-overlay" id="modal-overlay" hidden></div>
+  <div class="modal-overlay" id="modal-overlay"></div>
 
   <!-- ADD BOARD MODAL (bottom sheet) -->
-  <div class="bottom-sheet" id="sheet-add-board" hidden>
+  <div class="bottom-sheet" id="sheet-add-board">
     <div class="sheet-handle"></div>
     <div class="sheet-header">
       <h2 class="sheet-title">Add Board</h2>
@@ -901,7 +897,7 @@ input {
   </div>
 
   <!-- SHARE MODAL (bottom sheet) -->
-  <div class="bottom-sheet" id="sheet-share" hidden>
+  <div class="bottom-sheet" id="sheet-share">
     <div class="sheet-handle"></div>
     <div class="sheet-header">
       <h2 class="sheet-title">Share / Import</h2>
@@ -914,7 +910,7 @@ input {
           <input type="text" class="share-input" id="share-code-out" readonly>
           <button class="btn-copy" id="btn-copy-code">Copy</button>
         </div>
-        <div class="copy-confirm" id="copy-confirm" hidden>Copied!</div>
+        <div class="copy-confirm" id="copy-confirm" style="display:none">Copied!</div>
       </section>
       <section class="share-section">
         <label class="share-label">Import a build code</label>
@@ -922,7 +918,7 @@ input {
           <input type="text" class="share-input" id="share-code-in" placeholder="Paste code here...">
           <button class="btn-copy" id="btn-load-code">Load</button>
         </div>
-        <div class="share-error" id="share-error" hidden></div>
+        <div class="share-error" id="share-error" style="display:none"></div>
       </section>
     </div>
   </div>
@@ -1514,15 +1510,13 @@ function removeBoard(bid) {
 let statsExpanded = false;
 
 function openSheet(sheetId) {
-  const overlay = document.getElementById('modal-overlay');
-  const sheet = document.getElementById(sheetId);
-  overlay.hidden = false;
-  sheet.hidden = false;
+  document.getElementById('modal-overlay').classList.add('is-open');
+  document.getElementById(sheetId).classList.add('is-open');
 }
 
 function closeAllSheets() {
-  document.getElementById('modal-overlay').hidden = true;
-  document.querySelectorAll('.bottom-sheet').forEach(function(s) { s.hidden = true; });
+  document.getElementById('modal-overlay').classList.remove('is-open');
+  document.querySelectorAll('.bottom-sheet').forEach(function(s) { s.classList.remove('is-open'); });
 }
 
 function openAddBoardSheet() {
@@ -1586,9 +1580,9 @@ function openShareSheet() {
   const codeOut = document.getElementById('share-code-out');
   codeOut.value = buildShareCode();
   const errEl = document.getElementById('share-error');
-  errEl.hidden = true;
+  errEl.style.display = 'none';
   const confirmEl = document.getElementById('copy-confirm');
-  confirmEl.hidden = true;
+  confirmEl.style.display = 'none';
   document.getElementById('share-code-in').value = '';
   openSheet('sheet-share');
 }
@@ -1617,11 +1611,11 @@ function toggleStats() {
 
   if (statsExpanded) {
     bar.classList.add('expanded');
-    expanded.hidden = false;
-    chevron.textContent = '▼'; // down arrow when expanded (chevron flipped by CSS)
+    expanded.style.display = 'block';
+    chevron.textContent = '▼';
   } else {
     bar.classList.remove('expanded');
-    expanded.hidden = true;
+    expanded.style.display = 'none';
     chevron.textContent = '▲';
   }
 }
@@ -1660,13 +1654,13 @@ function wireEvents() {
     const codeOut = document.getElementById('share-code-out');
     const confirmEl = document.getElementById('copy-confirm');
     navigator.clipboard.writeText(codeOut.value).then(function() {
-      confirmEl.hidden = false;
-      setTimeout(function() { confirmEl.hidden = true; }, 2000);
+      confirmEl.style.display = 'block';
+      setTimeout(function() { confirmEl.style.display = 'none'; }, 2000);
     }).catch(function() {
       codeOut.select();
       document.execCommand('copy');
-      confirmEl.hidden = false;
-      setTimeout(function() { confirmEl.hidden = true; }, 2000);
+      confirmEl.style.display = 'block';
+      setTimeout(function() { confirmEl.style.display = 'none'; }, 2000);
     });
   });
 
@@ -1675,15 +1669,15 @@ function wireEvents() {
     const codeIn = document.getElementById('share-code-in');
     const errEl = document.getElementById('share-error');
     const code = codeIn.value.trim();
-    if (!code) { errEl.textContent = 'Please paste a code first.'; errEl.hidden = false; return; }
+    if (!code) { errEl.textContent = 'Please paste a code first.'; errEl.style.display = 'block'; return; }
     try {
       loadShareCode(code);
-      errEl.hidden = true;
+      errEl.style.display = 'none';
       closeAllSheets();
       render();
     } catch (e) {
       errEl.textContent = 'Invalid code. Please check and try again.';
-      errEl.hidden = false;
+      errEl.style.display = 'block';
     }
   });
 
