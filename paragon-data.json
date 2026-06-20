@@ -268,7 +268,7 @@
     "danse_macabre_legendary": {
       "id": "danse_macabre_legendary",
       "name": "Danse Macabre",
-      "description": "Casting a Mobility or Subterfuge Skill increases the damage of your next Skill by 50%[x].",
+      "description": "Casting a Mobility or Subterfuge Skill increases the damage of your next Skill by 50%[x] for 10 seconds.",
       "stats": {}
     }
   },
@@ -551,39 +551,39 @@
     },
     "rare_danse_macabre_1": {
       "id": "rare_danse_macabre_1",
-      "name": "Assassin",
-      "description": "+25.0% Damage to Healthy enemies, +10 Dexterity. Bonus (285 Str): +25% more Damage to Healthy.",
-      "bonus": { "damage": 25, "dexterity": 10 }
+      "name": "Acrobat",
+      "description": "+3% Mobility Skill Cooldown Reduction, +4% Maximum Life. Bonus (190 Str): +3% more Mobility CDR.",
+      "bonus": { "life": 40 }
     },
     "rare_danse_macabre_2": {
       "id": "rare_danse_macabre_2",
-      "name": "Giant Killer",
-      "description": "+30.0% Damage to Elites, +10 Dexterity. Bonus (285 Int): +30% more Damage to Elites.",
-      "bonus": { "damage": 30, "dexterity": 10 }
+      "name": "Assassin",
+      "description": "+25% Damage to Healthy enemies, +10 Dexterity. Bonus (210 Str): +25% more Damage to Healthy.",
+      "bonus": { "damage": 25, "dexterity": 10 }
     },
     "rare_danse_macabre_3": {
       "id": "rare_danse_macabre_3",
-      "name": "Ranger (Paragon Node)",
-      "description": "9.0% Damage Reduction from Distant enemies, +40.0% Damage to Distant enemies. Bonus: +9% more DR.",
-      "bonus": { "damage": 40, "armor": 20 }
+      "name": "Brawler",
+      "description": "+3% Total Armor, +24% Damage to Close enemies. Bonus (700 Dex + 190 Str): +3% more Armor.",
+      "bonus": { "damage": 24, "armor": 20 }
     },
     "rare_danse_macabre_4": {
       "id": "rare_danse_macabre_4",
-      "name": "Brawler (Paragon Node)",
-      "description": "6.0% Damage Reduction from Close enemies, +24.0% Damage to Close enemies. Bonus: +6% more DR.",
-      "bonus": { "damage": 24, "armor": 20 }
+      "name": "Giant Killer",
+      "description": "+30% Damage to Elites, +10 Dexterity. Bonus (210 Int): +30% more Damage to Elites.",
+      "bonus": { "damage": 30, "dexterity": 10 }
     },
     "rare_danse_macabre_5": {
       "id": "rare_danse_macabre_5",
-      "name": "Skulker",
-      "description": "3.0% Subterfuge Skill Cooldown Reduction, +3.0% Resistance to All Elements. Bonus (305 Int): +3% more CDR.",
-      "bonus": { "armor": 15 }
+      "name": "Ranger",
+      "description": "+3% Total Armor, +80% Damage to Distant enemies. Bonus (700 Dex + 190 Int): +3% more Armor.",
+      "bonus": { "damage": 80, "armor": 20 }
     },
     "rare_danse_macabre_6": {
       "id": "rare_danse_macabre_6",
-      "name": "Acrobat",
-      "description": "3.0% Mobility Skill Cooldown Reduction, +4.0% Maximum Life. Bonus (265 Str): +3% more CDR.",
-      "bonus": { "life": 40 }
+      "name": "Skulker",
+      "description": "+3% Subterfuge Skill Cooldown Reduction, +3% Resistance to All Elements. Bonus (230 Int): +3% more Subterfuge CDR.",
+      "bonus": { "armor": 15 }
     }
   }
 }
