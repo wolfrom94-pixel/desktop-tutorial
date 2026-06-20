@@ -1,0 +1,1709 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>D4 Rogue Paragon Planner</title>
+  <style>
+/* ============================================================
+   D4 Rogue Paragon Planner — Mobile-First CSS
+   Target: iPhone 14 Pro (390px)
+   ============================================================ */
+
+/* --- Design Tokens --- */
+:root {
+  --bg0: #090508;
+  --bg1: #0f090e;
+  --bg2: #180d16;
+  --bg3: #22111f;
+  --bg4: #2c1529;
+  --bdr:  #3a1e36;
+  --bdr2: #562a50;
+  --txt0: #f0e6cc;
+  --txt1: #c4aa88;
+  --txt2: #7a6052;
+  --red:  #c83040;
+  --redlt:#e04050;
+  --gold: #c89830;
+  --goldlt: #e8b848;
+  --blue: #4888c0;
+  --purple: #8848c8;
+
+  --header-h: 88px;
+  --chips-h:  52px;
+  --stats-h:  52px;
+  --sheet-radius: 20px;
+  --transition: 0.28s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+/* --- Reset & Base --- */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html {
+  font-size: 16px;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI",
+               Roboto, Helvetica, Arial, sans-serif;
+  background: var(--bg0);
+  color: var(--txt0);
+  overscroll-behavior: none;
+  -webkit-overflow-scrolling: touch;
+  padding-top: calc(var(--header-h) + var(--chips-h) + env(safe-area-inset-top));
+  padding-bottom: calc(var(--stats-h) + env(safe-area-inset-bottom) + 8px);
+  min-height: 100dvh;
+}
+
+button {
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+}
+
+input {
+  font-family: inherit;
+}
+
+/* --- Sticky Header --- */
+.app-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  background: var(--bg1);
+  border-bottom: 1px solid var(--bdr);
+  padding-top: env(safe-area-inset-top);
+}
+
+.header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  height: 56px;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.logo-icon {
+  font-size: 22px;
+  line-height: 1;
+}
+
+.logo-text {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--gold);
+  letter-spacing: 0.3px;
+}
+
+.header-actions {
+  display: flex;
+  gap: 4px;
+}
+
+.btn-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  color: var(--txt1);
+  background: transparent;
+  transition: background 0.15s, color 0.15s;
+}
+
+.btn-icon:active {
+  background: var(--bg3);
+}
+
+.btn-icon.btn-danger {
+  color: var(--red);
+}
+
+.btn-icon.btn-danger:active {
+  background: rgba(200, 48, 64, 0.15);
+}
+
+/* Points bar */
+.points-bar-wrap {
+  padding: 0 16px 10px;
+}
+
+.points-label {
+  font-size: 11px;
+  color: var(--txt2);
+  margin-bottom: 4px;
+}
+
+.points-label span {
+  color: var(--txt1);
+  font-weight: 600;
+}
+
+.points-bar-track {
+  height: 4px;
+  background: var(--bg3);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.points-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--red), var(--gold));
+  border-radius: 2px;
+  width: 0%;
+  transition: width 0.4s ease;
+}
+
+/* --- Chips Strip --- */
+.chips-strip {
+  position: fixed;
+  top: calc(var(--header-h) + env(safe-area-inset-top));
+  left: 0;
+  right: 0;
+  z-index: 99;
+  background: var(--bg0);
+  border-bottom: 1px solid var(--bdr);
+  height: var(--chips-h);
+  display: flex;
+  align-items: center;
+}
+
+.chips-scroll {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 0 16px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  height: 100%;
+  width: 100%;
+}
+
+.chips-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 34px;
+  padding: 0 12px;
+  border-radius: 17px;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  border: 1.5px solid var(--bdr2);
+  background: var(--bg2);
+  color: var(--txt1);
+  flex-shrink: 0;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.chip:active {
+  background: var(--bg3);
+}
+
+.chip.chip-active {
+  background: var(--bg3);
+  border-color: var(--gold);
+  color: var(--goldlt);
+}
+
+.chip.chip-add {
+  border-style: dashed;
+  border-color: var(--bdr2);
+  color: var(--txt2);
+}
+
+.chip.chip-add:active {
+  color: var(--txt1);
+  border-color: var(--txt2);
+}
+
+/* --- Board Cards --- */
+.boards-list {
+  padding: 12px 0 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.board-card {
+  margin: 0 12px;
+  background: var(--bg1);
+  border: 1px solid var(--bdr);
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+/* Card header row */
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 14px;
+  min-height: 52px;
+  background: var(--bg2);
+  cursor: pointer;
+  user-select: none;
+}
+
+.card-badge {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  background: var(--bg4);
+  border: 1px solid var(--bdr2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--txt2);
+  flex-shrink: 0;
+}
+
+.card-icon {
+  font-size: 20px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.card-title {
+  flex: 1;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--txt0);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.card-chevron {
+  color: var(--txt2);
+  font-size: 12px;
+  flex-shrink: 0;
+  transition: transform 0.25s ease;
+}
+
+.board-card.collapsed .card-chevron {
+  transform: rotate(-90deg);
+}
+
+/* Card body */
+.card-body {
+  padding: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+  max-height: 2000px;
+}
+
+.board-card.collapsed .card-body {
+  max-height: 0;
+}
+
+/* Sections inside card */
+.card-section {
+  border-top: 1px solid var(--bdr);
+  padding: 12px 14px;
+}
+
+.section-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: var(--txt2);
+  margin-bottom: 8px;
+}
+
+/* Legendary section */
+.legendary-section {
+  background: rgba(200, 152, 48, 0.06);
+  border-top: 1px solid rgba(200, 152, 48, 0.2);
+}
+
+.legendary-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--goldlt);
+  margin-bottom: 4px;
+}
+
+.legendary-desc {
+  font-size: 12px;
+  color: var(--txt1);
+  line-height: 1.5;
+}
+
+/* Glyph section */
+.glyph-select {
+  width: 100%;
+  height: 44px;
+  background: var(--bg3);
+  border: 1px solid var(--bdr2);
+  border-radius: 10px;
+  color: var(--txt0);
+  font-size: 14px;
+  padding: 0 12px;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%237a6052' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  cursor: pointer;
+}
+
+.glyph-select:focus {
+  outline: none;
+  border-color: var(--blue);
+}
+
+.glyph-info {
+  margin-top: 8px;
+  padding: 10px 12px;
+  background: var(--bg2);
+  border-radius: 8px;
+  border: 1px solid var(--bdr);
+}
+
+.glyph-info-desc {
+  font-size: 12px;
+  color: var(--txt1);
+  line-height: 1.5;
+  margin-bottom: 6px;
+}
+
+.glyph-info-bonus {
+  font-size: 12px;
+  color: var(--blue);
+  line-height: 1.5;
+}
+
+/* Rare nodes section */
+.rare-node-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--bdr);
+  cursor: pointer;
+  min-height: 44px;
+  transition: background 0.12s;
+}
+
+.rare-node-row:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.rare-node-row:first-child {
+  padding-top: 0;
+}
+
+.rare-check {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid var(--bdr2);
+  flex-shrink: 0;
+  margin-top: 1px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.rare-node-row.active .rare-check {
+  background: var(--red);
+  border-color: var(--redlt);
+}
+
+.rare-check-mark {
+  display: none;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.rare-node-row.active .rare-check-mark {
+  display: block;
+}
+
+.rare-node-text {
+  flex: 1;
+}
+
+.rare-node-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--txt0);
+  margin-bottom: 2px;
+  transition: color 0.15s;
+}
+
+.rare-node-row.active .rare-node-name {
+  color: var(--redlt);
+}
+
+.rare-node-desc {
+  font-size: 12px;
+  color: var(--txt2);
+  line-height: 1.45;
+}
+
+/* --- Stats Bar (fixed bottom) --- */
+.stats-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  background: var(--bg1);
+  border-top: 1px solid var(--bdr);
+  padding-bottom: env(safe-area-inset-bottom);
+  cursor: pointer;
+  user-select: none;
+}
+
+.stats-collapsed {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 16px;
+  height: var(--stats-h);
+}
+
+.stats-bar-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--txt2);
+  flex-shrink: 0;
+}
+
+.stats-summary {
+  flex: 1;
+  font-size: 12px;
+  color: var(--txt1);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.stats-chevron {
+  color: var(--txt2);
+  font-size: 10px;
+  flex-shrink: 0;
+  transition: transform 0.25s ease;
+}
+
+.stats-bar.expanded .stats-chevron {
+  transform: rotate(180deg);
+}
+
+.stats-expanded {
+  padding: 12px 16px 8px;
+  border-top: 1px solid var(--bdr);
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px 16px;
+}
+
+.stat-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.stat-item-name {
+  font-size: 12px;
+  color: var(--txt2);
+  text-transform: uppercase;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+}
+
+.stat-item-value {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--txt0);
+}
+
+/* --- Modal Overlay --- */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  animation: fade-in 0.2s ease;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* --- Bottom Sheet --- */
+.bottom-sheet {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 201;
+  background: var(--bg2);
+  border-radius: var(--sheet-radius) var(--sheet-radius) 0 0;
+  border-top: 1px solid var(--bdr2);
+  padding-bottom: env(safe-area-inset-bottom);
+  max-height: 85dvh;
+  display: flex;
+  flex-direction: column;
+  transform: translateY(0);
+  animation: slide-up var(--transition);
+}
+
+@keyframes slide-up {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+
+.sheet-handle {
+  width: 36px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--bdr2);
+  margin: 10px auto 0;
+  flex-shrink: 0;
+}
+
+.sheet-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px 8px;
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--bdr);
+}
+
+.sheet-title {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--txt0);
+}
+
+.sheet-body {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 8px 0;
+  flex: 1;
+}
+
+/* Add Board list */
+.add-board-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 16px;
+  min-height: 56px;
+  border-bottom: 1px solid var(--bdr);
+  cursor: pointer;
+  transition: background 0.12s;
+}
+
+.add-board-row:last-child {
+  border-bottom: none;
+}
+
+.add-board-row:active {
+  background: var(--bg3);
+}
+
+.add-board-row.already-added {
+  opacity: 0.35;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.add-board-icon {
+  font-size: 22px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.add-board-info {
+  flex: 1;
+}
+
+.add-board-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--txt0);
+}
+
+.add-board-legendary {
+  font-size: 12px;
+  color: var(--gold);
+  margin-top: 1px;
+}
+
+.add-board-check {
+  color: var(--txt2);
+  font-size: 13px;
+  flex-shrink: 0;
+}
+
+/* Share sheet */
+.share-section {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--bdr);
+}
+
+.share-section:last-child {
+  border-bottom: none;
+}
+
+.share-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: var(--txt2);
+  margin-bottom: 8px;
+}
+
+.share-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.share-input {
+  flex: 1;
+  height: 44px;
+  background: var(--bg3);
+  border: 1px solid var(--bdr2);
+  border-radius: 10px;
+  color: var(--txt0);
+  font-size: 13px;
+  padding: 0 12px;
+  min-width: 0;
+}
+
+.share-input:focus {
+  outline: none;
+  border-color: var(--blue);
+}
+
+.share-input::placeholder {
+  color: var(--txt2);
+}
+
+.btn-copy {
+  height: 44px;
+  padding: 0 16px;
+  background: var(--bg4);
+  border: 1px solid var(--bdr2);
+  border-radius: 10px;
+  color: var(--txt1);
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: background 0.15s;
+}
+
+.btn-copy:active {
+  background: var(--bdr2);
+}
+
+.copy-confirm {
+  margin-top: 6px;
+  font-size: 12px;
+  color: #4caf50;
+  font-weight: 600;
+}
+
+.share-error {
+  margin-top: 6px;
+  font-size: 12px;
+  color: var(--redlt);
+  font-weight: 600;
+}
+
+/* Glyph level stepper */
+.glyph-level-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.glyph-level-label {
+  font-size: 12px;
+  color: var(--txt2);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  flex-shrink: 0;
+}
+
+.glyph-lvl-btn {
+  width: 36px;
+  height: 36px;
+  background: var(--bg3);
+  border: 1px solid var(--bdr2);
+  border-radius: 8px;
+  color: var(--txt1);
+  font-size: 18px;
+  line-height: 1;
+  flex-shrink: 0;
+  touch-action: none;
+  user-select: none;
+}
+
+.glyph-lvl-btn:active {
+  background: var(--bdr2);
+}
+
+.glyph-lvl-val {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--txt0);
+  min-width: 36px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.glyph-radius-badge {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--blue);
+  background: rgba(72, 136, 192, 0.15);
+  border: 1px solid rgba(72, 136, 192, 0.35);
+  border-radius: 6px;
+  padding: 3px 8px;
+  flex-shrink: 0;
+  letter-spacing: 0.3px;
+}
+
+.glyph-radius-badge.legendary {
+  color: var(--goldlt);
+  background: rgba(200, 152, 48, 0.15);
+  border-color: rgba(200, 152, 48, 0.4);
+}
+
+/* --- Utility: hidden --- */
+[hidden] {
+  display: none !important;
+}
+
+  </style>
+</head>
+<body>
+
+  <!-- STICKY HEADER -->
+  <header class="app-header">
+    <div class="header-top">
+      <div class="logo">
+        <span class="logo-icon">&#x1F5E1;&#xFE0F;</span>
+        <span class="logo-text">Rogue Paragon</span>
+      </div>
+      <div class="header-actions">
+        <button class="btn-icon" id="btn-share" aria-label="Share / Import">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+            <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+          </svg>
+        </button>
+        <button class="btn-icon btn-danger" id="btn-reset" aria-label="Reset">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="1 4 1 10 7 10"/>
+            <path d="M3.51 15a9 9 0 1 0 .49-4.94"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+    <div class="points-bar-wrap">
+      <div class="points-label">
+        <span id="points-used">0</span> / 300 Paragon Points
+      </div>
+      <div class="points-bar-track">
+        <div class="points-bar-fill" id="points-bar-fill"></div>
+      </div>
+    </div>
+  </header>
+
+  <!-- BOARD CHIPS STRIP -->
+  <div class="chips-strip" id="chips-strip">
+    <div class="chips-scroll" id="chips-scroll">
+      <button class="chip chip-add" id="btn-add-board">
+        <span>+</span>&nbsp;Add Board
+      </button>
+    </div>
+  </div>
+
+  <!-- MAIN BOARD CARDS -->
+  <main class="boards-list" id="boards-list"></main>
+
+  <!-- BOTTOM STATS BAR -->
+  <div class="stats-bar" id="stats-bar">
+    <div class="stats-collapsed" id="stats-collapsed">
+      <span class="stats-bar-label">&#x1F4CA; Stats</span>
+      <span class="stats-summary" id="stats-summary"></span>
+      <span class="stats-chevron" id="stats-chevron">&#9650;</span>
+    </div>
+    <div class="stats-expanded" id="stats-expanded" hidden>
+      <div class="stats-grid" id="stats-grid"></div>
+    </div>
+  </div>
+
+  <!-- MODAL OVERLAY -->
+  <div class="modal-overlay" id="modal-overlay" hidden></div>
+
+  <!-- ADD BOARD MODAL (bottom sheet) -->
+  <div class="bottom-sheet" id="sheet-add-board" hidden>
+    <div class="sheet-handle"></div>
+    <div class="sheet-header">
+      <h2 class="sheet-title">Add Board</h2>
+      <button class="btn-icon" id="btn-close-add-board" aria-label="Close">&#x2715;</button>
+    </div>
+    <div class="sheet-body" id="add-board-list"></div>
+  </div>
+
+  <!-- SHARE MODAL (bottom sheet) -->
+  <div class="bottom-sheet" id="sheet-share" hidden>
+    <div class="sheet-handle"></div>
+    <div class="sheet-header">
+      <h2 class="sheet-title">Share / Import</h2>
+      <button class="btn-icon" id="btn-close-share" aria-label="Close">&#x2715;</button>
+    </div>
+    <div class="sheet-body">
+      <section class="share-section">
+        <label class="share-label">Your build code</label>
+        <div class="share-row">
+          <input type="text" class="share-input" id="share-code-out" readonly>
+          <button class="btn-copy" id="btn-copy-code">Copy</button>
+        </div>
+        <div class="copy-confirm" id="copy-confirm" hidden>Copied!</div>
+      </section>
+      <section class="share-section">
+        <label class="share-label">Import a build code</label>
+        <div class="share-row">
+          <input type="text" class="share-input" id="share-code-in" placeholder="Paste code here...">
+          <button class="btn-copy" id="btn-load-code">Load</button>
+        </div>
+        <div class="share-error" id="share-error" hidden></div>
+      </section>
+    </div>
+  </div>
+
+  <script>
+'use strict';
+
+// ============================================================
+//  DATA
+// ============================================================
+
+const BOARD_META = {
+  starting:          { name: 'Starting Board',        icon: '⭐', legendaryId: 'starting_legendary',          rareIds: ['rare_starting_1','rare_starting_2','rare_starting_3','rare_starting_4'] },
+  deadly_ambush:     { name: 'Deadly Ambush',         icon: '💥', legendaryId: 'deadly_ambush_legendary',     rareIds: ['rare_deadly_ambush_1','rare_deadly_ambush_2','rare_deadly_ambush_3','rare_deadly_ambush_4','rare_deadly_ambush_5','rare_deadly_ambush_6'] },
+  eldritch_bounty:   { name: 'Eldritch Bounty',       icon: '✨', legendaryId: 'eldritch_bounty_legendary',   rareIds: ['rare_eldritch_bounty_1','rare_eldritch_bounty_2','rare_eldritch_bounty_3','rare_eldritch_bounty_4','rare_eldritch_bounty_5','rare_eldritch_bounty_6'] },
+  cheap_shot:        { name: 'Cheap Shot',            icon: '🎯', legendaryId: 'cheap_shot_legendary',        rareIds: ['rare_cheap_shot_1','rare_cheap_shot_2','rare_cheap_shot_3','rare_cheap_shot_4','rare_cheap_shot_5','rare_cheap_shot_6'] },
+  no_witnesses:      { name: 'No Witnesses',          icon: '☠️', legendaryId: 'no_witnesses_legendary',      rareIds: ['rare_no_witnesses_1','rare_no_witnesses_2','rare_no_witnesses_3','rare_no_witnesses_4','rare_no_witnesses_5','rare_no_witnesses_6'] },
+  cunning_stratagem: { name: 'Cunning Stratagem',     icon: '🧠', legendaryId: 'cunning_stratagem_legendary', rareIds: ['rare_cunning_stratagem_1','rare_cunning_stratagem_2','rare_cunning_stratagem_3','rare_cunning_stratagem_4','rare_cunning_stratagem_5','rare_cunning_stratagem_6'] },
+  tricks_of_trade:   { name: 'Tricks of the Trade',   icon: '🃏', legendaryId: 'tricks_legendary',            rareIds: ['rare_tricks_1','rare_tricks_2','rare_tricks_3','rare_tricks_4','rare_tricks_5','rare_tricks_6'] },
+  exploit_weakness:  { name: 'Exploit Weakness',      icon: '💢', legendaryId: 'exploit_legendary',           rareIds: ['rare_exploit_weakness_1','rare_exploit_weakness_2','rare_exploit_weakness_3','rare_exploit_weakness_4','rare_exploit_weakness_5','rare_exploit_weakness_6'] },
+  leyrana_instinct:  { name: "Leyrana's Instinct",    icon: '👁️', legendaryId: 'leyrana_instinct_legendary',  rareIds: ['rare_leyrana_instinct_1','rare_leyrana_instinct_2','rare_leyrana_instinct_3','rare_leyrana_instinct_4','rare_leyrana_instinct_5','rare_leyrana_instinct_6'] },
+  danse_macabre:     { name: 'Danse Macabre',         icon: '💃', legendaryId: 'danse_macabre_legendary',    rareIds: ['rare_danse_macabre_1','rare_danse_macabre_2','rare_danse_macabre_3','rare_danse_macabre_4','rare_danse_macabre_5','rare_danse_macabre_6'] },
+};
+
+const MAX_POINTS = 300;
+const MAX_BOARDS = 5;
+
+// ============================================================
+//  STATE
+// ============================================================
+
+const state = {
+  boards: ['starting'],
+  boardData: {
+    starting: { glyphId: null, glyphLevel: 1, activeRares: new Set() }
+  }
+};
+
+// Loaded paragon data
+let DATA = {};
+
+// ============================================================
+//  INLINE DATA (no fetch needed — works when opened locally)
+// ============================================================
+
+const PARAGON_DATA = {"version":"1.1","class":"rogue","glyphs":[{"id":"headhunter","name":"Headhunter","radius":3,"description":"Grants +30.0% bonus to all Normal nodes within range. Damage bonus increased by 0.0%[x].","bonusEffect":"You deal 10%[x] increased damage to Elites.","bonusStat":null,"bonusThreshold":0},{"id":"ambush","name":"Ambush","radius":3,"description":"For every 5 Strength purchased within range, you deal +1.9% increased damage to targets affected by Trap Skills.","bonusEffect":"Enemies affected by Trap Skills take 10%[x] increased damage from you.","bonusStat":"strength","bonusThreshold":0},{"id":"bane_rogue","name":"Bane (Rogue)","radius":3,"description":"For every 5 Intelligence purchased within range, you deal +1.9% increased Poison damage.","bonusEffect":"Non-Physical damage increases all the Non-Physical damage an enemy takes from you by 1%[x], up to 10%[x], for 15 seconds.","bonusStat":"intelligence","bonusThreshold":0},{"id":"canny","name":"Canny","radius":3,"description":"For every 5 Intelligence purchased within range, you deal +1.9% increased Non-Physical damage.","bonusEffect":"Non-Physical damage increases the damage an enemy takes from you by 1%[x], up to 10%[x], for 15 seconds.","bonusStat":"intelligence","bonusThreshold":0},{"id":"chip","name":"Chip","radius":3,"description":"For every 5 Dexterity purchased within range, you deal +3.3% increased Physical damage.","bonusEffect":"Physical damage increases the damage an enemy takes from you by 1%[x], up to 10%[x], for 15 seconds.","bonusStat":"dexterity","bonusThreshold":0},{"id":"closer","name":"Closer","radius":3,"description":"For every 5 Dexterity purchased within range, your Cutthroat Skills deal +1.3% increased damage.","bonusEffect":"While wielding a Melee weapon, you take 10% reduced damage.","bonusStat":"dexterity","bonusThreshold":0},{"id":"combat","name":"Combat (Glyph)","radius":3,"description":"For every 5 Intelligence purchased within range, all Damage deals +1.9% increased Critical Strike Damage.","bonusEffect":"Skills that Critically Strike restore 12% of their Energy cost.","bonusStat":"intelligence","bonusThreshold":0},{"id":"control_rogue","name":"Control (Rogue)","radius":3,"description":"For every 5 Intelligence purchased within range, you deal +2.9% increased damage to Crowd Controlled targets.","bonusEffect":"You deal 10%[x] increased damage to Slowed or Chilled enemies or, instead, 20%[x] increased damage to Stunned or Frozen enemies.","bonusStat":"intelligence","bonusThreshold":0},{"id":"devious","name":"Devious","radius":3,"description":"Grants +30.0% bonus to all Magic nodes within range.","bonusEffect":"When you hit an enemy with an attack that applies a Crowd Control effect, they take 2%[x], up to 10%[x], increased damage from you for 20 seconds.","bonusStat":null,"bonusThreshold":0},{"id":"diminish","name":"Diminish","radius":3,"description":"Grants +25.0% bonus to all Rare nodes within range.","bonusEffect":"You take 10% reduced Physical damage from Vulnerable enemies.","bonusStat":null,"bonusThreshold":0},{"id":"efficacy","name":"Efficacy","radius":3,"description":"Grants +25.0% bonus to all Rare nodes within range.","bonusEffect":"Imbuement Skill effects have 20%[x] increased potency.","bonusStat":null,"bonusThreshold":0},{"id":"exploit_rogue","name":"Exploit (Rogue)","radius":3,"description":"For every 5 Strength purchased within range, you deal +0.9% increased damage to Vulnerable targets.","bonusEffect":"When an enemy is damaged by you, they become Vulnerable for 3 seconds. This cannot happen more than once every 20 seconds per enemy.","bonusStat":"strength","bonusThreshold":0},{"id":"explosive","name":"Explosive","radius":3,"description":"For every 5 Dexterity purchased within range, your Stun Grenades deal +13.2% increased damage.","bonusEffect":"Dropping a Stun Grenade grants you 10% Damage Reduction for 2 seconds.","bonusStat":"dexterity","bonusThreshold":0},{"id":"fluidity","name":"Fluidity","radius":3,"description":"Grants +30.0% bonus to all Magic nodes within range.","bonusEffect":"When you cast an Agility Skill, you gain 9%[x] increased Energy Regeneration for 6 seconds.","bonusStat":null,"bonusThreshold":0},{"id":"frostfeeder","name":"Frostfeeder","radius":3,"description":"For every 5 Dexterity purchased within range, you deal +1.9% increased damage to Chilled targets.","bonusEffect":"You gain 20%[x] increased Chill effect.","bonusStat":"dexterity","bonusThreshold":0},{"id":"infusion","name":"Infusion","radius":3,"description":"For every 5 Intelligence purchased within range, Skills that are Imbued deal +2.9% increased damage.","bonusEffect":"Casting an Imbuement Skill reduces the active Cooldown of another random Imbuement Skill by 0.5 seconds.","bonusStat":"intelligence","bonusThreshold":0},{"id":"nightstalker","name":"Nightstalker","radius":3,"description":"For every 5 Intelligence purchased within range, you deal +2.0% increased Shadow damage.","bonusEffect":"Entering Stealth reduces the active time window of Shadow Imbuement by 4 seconds.","bonusStat":"intelligence","bonusThreshold":0},{"id":"pride","name":"Pride","radius":4,"description":"Paragon nodes within range gain +15.0% bonus to their Physical damage and damage reduction modifiers.","bonusEffect":"You deal 13%[x] increased Physical damage to both Healthy and Injured enemies.","bonusStat":null,"bonusThreshold":0},{"id":"ranger","name":"Ranger","radius":3,"description":"For every 5 Dexterity purchased within range, Marksman Skills deal +1.3% increased damage.","bonusEffect":"While wielding a Ranged weapon, you take 10% reduced damage.","bonusStat":"dexterity","bonusThreshold":0},{"id":"snare","name":"Snare","radius":3,"description":"For every 5 Intelligence purchased within range, Trap Skills deal +2.6% increased damage.","bonusEffect":"Non-Ultimate Trap Skills have 25%[x] increased radius.","bonusStat":"intelligence","bonusThreshold":0},{"id":"tracker_rogue","name":"Tracker (Rogue)","radius":3,"description":"For every 5 Intelligence purchased within range, you deal +1.5% increased damage to Poisoned targets.","bonusEffect":"Poisoning damage effects last 33%[x] longer.","bonusStat":"intelligence","bonusThreshold":0},{"id":"turf","name":"Turf","radius":3,"description":"For every 5 Strength purchased within range, you deal +1.9% increased damage to Close targets.","bonusEffect":"You gain 10% Damage Reduction against Close enemies.","bonusStat":"strength","bonusThreshold":0},{"id":"versatility","name":"Versatility","radius":3,"description":"Grants +30.0% bonus to all Magic nodes within range.","bonusEffect":"Non-Basic and Non-Core Skills deal 15%[x] increased damage.","bonusStat":null,"bonusThreshold":0}],"legendaryNodes":{"starting_legendary":{"id":"starting_legendary","name":"Savagery","description":"Lucky Hit: Up to a 5% chance to make your next attack deal 100%[x] increased damage for 4 seconds.","stats":{}},"deadly_ambush_legendary":{"id":"deadly_ambush_legendary","name":"Deadly Ambush","description":"When you damage an enemy with a Trap Skill, that enemy takes 40%[x] increased damage from your next direct damage attack.","stats":{}},"eldritch_bounty_legendary":{"id":"eldritch_bounty_legendary","name":"Eldritch Bounty","description":"When you attack with an Imbued Skill you gain 3%[x] Maximum Resistance and 20%[x] increased damage for that Imbuement's element for 9 seconds.","stats":{}},"cheap_shot_legendary":{"id":"cheap_shot_legendary","name":"Cheap Shot","description":"You deal 5%[x] increased damage for each Nearby enemy that is Crowd Controlled, up to 25%[x]. A Nearby Staggered Boss provides the maximum bonus.","stats":{}},"no_witnesses_legendary":{"id":"no_witnesses_legendary","name":"No Witnesses","description":"Your Ultimate Skills gain an additional 10%[x] damage from your Damage with Ultimate bonus and grant this bonus to all Skills for 10 seconds when cast. Maximum Bonus: 45%[x].","stats":{}},"cunning_stratagem_legendary":{"id":"cunning_stratagem_legendary","name":"Cunning Stratagem","description":"Your non-damage Combo Point bonuses are increased by 33% when you spend 3 Combo Points.","stats":{}},"tricks_legendary":{"id":"tricks_legendary","name":"Tricks of the Trade","description":"Your Marksman Skills grant your Cutthroat Skills 25%[x] increased damage for 8 seconds. Your Cutthroat Skills grant your Marksman Skills 25%[x] increased damage for 8 seconds.","stats":{}},"exploit_legendary":{"id":"exploit_legendary","name":"Exploit Weakness","description":"Lucky Hit: Hitting a Vulnerable enemy has up to a 60% chance to increase your damage by 1%[x] for 25 seconds, up to 25%[x]. At 25 stacks, this bonus remains for 8 seconds before expiring.","stats":{}},"leyrana_instinct_legendary":{"id":"leyrana_instinct_legendary","name":"Leyrana's Instinct","description":"When Inner Sight's gauge becomes full, you gain 100%[x] Dodge Chance for 2 seconds. Your Core Skills deal increased damage equal to 25%[x] of your Core Skill Damage Bonus while Inner Sight's gauge remains full, up to 35.0%[x].","stats":{}},"danse_macabre_legendary":{"id":"danse_macabre_legendary","name":"Danse Macabre","description":"Casting a Mobility or Subterfuge Skill increases the damage of your next Skill by 50%[x].","stats":{}}},"rareNodes":{"rare_starting_1":{"id":"rare_starting_1","name":"Resilience","description":"+2.0% Resistance to All Elements, +4.0% Maximum Life. Bonus (212 Str): Another +2.0% Resistance to All Elements.","bonus":{"armor":10,"life":40}},"rare_starting_2":{"id":"rare_starting_2","name":"Pride","description":"+35.0% Damage, +4.0% Maximum Life. Bonus (190 Str): Another +20.0% Damage.","bonus":{"damage":35,"life":40}},"rare_starting_3":{"id":"rare_starting_3","name":"Outlaw","description":"+30.0% Damage to Elites, +10 Dexterity. Bonus (190 Str): Another +30.0% Damage to Elites.","bonus":{"damage":30,"dexterity":10}},"rare_starting_4":{"id":"rare_starting_4","name":"Skillful","description":"+20.0% Damage, +10 Dexterity. Bonus (210 Int): Another +20.0% Damage.","bonus":{"damage":20,"dexterity":10}},"rare_deadly_ambush_1":{"id":"rare_deadly_ambush_1","name":"Trap Mastery","description":"+25% Trap Skill Damage, +5% Lucky Hit Chance.","bonus":{"trap":25}},"rare_deadly_ambush_2":{"id":"rare_deadly_ambush_2","name":"Spring-Loaded","description":"20% Trap Cooldown Reduction, +10 Dexterity.","bonus":{"dexterity":10}},"rare_deadly_ambush_3":{"id":"rare_deadly_ambush_3","name":"Predator's Mark","description":"+12% Critical Strike Damage, +10 Dexterity.","bonus":{"critdmg":12,"dexterity":10}},"rare_deadly_ambush_4":{"id":"rare_deadly_ambush_4","name":"Patient Killer","description":"+18% Damage Over Time, +4.0% Maximum Life.","bonus":{"poison":18,"life":40}},"rare_deadly_ambush_5":{"id":"rare_deadly_ambush_5","name":"Scavenger","description":"+10% Damage to Slowed Enemies, +10 Dexterity.","bonus":{"damage":10,"dexterity":10}},"rare_deadly_ambush_6":{"id":"rare_deadly_ambush_6","name":"Hunter's Edge","description":"+4.0% Maximum Life, +30 Armor.","bonus":{"life":40,"armor":30}},"rare_eldritch_bounty_1":{"id":"rare_eldritch_bounty_1","name":"Potent","description":"+40.0% Imbued Damage, +10 Dexterity. Bonus (305 Str): Another +40.0% Imbued Damage.","bonus":{"damage":40,"dexterity":10}},"rare_eldritch_bounty_2":{"id":"rare_eldritch_bounty_2","name":"Concoction (Paragon Node)","description":"+20.0% Non-Physical Damage, +10 Dexterity. Bonus (265 Int): Another +20.0% Non-Physical Damage.","bonus":{"damage":20,"dexterity":10}},"rare_eldritch_bounty_3":{"id":"rare_eldritch_bounty_3","name":"Suffused Resilience","description":"5.0% Damage Reduction, +3.0% Resistance to All Elements. Bonus (265 Int): Another 5.0% Damage Reduction.","bonus":{"armor":15,"life":20}},"rare_eldritch_bounty_4":{"id":"rare_eldritch_bounty_4","name":"Ready Supply","description":"+20.0% Non-Physical Damage, 3.0% Imbuement Cooldown Reduction. Bonus (1345 Dex): Another +20.0% Non-Physical Damage.","bonus":{"damage":20}},"rare_eldritch_bounty_5":{"id":"rare_eldritch_bounty_5","name":"Restorative","description":"+4.0% Maximum Life, +6.0% Healing Received. Bonus (285 Int): Another +4.0% Maximum Life.","bonus":{"life":40}},"rare_eldritch_bounty_6":{"id":"rare_eldritch_bounty_6","name":"Imbuer","description":"+3.0% Resistance to All Elements, +30 Armor. Bonus (1155 Dex + 280 Str): Another +3.0% Resistance.","bonus":{"armor":30}},"rare_cheap_shot_1":{"id":"rare_cheap_shot_1","name":"Calculated","description":"+35.0% Damage to Crowd Controlled Enemies, +30 Armor. Bonus (285 Int): Another +35.0% Damage to Crowd Controlled Enemies.","bonus":{"damage":35,"armor":30}},"rare_cheap_shot_2":{"id":"rare_cheap_shot_2","name":"Deviant","description":"+3.0 Resistance to All Elements, +4.0% Maximum Life. Bonus (305 Int): Another +3.0 Resistance to All Elements.","bonus":{"armor":15,"life":40}},"rare_cheap_shot_3":{"id":"rare_cheap_shot_3","name":"Devious (Paragon Node)","description":"+35.0% Damage to Crowd Controlled Enemies, +10 Dexterity. Bonus (305 Int): Another +35.0% Damage to Crowd Controlled Enemies.","bonus":{"damage":35,"dexterity":10}},"rare_cheap_shot_4":{"id":"rare_cheap_shot_4","name":"Artifice","description":"+20% Damage, +10 Dexterity. Bonus (305 Str): Another +20.0% Damage.","bonus":{"damage":20,"dexterity":10}},"rare_cheap_shot_5":{"id":"rare_cheap_shot_5","name":"Safeguard (Paragon Node)","description":"6.5% Damage Reduction from Elites, +30 Armor. Bonus (1215 Dex): Another 6.5% Damage Reduction from Elites.","bonus":{"armor":30}},"rare_cheap_shot_6":{"id":"rare_cheap_shot_6","name":"Spearhead","description":"+25.0% Damage to Healthy Enemies, +4.0% Maximum Life. Bonus (265 Int): Another +25.0% Damage to Healthy Enemies.","bonus":{"damage":25,"life":40}},"rare_no_witnesses_1":{"id":"rare_no_witnesses_1","name":"Recuperate","description":"+4.0% Maximum Life, +100 Life per 5 Seconds. Bonus (305 Str): Another +4.0% Maximum Life.","bonus":{"life":40}},"rare_no_witnesses_2":{"id":"rare_no_witnesses_2","name":"Culler","description":"+2.5% Attack Speed, +20.0% Non-Physical Damage. Bonus (305 Str): Another +2.5% Attack Speed.","bonus":{"damage":20}},"rare_no_witnesses_3":{"id":"rare_no_witnesses_3","name":"Deliverance","description":"+35.0% Ultimate Damage, +10.0% Dexterity. Bonus (285 Int): Another +35.0% Ultimate Damage.","bonus":{"damage":35,"dexterity":10}},"rare_no_witnesses_4":{"id":"rare_no_witnesses_4","name":"Fleeting","description":"12.0% Impairment Reduction, +2.0% Dodge Chance. Bonus (285 Str): Another 12.0% Impairment Reduction.","bonus":{"armor":12}},"rare_no_witnesses_5":{"id":"rare_no_witnesses_5","name":"Skillful","description":"+20.0% Damage, +10 Dexterity. Bonus (285 Int): Another +20.0% Damage.","bonus":{"damage":20,"dexterity":10}},"rare_no_witnesses_6":{"id":"rare_no_witnesses_6","name":"Training","description":"+4.0% Maximum Life, +3.0% Resistance to All Elements. Bonus (285 Str): Another +4.0% Maximum Life.","bonus":{"life":40,"armor":15}},"rare_cunning_stratagem_1":{"id":"rare_cunning_stratagem_1","name":"Finisher","description":"+28.0% Core Damage, +10 Dexterity. Bonus (305 Int): Another +28.0% Core Damage.","bonus":{"damage":28,"dexterity":10}},"rare_cunning_stratagem_2":{"id":"rare_cunning_stratagem_2","name":"Haven","description":"+4.0% Maximum Life, +30 Armor. Bonus (305 Int): Another +4.0% Maximum Life.","bonus":{"life":40,"armor":30}},"rare_cunning_stratagem_3":{"id":"rare_cunning_stratagem_3","name":"Dominant","description":"+28.0% Core Damage, +5.0% Basic Attack Speed. Bonus (260 Int + 255 Str): Another +28.0% Core Damage.","bonus":{"damage":28}},"rare_cunning_stratagem_4":{"id":"rare_cunning_stratagem_4","name":"Fundamentals","description":"+20.0% Damage, +10 Dexterity. Bonus (265 Str): Another +20.0% Damage.","bonus":{"damage":20,"dexterity":10}},"rare_cunning_stratagem_5":{"id":"rare_cunning_stratagem_5","name":"Denial","description":"+3.0% Resistance to All Elements, +30 Armor. Bonus (265 Str): Another +3.0% Resistance to All Elements.","bonus":{"armor":30}},"rare_cunning_stratagem_6":{"id":"rare_cunning_stratagem_6","name":"Slayer (Paragon Node)","description":"+30 Armor, +4.0% Maximum Life. Bonus (285 Str): Another +30 Armor.","bonus":{"armor":30,"life":40}},"rare_tricks_1":{"id":"rare_tricks_1","name":"Brawler","description":"6.0% Damage Reduction from Close Enemies, +24.0% Damage to Close Enemies. Bonus (1155 Dex + 260 Str): Another 6.0% Damage Reduction from Close Enemies.","bonus":{"damage":24,"armor":20}},"rare_tricks_2":{"id":"rare_tricks_2","name":"Shadow Resilience","description":"10.0% Shadow Resistance, +2.0% Maximum Shadow Resistance. Bonus (265 Int): Another +10.0% Shadow Resistance.","bonus":{"armor":20}},"rare_tricks_3":{"id":"rare_tricks_3","name":"Surgical","description":"+20.0% Cutthroat Damage, +10 Dexterity. Bonus (285 Str): Another +20.0% Cutthroat Damage.","bonus":{"damage":20,"dexterity":10}},"rare_tricks_4":{"id":"rare_tricks_4","name":"Focused","description":"+20.0% Marksman Damage, +10 Dexterity. Bonus (305 Int): Another +20.0% Marksman Damage.","bonus":{"damage":20,"dexterity":10}},"rare_tricks_5":{"id":"rare_tricks_5","name":"Ranger (Paragon Node)","description":"9.0% Damage Reduction from Distant Enemies, +40.0% Damage to Distant Enemies. Bonus (1155 Dex + 260 Int): Another 9.0% Damage Reduction.","bonus":{"damage":40,"armor":20}},"rare_tricks_6":{"id":"rare_tricks_6","name":"Haven","description":"+4.0% Maximum Life, +30 Armor. Bonus (305 Int): Another +4.0% Maximum Life.","bonus":{"life":40,"armor":30}},"rare_exploit_weakness_1":{"id":"rare_exploit_weakness_1","name":"Cold Resilience","description":"+10.0% Cold Resistance, +2.0% Maximum Cold Resistance. Bonus (285 Int): Another +10.0% Cold Resistance.","bonus":{"armor":20}},"rare_exploit_weakness_2":{"id":"rare_exploit_weakness_2","name":"Toughened","description":"+30 Armor, +4.0% Maximum Life. Bonus (285 Int): Another +30 Armor.","bonus":{"armor":30,"life":40}},"rare_exploit_weakness_3":{"id":"rare_exploit_weakness_3","name":"Unassailable","description":"6.0% Damage Reduction from Vulnerable Enemies, +30 Armor. Bonus (260 Int + 255 Str): Another 6.0% Damage Reduction.","bonus":{"armor":30}},"rare_exploit_weakness_4":{"id":"rare_exploit_weakness_4","name":"Exploit (Paragon Node)","description":"+25.0% Vulnerable Damage, +5.0% Lucky Hit Chance. Bonus (1155 Dex + 260 Int): Another +25.0% Vulnerable Damage.","bonus":{"vulnerable":25}},"rare_exploit_weakness_5":{"id":"rare_exploit_weakness_5","name":"Artifice","description":"+20.0% Damage, +10 Dexterity. Bonus (305 Str): Another +20.0% Damage.","bonus":{"damage":20,"dexterity":10}},"rare_exploit_weakness_6":{"id":"rare_exploit_weakness_6","name":"Misery","description":"+30.0% Damage to Elites, +10 Dexterity. Bonus (285 Int): Another +30.0% Damage to Elites.","bonus":{"damage":30,"dexterity":10}},"rare_leyrana_instinct_1":{"id":"rare_leyrana_instinct_1","name":"Suffused Resilience","description":"5.0% Damage Reduction, +3.0% Resistance to All Elements. Bonus (265 Int): Another 5.0% Damage Reduction.","bonus":{"armor":15,"life":20}},"rare_leyrana_instinct_2":{"id":"rare_leyrana_instinct_2","name":"Poison Resilience","description":"+10.0% Poison Resistance, +2.0% Maximum Poison Resistance. Bonus (265 Str): Another +10.0% Poison Resistance.","bonus":{"armor":20}},"rare_leyrana_instinct_3":{"id":"rare_leyrana_instinct_3","name":"Nimble","description":"+2.5% Attack Speed, +20.0% Damage. Bonus (1345 Dex): Another +2.5% Attack Speed.","bonus":{"damage":20}},"rare_leyrana_instinct_4":{"id":"rare_leyrana_instinct_4","name":"Restorative","description":"+4.0% Maximum Life, +6.0% Healing Received. Bonus (285 Int): Another +4.0% Maximum Life.","bonus":{"life":40}},"rare_leyrana_instinct_5":{"id":"rare_leyrana_instinct_5","name":"Essential","description":"+28.0% Core Damage, +10 Dexterity. Bonus (305 Int): Another +28.0% Core Damage.","bonus":{"damage":28,"dexterity":10}},"rare_leyrana_instinct_6":{"id":"rare_leyrana_instinct_6","name":"Punishment","description":"+20.0% Damage, +10 Dexterity. Bonus (265 Str): Another +20.0% Damage.","bonus":{"damage":20,"dexterity":10}},"rare_danse_macabre_1":{"id":"rare_danse_macabre_1","name":"Assassin","description":"+25.0% Damage to Healthy Enemies, +10 Dexterity. Bonus (285 Str): Another +25.0% Damage to Healthy Enemies.","bonus":{"damage":25,"dexterity":10}},"rare_danse_macabre_2":{"id":"rare_danse_macabre_2","name":"Giant Killer","description":"+30.0% Damage to Elites, +10 Dexterity. Bonus (285 Int): Another +30.0% Damage to Elites.","bonus":{"damage":30,"dexterity":10}},"rare_danse_macabre_3":{"id":"rare_danse_macabre_3","name":"Ranger (Paragon Node)","description":"9.0% Damage Reduction from Distant Enemies, +40.0% Damage to Distant Enemies. Bonus (1155 Dex + 260 Int): Another 9.0% Damage Reduction.","bonus":{"damage":40,"armor":20}},"rare_danse_macabre_4":{"id":"rare_danse_macabre_4","name":"Brawler","description":"6.0% Damage Reduction from Close Enemies, +24.0% Damage to Close Enemies. Bonus (1155 Dex + 260 Str): Another 6.0% Damage Reduction.","bonus":{"damage":24,"armor":20}},"rare_danse_macabre_5":{"id":"rare_danse_macabre_5","name":"Skulker","description":"3.0% Subterfuge Cooldown Reduction, +3.0% Resistance to All Elements. Bonus (305 Int): Another 3.0% Subterfuge Cooldown Reduction.","bonus":{"armor":15}},"rare_danse_macabre_6":{"id":"rare_danse_macabre_6","name":"Acrobat","description":"3.0% Mobility Cooldown Reduction, +4.0% Maximum Life. Bonus (265 Str): Another 3.0% Mobility Cooldown Reduction.","bonus":{"life":40}}}};
+
+function loadData() {
+  DATA = PARAGON_DATA;
+  init();
+}
+
+// ============================================================
+//  STATS CALCULATION
+// ============================================================
+
+function calcStats() {
+  const t = {
+    dexterity: 0, strength: 0, intelligence: 0, willpower: 0,
+    life: 0, armor: 0, damage: 0, vulnerable: 0, critdmg: 0, poison: 0, trap: 0
+  };
+
+  state.boards.forEach(function(bid) {
+    const bdata = state.boardData[bid];
+    const base = bid === 'starting' ? 40 : 75;
+    t.dexterity += Math.floor(base * 0.5);
+    t.strength  += Math.floor(base * 0.15);
+
+    bdata.activeRares.forEach(function(rid) {
+      const rn = DATA.rareNodes && DATA.rareNodes[rid];
+      if (rn && rn.bonus) {
+        Object.entries(rn.bonus).forEach(function([k, v]) {
+          t[k] = (t[k] || 0) + v;
+        });
+      }
+    });
+
+    if (bdata.glyphId) {
+      const g = DATA.glyphs && DATA.glyphs.find(function(g) { return g.id === bdata.glyphId; });
+      if (g) applyGlyph(g, t, bdata.glyphLevel || 1);
+    }
+  });
+
+  // Derived
+  t.damage     += Math.floor(t.dexterity * 0.12);
+  t.critdmg    += Math.floor(t.dexterity * 0.09);
+  t.vulnerable += Math.floor(t.intelligence * 0.07);
+  t.life       += Math.floor(t.willpower * 2);
+  t.armor      += Math.floor(t.strength * 0.6);
+  t.poison     += Math.floor((t.dexterity + t.intelligence) * 0.04);
+  t.trap       += Math.floor(t.dexterity * 0.07);
+  return t;
+}
+
+function glyphRadius(level) {
+  if (level >= 51) return 5;
+  if (level >= 25) return 4;
+  return 3;
+}
+
+function applyGlyph(g, t, level) {
+  const lvl = level || 1;
+  // Bonus scales roughly: starts ~17 at lvl 1, grows to ~85 at lvl 150
+  const bonus = Math.round(17 * (1 + (lvl - 1) / 30));
+  const map = {
+    headhunter: 'damage', ambush: 'trap', bane_rogue: 'poison', canny: 'damage',
+    chip: 'damage', closer: 'damage', combat: 'critdmg', control_rogue: 'damage',
+    devious: 'damage', diminish: 'damage', efficacy: 'damage', exploit_rogue: 'vulnerable',
+    explosive: 'damage', fluidity: 'damage', frostfeeder: 'damage', infusion: 'damage',
+    nightstalker: 'poison', pride: 'damage', ranger: 'damage', snare: 'trap',
+    tracker_rogue: 'poison', turf: 'armor', versatility: 'damage',
+  };
+  const key = map[g.id] || 'damage';
+  t[key] = (t[key] || 0) + bonus;
+}
+
+function calcPointsUsed() {
+  let used = 0;
+  state.boards.forEach(function(bid) {
+    const base = bid === 'starting' ? 40 : 75;
+    used += base + (state.boardData[bid].activeRares.size);
+  });
+  return used;
+}
+
+// ============================================================
+//  SHARE CODE
+// ============================================================
+
+function buildShareCode() {
+  const d = {
+    v: 3,
+    b: state.boards.map(function(bid) {
+      return {
+        id: bid,
+        g: state.boardData[bid].glyphId,
+        gl: state.boardData[bid].glyphLevel || 1,
+        r: Array.from(state.boardData[bid].activeRares),
+      };
+    })
+  };
+  return btoa(encodeURIComponent(JSON.stringify(d)));
+}
+
+function loadShareCode(code) {
+  const d = JSON.parse(decodeURIComponent(atob(code)));
+  if (![2, 3].includes(d.v) || !Array.isArray(d.b)) throw new Error('Invalid share code');
+  state.boards = [];
+  state.boardData = {};
+  d.b.forEach(function(bd) {
+    if (!BOARD_META[bd.id]) return;
+    state.boards.push(bd.id);
+    state.boardData[bd.id] = { glyphId: bd.g || null, glyphLevel: bd.gl || 1, activeRares: new Set(bd.r || []) };
+  });
+  if (!state.boards.includes('starting')) {
+    state.boards.unshift('starting');
+    state.boardData.starting = { glyphId: null, glyphLevel: 1, activeRares: new Set() };
+  }
+}
+
+// ============================================================
+//  RENDER
+// ============================================================
+
+function render() {
+  renderChips();
+  renderBoards();
+  renderStats();
+}
+
+// --- Chips ---
+
+function renderChips() {
+  const scroll = document.getElementById('chips-scroll');
+  // Remove all existing chips (but not the add button)
+  const existing = scroll.querySelectorAll('.chip:not(.chip-add)');
+  existing.forEach(function(el) { el.remove(); });
+
+  const addBtn = scroll.querySelector('.chip-add');
+
+  state.boards.forEach(function(bid, idx) {
+    const meta = BOARD_META[bid];
+    if (!meta) return;
+    const chip = document.createElement('button');
+    chip.className = 'chip chip-active';
+    chip.textContent = meta.icon + ' ' + meta.name;
+    chip.setAttribute('aria-label', 'Jump to ' + meta.name);
+    chip.addEventListener('click', function() {
+      const card = document.getElementById('card-' + bid);
+      if (card) card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+    scroll.insertBefore(chip, addBtn);
+  });
+}
+
+// --- Board cards ---
+
+function renderBoards() {
+  const list = document.getElementById('boards-list');
+  list.innerHTML = '';
+
+  state.boards.forEach(function(bid, idx) {
+    const card = buildBoardCard(bid, idx);
+    list.appendChild(card);
+  });
+}
+
+function buildBoardCard(bid, idx) {
+  const meta = BOARD_META[bid];
+  const bdata = state.boardData[bid];
+  const legNode = DATA.legendaryNodes && DATA.legendaryNodes[meta.legendaryId];
+  const isStarting = bid === 'starting';
+
+  const card = document.createElement('div');
+  card.className = 'board-card';
+  card.id = 'card-' + bid;
+
+  // --- Header ---
+  const header = document.createElement('div');
+  header.className = 'card-header';
+  header.setAttribute('role', 'button');
+  header.setAttribute('tabindex', '0');
+  header.setAttribute('aria-expanded', 'true');
+
+  const badge = document.createElement('span');
+  badge.className = 'card-badge';
+  badge.textContent = String(idx + 1);
+
+  const icon = document.createElement('span');
+  icon.className = 'card-icon';
+  icon.textContent = meta.icon;
+
+  const title = document.createElement('span');
+  title.className = 'card-title';
+  title.textContent = meta.name;
+
+  const chevron = document.createElement('span');
+  chevron.className = 'card-chevron';
+  chevron.textContent = '▾'; // down-pointing triangle
+
+  header.appendChild(badge);
+  header.appendChild(icon);
+  header.appendChild(title);
+  if (!isStarting) {
+    const removeBtn = document.createElement('button');
+    removeBtn.className = 'btn-icon';
+    removeBtn.style.cssText = 'width:36px;height:36px;color:var(--txt2);font-size:15px;';
+    removeBtn.setAttribute('aria-label', 'Remove ' + meta.name);
+    removeBtn.textContent = '×';
+    removeBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      removeBoard(bid);
+    });
+    header.appendChild(removeBtn);
+  }
+  header.appendChild(chevron);
+
+  header.addEventListener('click', function() {
+    card.classList.toggle('collapsed');
+    const expanded = !card.classList.contains('collapsed');
+    header.setAttribute('aria-expanded', String(expanded));
+  });
+
+  card.appendChild(header);
+
+  // --- Body ---
+  const body = document.createElement('div');
+  body.className = 'card-body';
+
+  // Legendary section
+  if (legNode) {
+    const legSec = document.createElement('div');
+    legSec.className = 'card-section legendary-section';
+
+    const secLabel = document.createElement('div');
+    secLabel.className = 'section-label';
+    secLabel.textContent = 'Legendary Node';
+
+    const legName = document.createElement('div');
+    legName.className = 'legendary-name';
+    legName.textContent = legNode.name;
+
+    const legDesc = document.createElement('div');
+    legDesc.className = 'legendary-desc';
+    legDesc.textContent = legNode.description;
+
+    legSec.appendChild(secLabel);
+    legSec.appendChild(legName);
+    legSec.appendChild(legDesc);
+    body.appendChild(legSec);
+  }
+
+  // Glyph section
+  const glyphSec = document.createElement('div');
+  glyphSec.className = 'card-section';
+
+  const glyphLabel = document.createElement('div');
+  glyphLabel.className = 'section-label';
+  glyphLabel.textContent = 'Glyph';
+
+  const glyphSelect = document.createElement('select');
+  glyphSelect.className = 'glyph-select';
+  glyphSelect.setAttribute('aria-label', 'Select glyph for ' + meta.name);
+
+  const noneOpt = document.createElement('option');
+  noneOpt.value = '';
+  noneOpt.textContent = '-- No Glyph --';
+  glyphSelect.appendChild(noneOpt);
+
+  if (DATA.glyphs) {
+    DATA.glyphs.forEach(function(g) {
+      const opt = document.createElement('option');
+      opt.value = g.id;
+      opt.textContent = '⬡ ' + g.name + ' (r' + g.radius + ')';
+      if (g.id === bdata.glyphId) opt.selected = true;
+      glyphSelect.appendChild(opt);
+    });
+  }
+
+  // Glyph level stepper
+  const glyphLevelRow = document.createElement('div');
+  glyphLevelRow.className = 'glyph-level-row';
+  glyphLevelRow.hidden = !bdata.glyphId;
+
+  const lvlLabel = document.createElement('span');
+  lvlLabel.className = 'glyph-level-label';
+  lvlLabel.textContent = 'Level';
+
+  const lvlMinus = document.createElement('button');
+  lvlMinus.className = 'glyph-lvl-btn';
+  lvlMinus.textContent = '−';
+
+  const lvlVal = document.createElement('span');
+  lvlVal.className = 'glyph-lvl-val';
+  lvlVal.textContent = String(bdata.glyphLevel || 1);
+
+  const lvlPlus = document.createElement('button');
+  lvlPlus.className = 'glyph-lvl-btn';
+  lvlPlus.textContent = '+';
+
+  const radiusBadge = document.createElement('span');
+  radiusBadge.className = 'glyph-radius-badge';
+
+  function updateRadiusBadge(level) {
+    const r = glyphRadius(level);
+    const isLeg = level >= 51;
+    radiusBadge.textContent = 'r' + r + (isLeg ? ' ✦' : '');
+    radiusBadge.className = 'glyph-radius-badge' + (isLeg ? ' legendary' : '');
+  }
+  updateRadiusBadge(bdata.glyphLevel || 1);
+
+  function setGlyphLevel(newLvl) {
+    newLvl = Math.max(1, Math.min(150, newLvl));
+    state.boardData[bid].glyphLevel = newLvl;
+    lvlVal.textContent = String(newLvl);
+    updateRadiusBadge(newLvl);
+    renderStats();
+  }
+
+  lvlMinus.addEventListener('click', function() { setGlyphLevel((state.boardData[bid].glyphLevel || 1) - 1); });
+  lvlPlus.addEventListener('click',  function() { setGlyphLevel((state.boardData[bid].glyphLevel || 1) + 1); });
+
+  // Long-press for fast increment
+  let lvlInterval = null;
+  function startHold(delta) { lvlInterval = setInterval(function() { setGlyphLevel((state.boardData[bid].glyphLevel || 1) + delta); }, 120); }
+  function stopHold() { clearInterval(lvlInterval); }
+  lvlMinus.addEventListener('pointerdown', function() { startHold(-1); });
+  lvlPlus.addEventListener('pointerdown',  function() { startHold(+1); });
+  ['pointerup','pointerleave'].forEach(function(ev) {
+    lvlMinus.addEventListener(ev, stopHold);
+    lvlPlus.addEventListener(ev, stopHold);
+  });
+
+  glyphLevelRow.appendChild(lvlLabel);
+  glyphLevelRow.appendChild(lvlMinus);
+  glyphLevelRow.appendChild(lvlVal);
+  glyphLevelRow.appendChild(lvlPlus);
+  glyphLevelRow.appendChild(radiusBadge);
+
+  const glyphInfo = document.createElement('div');
+  glyphInfo.className = 'glyph-info';
+  glyphInfo.hidden = !bdata.glyphId;
+
+  function updateGlyphInfo(gid) {
+    if (!gid || !DATA.glyphs) {
+      glyphInfo.hidden = true;
+      glyphLevelRow.hidden = true;
+      return;
+    }
+    const g = DATA.glyphs.find(function(g) { return g.id === gid; });
+    if (!g) {
+      glyphInfo.hidden = true;
+      glyphLevelRow.hidden = true;
+      return;
+    }
+    glyphInfo.hidden = false;
+    glyphLevelRow.hidden = false;
+    glyphInfo.innerHTML = '';
+    if (g.description) {
+      const d = document.createElement('div');
+      d.className = 'glyph-info-desc';
+      d.textContent = g.description;
+      glyphInfo.appendChild(d);
+    }
+    if (g.bonusEffect) {
+      const b = document.createElement('div');
+      b.className = 'glyph-info-bonus';
+      b.textContent = '★ ' + g.bonusEffect;
+      glyphInfo.appendChild(b);
+    }
+  }
+
+  // Initial render
+  if (bdata.glyphId) updateGlyphInfo(bdata.glyphId);
+
+  glyphSelect.addEventListener('change', function() {
+    const gid = glyphSelect.value || null;
+    state.boardData[bid].glyphId = gid;
+    updateGlyphInfo(gid);
+    renderStats();
+  });
+
+  glyphSec.appendChild(glyphLabel);
+  glyphSec.appendChild(glyphSelect);
+  glyphSec.appendChild(glyphLevelRow);
+  glyphSec.appendChild(glyphInfo);
+  body.appendChild(glyphSec);
+
+  // Rare nodes section
+  if (meta.rareIds && meta.rareIds.length > 0) {
+    const rareSec = document.createElement('div');
+    rareSec.className = 'card-section';
+
+    const rareLabel = document.createElement('div');
+    rareLabel.className = 'section-label';
+    rareLabel.textContent = 'Rare Nodes';
+
+    rareSec.appendChild(rareLabel);
+
+    meta.rareIds.forEach(function(rid) {
+      const rn = DATA.rareNodes && DATA.rareNodes[rid];
+      if (!rn) return;
+
+      const row = document.createElement('div');
+      row.className = 'rare-node-row' + (bdata.activeRares.has(rid) ? ' active' : '');
+      row.setAttribute('role', 'button');
+      row.setAttribute('tabindex', '0');
+      row.setAttribute('aria-pressed', String(bdata.activeRares.has(rid)));
+
+      const check = document.createElement('div');
+      check.className = 'rare-check';
+      const mark = document.createElement('span');
+      mark.className = 'rare-check-mark';
+      mark.textContent = '✓';
+      check.appendChild(mark);
+
+      const textWrap = document.createElement('div');
+      textWrap.className = 'rare-node-text';
+
+      const rName = document.createElement('div');
+      rName.className = 'rare-node-name';
+      rName.textContent = rn.name;
+
+      const rDesc = document.createElement('div');
+      rDesc.className = 'rare-node-desc';
+      rDesc.textContent = rn.description;
+
+      textWrap.appendChild(rName);
+      textWrap.appendChild(rDesc);
+      row.appendChild(check);
+      row.appendChild(textWrap);
+
+      function toggleRare() {
+        if (bdata.activeRares.has(rid)) {
+          bdata.activeRares.delete(rid);
+          row.classList.remove('active');
+          row.setAttribute('aria-pressed', 'false');
+        } else {
+          bdata.activeRares.add(rid);
+          row.classList.add('active');
+          row.setAttribute('aria-pressed', 'true');
+        }
+        renderStats();
+        updatePointsBar();
+      }
+
+      row.addEventListener('click', toggleRare);
+      row.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleRare(); }
+      });
+
+      rareSec.appendChild(row);
+    });
+
+    body.appendChild(rareSec);
+  }
+
+  card.appendChild(body);
+  return card;
+}
+
+// --- Stats bar ---
+
+function renderStats() {
+  const stats = calcStats();
+  updatePointsBar();
+
+  // Summary line
+  const summary = document.getElementById('stats-summary');
+  summary.textContent =
+    'DEX ' + stats.dexterity +
+    '  DMG +' + stats.damage + '%' +
+    '  CRIT +' + stats.critdmg + '%' +
+    '  VUL +' + stats.vulnerable + '%';
+
+  // Expanded grid
+  const grid = document.getElementById('stats-grid');
+  grid.innerHTML = '';
+
+  const statDefs = [
+    { key: 'dexterity',   label: 'DEX',  fmt: function(v) { return String(v); } },
+    { key: 'strength',    label: 'STR',  fmt: function(v) { return String(v); } },
+    { key: 'intelligence',label: 'INT',  fmt: function(v) { return String(v); } },
+    { key: 'willpower',   label: 'WIL',  fmt: function(v) { return String(v); } },
+    { key: 'life',        label: 'LIFE', fmt: function(v) { return '+' + v; } },
+    { key: 'armor',       label: 'ARM',  fmt: function(v) { return '+' + v; } },
+    { key: 'damage',      label: 'DMG',  fmt: function(v) { return '+' + v + '%'; } },
+    { key: 'critdmg',     label: 'CRIT', fmt: function(v) { return '+' + v + '%'; } },
+    { key: 'vulnerable',  label: 'VUL',  fmt: function(v) { return '+' + v + '%'; } },
+    { key: 'poison',      label: 'PSN',  fmt: function(v) { return '+' + v + '%'; } },
+    { key: 'trap',        label: 'TRAP', fmt: function(v) { return '+' + v + '%'; } },
+  ];
+
+  statDefs.forEach(function(def) {
+    const val = stats[def.key] || 0;
+    const item = document.createElement('div');
+    item.className = 'stat-item';
+
+    const name = document.createElement('span');
+    name.className = 'stat-item-name';
+    name.textContent = def.label;
+
+    const value = document.createElement('span');
+    value.className = 'stat-item-value';
+    value.textContent = def.fmt(val);
+
+    item.appendChild(name);
+    item.appendChild(value);
+    grid.appendChild(item);
+  });
+}
+
+function updatePointsBar() {
+  const used = calcPointsUsed();
+  const pct = Math.min(100, Math.round(used / MAX_POINTS * 100));
+  const el = document.getElementById('points-used');
+  const fill = document.getElementById('points-bar-fill');
+  if (el) el.textContent = String(used);
+  if (fill) fill.style.width = pct + '%';
+}
+
+// ============================================================
+//  ADD / REMOVE BOARDS
+// ============================================================
+
+function addBoard(bid) {
+  if (state.boards.includes(bid)) return;
+  if (state.boards.length >= MAX_BOARDS) {
+    alert('Maximum ' + MAX_BOARDS + ' boards (Season 6 limit).');
+    return;
+  }
+  state.boards.push(bid);
+  state.boardData[bid] = { glyphId: null, glyphLevel: 1, activeRares: new Set() };
+  render();
+  closeAllSheets();
+}
+
+function removeBoard(bid) {
+  if (bid === 'starting') return;
+  state.boards = state.boards.filter(function(b) { return b !== bid; });
+  delete state.boardData[bid];
+  render();
+}
+
+// ============================================================
+//  MODALS / SHEETS
+// ============================================================
+
+let statsExpanded = false;
+
+function openSheet(sheetId) {
+  const overlay = document.getElementById('modal-overlay');
+  const sheet = document.getElementById(sheetId);
+  overlay.hidden = false;
+  sheet.hidden = false;
+}
+
+function closeAllSheets() {
+  document.getElementById('modal-overlay').hidden = true;
+  document.querySelectorAll('.bottom-sheet').forEach(function(s) { s.hidden = true; });
+}
+
+function openAddBoardSheet() {
+  if (state.boards.length >= MAX_BOARDS) {
+    alert('Du har allerede ' + MAX_BOARDS + ' boards — det er max i Season 6.');
+    return;
+  }
+  const list = document.getElementById('add-board-list');
+  list.innerHTML = '';
+
+  Object.entries(BOARD_META).forEach(function([bid, meta]) {
+    const legNode = DATA.legendaryNodes && DATA.legendaryNodes[meta.legendaryId];
+    const alreadyAdded = state.boards.includes(bid);
+
+    const row = document.createElement('div');
+    row.className = 'add-board-row' + (alreadyAdded ? ' already-added' : '');
+
+    const iconEl = document.createElement('span');
+    iconEl.className = 'add-board-icon';
+    iconEl.textContent = meta.icon;
+
+    const info = document.createElement('div');
+    info.className = 'add-board-info';
+
+    const nameEl = document.createElement('div');
+    nameEl.className = 'add-board-name';
+    nameEl.textContent = meta.name;
+
+    info.appendChild(nameEl);
+
+    if (legNode) {
+      const legEl = document.createElement('div');
+      legEl.className = 'add-board-legendary';
+      legEl.textContent = legNode.name;
+      info.appendChild(legEl);
+    }
+
+    row.appendChild(iconEl);
+    row.appendChild(info);
+
+    if (alreadyAdded) {
+      const checkEl = document.createElement('span');
+      checkEl.className = 'add-board-check';
+      checkEl.textContent = '✓ Added';
+      row.appendChild(checkEl);
+    }
+
+    if (!alreadyAdded) {
+      row.addEventListener('click', function() {
+        addBoard(bid);
+      });
+    }
+
+    list.appendChild(row);
+  });
+
+  openSheet('sheet-add-board');
+}
+
+function openShareSheet() {
+  const codeOut = document.getElementById('share-code-out');
+  codeOut.value = buildShareCode();
+  const errEl = document.getElementById('share-error');
+  errEl.hidden = true;
+  const confirmEl = document.getElementById('copy-confirm');
+  confirmEl.hidden = true;
+  document.getElementById('share-code-in').value = '';
+  openSheet('sheet-share');
+}
+
+// ============================================================
+//  RESET
+// ============================================================
+
+function resetState() {
+  if (!window.confirm('Reset all boards and start over?')) return;
+  state.boards = ['starting'];
+  state.boardData = { starting: { glyphId: null, activeRares: new Set() } };
+  render();
+}
+
+// ============================================================
+//  STATS BAR TOGGLE
+// ============================================================
+
+function toggleStats() {
+  statsExpanded = !statsExpanded;
+  const bar = document.getElementById('stats-bar');
+  const collapsed = document.getElementById('stats-collapsed');
+  const expanded = document.getElementById('stats-expanded');
+  const chevron = document.getElementById('stats-chevron');
+
+  if (statsExpanded) {
+    bar.classList.add('expanded');
+    expanded.hidden = false;
+    chevron.textContent = '▼'; // down arrow when expanded (chevron flipped by CSS)
+  } else {
+    bar.classList.remove('expanded');
+    expanded.hidden = true;
+    chevron.textContent = '▲';
+  }
+}
+
+// ============================================================
+//  URL HASH IMPORT
+// ============================================================
+
+function checkUrlHash() {
+  const hash = window.location.hash.slice(1);
+  if (!hash) return;
+  try {
+    loadShareCode(hash);
+  } catch (e) {
+    // ignore invalid hash
+  }
+}
+
+// ============================================================
+//  EVENT WIRING
+// ============================================================
+
+function wireEvents() {
+  // Header buttons
+  document.getElementById('btn-share').addEventListener('click', openShareSheet);
+  document.getElementById('btn-reset').addEventListener('click', resetState);
+  document.getElementById('btn-add-board').addEventListener('click', openAddBoardSheet);
+
+  // Close sheets
+  document.getElementById('btn-close-add-board').addEventListener('click', closeAllSheets);
+  document.getElementById('btn-close-share').addEventListener('click', closeAllSheets);
+  document.getElementById('modal-overlay').addEventListener('click', closeAllSheets);
+
+  // Share: copy
+  document.getElementById('btn-copy-code').addEventListener('click', function() {
+    const codeOut = document.getElementById('share-code-out');
+    const confirmEl = document.getElementById('copy-confirm');
+    navigator.clipboard.writeText(codeOut.value).then(function() {
+      confirmEl.hidden = false;
+      setTimeout(function() { confirmEl.hidden = true; }, 2000);
+    }).catch(function() {
+      codeOut.select();
+      document.execCommand('copy');
+      confirmEl.hidden = false;
+      setTimeout(function() { confirmEl.hidden = true; }, 2000);
+    });
+  });
+
+  // Share: load
+  document.getElementById('btn-load-code').addEventListener('click', function() {
+    const codeIn = document.getElementById('share-code-in');
+    const errEl = document.getElementById('share-error');
+    const code = codeIn.value.trim();
+    if (!code) { errEl.textContent = 'Please paste a code first.'; errEl.hidden = false; return; }
+    try {
+      loadShareCode(code);
+      errEl.hidden = true;
+      closeAllSheets();
+      render();
+    } catch (e) {
+      errEl.textContent = 'Invalid code. Please check and try again.';
+      errEl.hidden = false;
+    }
+  });
+
+  // Stats bar toggle
+  document.getElementById('stats-bar').addEventListener('click', toggleStats);
+}
+
+// ============================================================
+//  INIT
+// ============================================================
+
+function init() {
+  checkUrlHash();
+  wireEvents();
+  render();
+}
+
+// Boot
+loadData();
+
+  </script>
+</body>
+</html>
