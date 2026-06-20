@@ -812,6 +812,66 @@ input {
   border-color: rgba(200, 152, 48, 0.4);
 }
 
+/* --- Board Grid Section --- */
+.board-grid-section {
+  padding: 10px 14px 12px;
+  background: var(--bg0);
+  border-top: 1px solid var(--bdr);
+}
+
+.board-grid-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  border-radius: 8px;
+  background: #0c060a;
+  border: 1px solid var(--bdr);
+  padding: 2px;
+  line-height: 0;
+}
+
+.board-grid-wrap::-webkit-scrollbar {
+  display: none;
+}
+
+.board-grid-wrap svg {
+  display: block;
+  border-radius: 6px;
+}
+
+.board-grid-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px 10px;
+  margin-top: 8px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--txt2);
+  letter-spacing: 0.3px;
+}
+
+.legend-node {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  flex-shrink: 0;
+}
+
+.legend-diamond {
+  transform: rotate(45deg);
+}
+
+.legend-hex {
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  border-radius: 0;
+}
+
 /* --- Utility: hidden --- */
 [hidden] {
   display: none !important;
