@@ -549,38 +549,38 @@
       "description": "(Tilføjet i Season 5 — data ikke tilgængelig endnu)",
       "bonus": {}
     },
-    "rare_danse_macabre_1": {
-      "id": "rare_danse_macabre_1",
+    "Rogue_Rare_047": {
+      "id": "Rogue_Rare_047",
       "name": "Acrobat",
       "description": "+3% Mobility Skill Cooldown Reduction, +4% Maximum Life. Bonus (190 Str): +3% more Mobility CDR.",
       "bonus": { "life": 40 }
     },
-    "rare_danse_macabre_2": {
-      "id": "rare_danse_macabre_2",
+    "Rogue_Rare_048": {
+      "id": "Rogue_Rare_048",
       "name": "Assassin",
       "description": "+25% Damage to Healthy enemies, +10 Dexterity. Bonus (210 Str): +25% more Damage to Healthy.",
       "bonus": { "damage": 25, "dexterity": 10 }
     },
-    "rare_danse_macabre_3": {
-      "id": "rare_danse_macabre_3",
+    "Rogue_Rare_049": {
+      "id": "Rogue_Rare_049",
       "name": "Brawler",
       "description": "+3% Total Armor, +24% Damage to Close enemies. Bonus (700 Dex + 190 Str): +3% more Armor.",
       "bonus": { "damage": 24, "armor": 20 }
     },
-    "rare_danse_macabre_4": {
-      "id": "rare_danse_macabre_4",
+    "Rogue_Rare_050": {
+      "id": "Rogue_Rare_050",
       "name": "Giant Killer",
       "description": "+30% Damage to Elites, +10 Dexterity. Bonus (210 Int): +30% more Damage to Elites.",
       "bonus": { "damage": 30, "dexterity": 10 }
     },
-    "rare_danse_macabre_5": {
-      "id": "rare_danse_macabre_5",
+    "Rogue_Rare_051": {
+      "id": "Rogue_Rare_051",
       "name": "Ranger",
       "description": "+3% Total Armor, +80% Damage to Distant enemies. Bonus (700 Dex + 190 Int): +3% more Armor.",
       "bonus": { "damage": 80, "armor": 20 }
     },
-    "rare_danse_macabre_6": {
-      "id": "rare_danse_macabre_6",
+    "Rogue_Rare_052": {
+      "id": "Rogue_Rare_052",
       "name": "Skulker",
       "description": "+3% Subterfuge Skill Cooldown Reduction, +3% Resistance to All Elements. Bonus (230 Int): +3% more Subterfuge CDR.",
       "bonus": { "armor": 15 }

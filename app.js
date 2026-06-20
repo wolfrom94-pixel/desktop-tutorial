@@ -14,7 +14,7 @@ const BOARD_META = {
   no_witnesses:      { name: 'No Witnesses',          icon: '☠️', legendaryId: 'no_witnesses_legendary',      rareIds: ['Generic_Rare_006','Generic_Rare_030','Generic_Rare_033','Generic_Rare_051','Generic_Rare_082','Rogue_Rare_045'] },
   exploit_weakness:  { name: 'Exploit Weakness',      icon: '💢', legendaryId: 'exploit_legendary',           rareIds: ['Generic_Rare_012','Generic_Rare_049','Generic_Rare_096','Generic_Rare_106','Necromancer_Rare_011','Rogue_Rare_046'] },
   cunning_stratagem: { name: 'Cunning Stratagem',     icon: '🧠', legendaryId: 'cunning_stratagem_legendary', rareIds: ['Generic_Rare_067','Rogue_Rare_005','Rogue_Rare_011','Rogue_Rare_014','Rogue_Rare_040','Sorcerer_Rare_034'] },
-  danse_macabre:     { name: 'Danse Macabre',         icon: '💃', legendaryId: 'danse_macabre_legendary',     rareIds: ['rare_danse_macabre_1','rare_danse_macabre_2','rare_danse_macabre_3','rare_danse_macabre_4','rare_danse_macabre_5','rare_danse_macabre_6'] },
+  danse_macabre:     { name: 'Danse Macabre',         icon: '💃', legendaryId: 'danse_macabre_legendary',     rareIds: ['Rogue_Rare_047','Rogue_Rare_048','Rogue_Rare_049','Rogue_Rare_050','Rogue_Rare_051','Rogue_Rare_052'] },
 };
 
 // Maps board IDs to their board-raw grid files (Rogue_09 not available)
@@ -28,6 +28,7 @@ const BOARD_FILE_MAP = {
   no_witnesses:      'board-raw/Rogue_06.json',
   exploit_weakness:  'board-raw/Rogue_07.json',
   cunning_stratagem: 'board-raw/Rogue_08.json',
+  danse_macabre:     'board-raw/Rogue_09.json',
 };
 
 const MAX_POINTS = 300;

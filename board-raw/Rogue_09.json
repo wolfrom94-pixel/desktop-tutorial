@@ -1,0 +1,90 @@
+{
+ "fileName": "Paragon_Rogue_09",
+ "boardId": "rogue_09",
+ "nWidth": 21,
+ "arEntries": [
+  null, null, null, null, null, null, null,
+  "Generic_Normal_Dex", "Generic_Normal_Str", "Generic_Normal_Int", "Generic_Gate", "Generic_Normal_Dex", "Generic_Magic_Armor", "Generic_Normal_Int",
+  null, null, null, null, null, null, null,
+
+  null, null, null, null, null, null, null,
+  "Generic_Normal_Str", "Generic_Normal_Dex", "Generic_Normal_Will", "Generic_Normal_Dex", "Generic_Normal_Int", "Generic_Normal_Str", "Generic_Normal_Dex",
+  null, null, null, null, null, null, null,
+
+  null, null, null, null, null, null, null,
+  "Generic_Normal_Dex", "Generic_Normal_Int", "Generic_Magic_HPPercent", "Generic_Normal_Dex", "Generic_Normal_Str", "Generic_Normal_Dex", "Generic_Normal_Will",
+  null, null, null, null, null, null, null,
+
+  null, null, null, null, null, null, null,
+  "Generic_Normal_Int", "Generic_Normal_Dex", "Generic_Normal_Str", "Generic_Normal_Dex", "Generic_Normal_Dex", "Generic_Magic_ResistanceAll", "Generic_Normal_Int",
+  null, null, null, null, null, null, null,
+
+  null, null, null, null, null, null, null,
+  "Generic_Normal_Str", "Generic_Normal_Dex", "Rogue_Rare_047", "Generic_Normal_Dex", "Rogue_Rare_048", "Generic_Normal_Int", "Generic_Normal_Dex",
+  null, null, null, null, null, null, null,
+
+  null, null, null, null, null, null, null,
+  "Generic_Normal_Dex", "Generic_Magic_Armor", "Generic_Normal_Dex", "Generic_Normal_Str", "Generic_Normal_Dex", "Generic_Normal_Int", "Generic_Normal_Str",
+  null, null, null, null, null, null, null,
+
+  null, null, null, null, null, null, null,
+  "Generic_Normal_Dex", "Generic_Normal_Int", "Generic_Normal_Dex", "Generic_Magic_HPPercent", "Generic_Normal_Dex", "Generic_Normal_Str", "Generic_Normal_Dex",
+  null, null, null, null, null, null, null,
+
+  "Generic_Normal_Dex", "Generic_Normal_Str", "Generic_Normal_Dex", "Generic_Magic_ResistanceAll", "Generic_Normal_Int", "Generic_Normal_Dex", "Generic_Normal_Str",
+  "Generic_Normal_Dex", "Generic_Magic_Armor", "Generic_Normal_Dex", "Generic_Normal_Int", "Generic_Normal_Str", "Generic_Normal_Dex", "Generic_Normal_Dex",
+  "Generic_Normal_Will", "Generic_Normal_Int", "Generic_Normal_Dex", "Generic_Magic_HPPercent", "Generic_Normal_Str", "Generic_Normal_Dex", "Generic_Normal_Int",
+
+  "Generic_Normal_Dex", "Generic_Magic_HPPercent", "Generic_Normal_Str", "Generic_Normal_Dex", "Generic_Normal_Int", "Generic_Normal_Dex", "Generic_Magic_Armor",
+  "Generic_Normal_Dex", "Generic_Normal_Str", "Generic_Normal_Dex", "Generic_Socket", "Generic_Normal_Int", "Generic_Normal_Dex", "Generic_Normal_Str",
+  "Generic_Normal_Dex", "Generic_Magic_ResistanceAll", "Generic_Normal_Int", "Generic_Normal_Dex", "Generic_Magic_Armor", "Generic_Normal_Str", "Generic_Normal_Dex",
+
+  "Generic_Normal_Will", "Generic_Normal_Dex", "Generic_Normal_Str", "Generic_Magic_HPPercent", "Generic_Normal_Dex", "Generic_Normal_Int", "Generic_Normal_Dex",
+  "Generic_Normal_Str", "Generic_Magic_ResistanceAll", "Generic_Normal_Dex", "Generic_Normal_Int", "Generic_Normal_Dex", "Generic_Normal_Str", "Generic_Magic_Armor",
+  "Generic_Normal_Dex", "Generic_Normal_Int", "Generic_Magic_HPPercent", "Generic_Normal_Dex", "Generic_Normal_Str", "Generic_Normal_Dex", "Generic_Normal_Will",
+
+  "Generic_Gate", "Generic_Normal_Dex", "Generic_Normal_Str", "Rogue_Rare_049", "Rogue_Legendary_013", "Generic_Normal_Dex", "Generic_Magic_Armor",
+  "Generic_Normal_Int", "Generic_Normal_Dex", "Generic_Normal_Str", "Generic_Normal_Dex", "Generic_Normal_Int", "Generic_Normal_Dex", "Generic_Magic_ResistanceAll",
+  "Generic_Normal_Str", "Generic_Normal_Dex", "Generic_Normal_Int", "Rogue_Rare_050", "Generic_Normal_Dex", "Generic_Normal_Str", "Generic_Gate",
+
+  "Generic_Normal_Dex", "Generic_Normal_Int", "Generic_Magic_HPPercent", "Generic_Normal_Dex", "Generic_Normal_Str", "Generic_Normal_Dex", "Generic_Normal_Int",
+  "Generic_Normal_Dex", "Generic_Magic_Armor", "Generic_Normal_Dex", "Generic_Normal_Int", "Generic_Normal_Str", "Generic_Normal_Dex", "Generic_Normal_Dex",
+  "Generic_Magic_ResistanceAll", "Generic_Normal_Int", "Generic_Normal_Dex", "Generic_Normal_Str", "Generic_Normal_Dex", "Generic_Magic_HPPercent", "Generic_Normal_Dex",
+
+  "Generic_Normal_Str", "Generic_Normal_Dex", "Generic_Normal_Int", "Generic_Magic_Armor", "Generic_Normal_Dex", "Generic_Magic_ResistanceAll", "Generic_Normal_Str",
+  "Generic_Normal_Dex", "Generic_Normal_Int", "Generic_Normal_Dex", "Generic_Magic_HPPercent", "Generic_Normal_Str", "Generic_Normal_Dex", "Generic_Normal_Int",
+  "Generic_Normal_Dex", "Generic_Normal_Str", "Generic_Magic_Armor", "Generic_Normal_Dex", "Generic_Normal_Int", "Generic_Normal_Dex", "Generic_Normal_Str",
+
+  "Generic_Normal_Dex", "Generic_Magic_HPPercent", "Generic_Normal_Str", "Generic_Normal_Dex", "Generic_Normal_Int", "Generic_Normal_Dex", "Generic_Magic_ResistanceAll",
+  "Generic_Normal_Dex", "Generic_Normal_Str", "Generic_Magic_Armor", "Generic_Normal_Dex", "Generic_Normal_Int", "Generic_Normal_Dex", "Generic_Normal_Str",
+  "Generic_Normal_Dex", "Generic_Magic_HPPercent", "Generic_Normal_Int", "Generic_Normal_Dex", "Generic_Magic_Armor", "Generic_Normal_Str", "Generic_Normal_Dex",
+
+  null, null, null, null, null, null, null,
+  "Generic_Normal_Dex", "Generic_Normal_Int", "Generic_Normal_Str", "Generic_Normal_Dex", "Generic_Magic_Armor", "Generic_Normal_Int", "Generic_Normal_Dex",
+  null, null, null, null, null, null, null,
+
+  null, null, null, null, null, null, null,
+  "Generic_Normal_Str", "Generic_Normal_Dex", "Generic_Normal_Int", "Generic_Magic_ResistanceAll", "Generic_Normal_Dex", "Generic_Normal_Str", "Generic_Normal_Int",
+  null, null, null, null, null, null, null,
+
+  null, null, null, null, null, null, null,
+  "Generic_Normal_Dex", "Generic_Normal_Str", "Rogue_Rare_051", "Generic_Normal_Int", "Rogue_Rare_052", "Generic_Normal_Dex", "Generic_Magic_HPPercent",
+  null, null, null, null, null, null, null,
+
+  null, null, null, null, null, null, null,
+  "Generic_Normal_Int", "Generic_Magic_Armor", "Generic_Normal_Dex", "Generic_Normal_Str", "Generic_Normal_Dex", "Generic_Normal_Int", "Generic_Normal_Dex",
+  null, null, null, null, null, null, null,
+
+  null, null, null, null, null, null, null,
+  "Generic_Normal_Dex", "Generic_Normal_Int", "Generic_Normal_Str", "Generic_Magic_HPPercent", "Generic_Normal_Dex", "Generic_Normal_Str", "Generic_Normal_Int",
+  null, null, null, null, null, null, null,
+
+  null, null, null, null, null, null, null,
+  "Generic_Normal_Int", "Generic_Normal_Dex", "Generic_Normal_Str", "Generic_Normal_Dex", "Generic_Normal_Int", "Generic_Normal_Dex", "Generic_Normal_Str",
+  null, null, null, null, null, null, null,
+
+  null, null, null, null, null, null, null,
+  "Generic_Normal_Dex", "Generic_Normal_Str", "Generic_Normal_Int", "Generic_Gate", "Generic_Normal_Dex", "Generic_Normal_Str", "Generic_Normal_Int",
+  null, null, null, null, null, null, null
+ ]
+}
