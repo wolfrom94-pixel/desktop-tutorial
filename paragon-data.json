@@ -1,5 +1,5 @@
 {
-  "version": "1.1",
+  "version": "2.0",
   "class": "rogue",
   "glyphs": [
     {
@@ -217,34 +217,10 @@
       "description": "Lucky Hit: Up to a 5% chance to make your next attack deal 100%[x] increased damage for 4 seconds.",
       "stats": {}
     },
-    "deadly_ambush_legendary": {
-      "id": "deadly_ambush_legendary",
-      "name": "Deadly Ambush",
-      "description": "When you damage an enemy with a Trap Skill, that enemy takes 40%[x] increased damage from your next direct damage attack.",
-      "stats": {}
-    },
     "eldritch_bounty_legendary": {
       "id": "eldritch_bounty_legendary",
       "name": "Eldritch Bounty",
       "description": "When you attack with an Imbued Skill you gain 3%[x] Maximum Resistance and 20%[x] increased damage for that Imbuement's element for 9 seconds.",
-      "stats": {}
-    },
-    "cheap_shot_legendary": {
-      "id": "cheap_shot_legendary",
-      "name": "Cheap Shot",
-      "description": "You deal 5%[x] increased damage for each Nearby enemy that is Crowd Controlled, up to 25%[x]. A Nearby Staggered Boss provides the maximum bonus.",
-      "stats": {}
-    },
-    "no_witnesses_legendary": {
-      "id": "no_witnesses_legendary",
-      "name": "No Witnesses",
-      "description": "Your Ultimate Skills gain an additional 10%[x] damage from your Damage with Ultimate bonus and grant this bonus to all Skills for 10 seconds when cast. Maximum Bonus: 45%[x].",
-      "stats": {}
-    },
-    "cunning_stratagem_legendary": {
-      "id": "cunning_stratagem_legendary",
-      "name": "Cunning Stratagem",
-      "description": "Your non-damage Combo Point bonuses are increased by 33% when you spend 3 Combo Points.",
       "stats": {}
     },
     "tricks_legendary": {
@@ -253,16 +229,40 @@
       "description": "Your Marksman Skills grant your Cutthroat Skills 25%[x] increased damage for 8 seconds. Your Cutthroat Skills grant your Marksman Skills 25%[x] increased damage for 8 seconds.",
       "stats": {}
     },
-    "exploit_legendary": {
-      "id": "exploit_legendary",
-      "name": "Exploit Weakness",
-      "description": "Lucky Hit: Hitting a Vulnerable enemy has up to a 60% chance to increase your damage by 1%[x] for 25 seconds, up to 25%[x]. At 25 stacks, this bonus remains for 8 seconds before expiring.",
+    "cheap_shot_legendary": {
+      "id": "cheap_shot_legendary",
+      "name": "Cheap Shot",
+      "description": "You deal 5%[x] increased damage for each Nearby enemy that is Crowd Controlled, up to 25%[x]. A Nearby Staggered Boss provides the maximum bonus.",
+      "stats": {}
+    },
+    "deadly_ambush_legendary": {
+      "id": "deadly_ambush_legendary",
+      "name": "Deadly Ambush",
+      "description": "When you damage an enemy with a Trap Skill, that enemy takes 40%[x] increased damage from your next direct damage attack.",
       "stats": {}
     },
     "leyrana_instinct_legendary": {
       "id": "leyrana_instinct_legendary",
       "name": "Leyrana's Instinct",
       "description": "When Inner Sight's gauge becomes full, you gain 100%[x] Dodge Chance for 2 seconds. Your Core Skills deal increased damage equal to 25%[x] of your Core Skill Damage Bonus while Inner Sight's gauge remains full, up to 35.0%[x].",
+      "stats": {}
+    },
+    "no_witnesses_legendary": {
+      "id": "no_witnesses_legendary",
+      "name": "No Witnesses",
+      "description": "Your Ultimate Skills gain an additional 10%[x] damage from your Damage with Ultimate bonus and grant this bonus to all Skills for 10 seconds when cast. Maximum Bonus: 45%[x].",
+      "stats": {}
+    },
+    "exploit_legendary": {
+      "id": "exploit_legendary",
+      "name": "Exploit Weakness",
+      "description": "Lucky Hit: Hitting a Vulnerable enemy has up to a 60% chance to increase your damage by 1%[x] for 25 seconds, up to 25%[x]. At 25 stacks, this bonus remains for 8 seconds before expiring.",
+      "stats": {}
+    },
+    "cunning_stratagem_legendary": {
+      "id": "cunning_stratagem_legendary",
+      "name": "Cunning Stratagem",
+      "description": "Your non-damage Combo Point bonuses are increased by 33% when you spend 3 Combo Points.",
       "stats": {}
     },
     "danse_macabre_legendary": {
@@ -273,352 +273,316 @@
     }
   },
   "rareNodes": {
-    "rare_starting_1": {
-      "id": "rare_starting_1",
-      "name": "Resilience",
-      "description": "+2.0% Resistance to All Elements, +4.0% Maximum Life. Bonus (212 Str): Another +2.0% Resistance to All Elements.",
-      "bonus": { "armor": 10, "life": 40 }
-    },
-    "rare_starting_2": {
-      "id": "rare_starting_2",
-      "name": "Pride",
-      "description": "+35.0% Damage, +4.0% Maximum Life. Bonus (190 Str): Another +20.0% Damage.",
-      "bonus": { "damage": 35, "life": 40 }
-    },
-    "rare_starting_3": {
-      "id": "rare_starting_3",
-      "name": "Outlaw",
-      "description": "+30.0% Damage to Elites, +10 Dexterity. Bonus (190 Str): Another +30.0% Damage to Elites.",
-      "bonus": { "damage": 30, "dexterity": 10 }
-    },
-    "rare_starting_4": {
-      "id": "rare_starting_4",
-      "name": "Skillful",
-      "description": "+20.0% Damage, +10 Dexterity. Bonus (210 Int): Another +20.0% Damage.",
-      "bonus": { "damage": 20, "dexterity": 10 }
-    },
-    "rare_deadly_ambush_1": {
-      "id": "rare_deadly_ambush_1",
-      "name": "Trap Mastery",
-      "description": "+25% Trap Skill Damage, +5% Lucky Hit Chance.",
-      "bonus": { "trap": 25 }
-    },
-    "rare_deadly_ambush_2": {
-      "id": "rare_deadly_ambush_2",
-      "name": "Spring-Loaded",
-      "description": "20% Trap Cooldown Reduction, +10 Dexterity.",
-      "bonus": { "dexterity": 10 }
-    },
-    "rare_deadly_ambush_3": {
-      "id": "rare_deadly_ambush_3",
-      "name": "Predator's Mark",
-      "description": "+12% Critical Strike Damage, +10 Dexterity.",
-      "bonus": { "critdmg": 12, "dexterity": 10 }
-    },
-    "rare_deadly_ambush_4": {
-      "id": "rare_deadly_ambush_4",
-      "name": "Patient Killer",
-      "description": "+18% Damage Over Time, +4.0% Maximum Life.",
-      "bonus": { "poison": 18, "life": 40 }
-    },
-    "rare_deadly_ambush_5": {
-      "id": "rare_deadly_ambush_5",
-      "name": "Scavenger",
-      "description": "+10% Damage to Slowed Enemies, +10 Dexterity.",
-      "bonus": { "damage": 10, "dexterity": 10 }
-    },
-    "rare_deadly_ambush_6": {
-      "id": "rare_deadly_ambush_6",
-      "name": "Hunter's Edge",
-      "description": "+4.0% Maximum Life, +30 Armor.",
-      "bonus": { "life": 40, "armor": 30 }
-    },
-    "rare_eldritch_bounty_1": {
-      "id": "rare_eldritch_bounty_1",
-      "name": "Potent",
-      "description": "+40.0% Imbued Damage, +10 Dexterity. Bonus (305 Str): Another +40.0% Imbued Damage.",
-      "bonus": { "damage": 40, "dexterity": 10 }
-    },
-    "rare_eldritch_bounty_2": {
-      "id": "rare_eldritch_bounty_2",
-      "name": "Concoction (Paragon Node)",
-      "description": "+20.0% Non-Physical Damage, +10 Dexterity. Bonus (265 Int): Another +20.0% Non-Physical Damage.",
-      "bonus": { "damage": 20, "dexterity": 10 }
-    },
-    "rare_eldritch_bounty_3": {
-      "id": "rare_eldritch_bounty_3",
-      "name": "Suffused Resilience",
-      "description": "5.0% Damage Reduction, +3.0% Resistance to All Elements. Bonus (265 Int): Another 5.0% Damage Reduction.",
-      "bonus": { "armor": 15, "life": 20 }
-    },
-    "rare_eldritch_bounty_4": {
-      "id": "rare_eldritch_bounty_4",
-      "name": "Ready Supply",
-      "description": "+20.0% Non-Physical Damage, 3.0% Imbuement Cooldown Reduction. Bonus (1345 Dex): Another +20.0% Non-Physical Damage.",
-      "bonus": { "damage": 20 }
-    },
-    "rare_eldritch_bounty_5": {
-      "id": "rare_eldritch_bounty_5",
-      "name": "Restorative",
-      "description": "+4.0% Maximum Life, +6.0% Healing Received. Bonus (285 Int): Another +4.0% Maximum Life.",
-      "bonus": { "life": 40 }
-    },
-    "rare_eldritch_bounty_6": {
-      "id": "rare_eldritch_bounty_6",
-      "name": "Imbuer",
-      "description": "+3.0% Resistance to All Elements, +30 Armor. Bonus (1155 Dex + 280 Str): Another +3.0% Resistance.",
-      "bonus": { "armor": 30 }
-    },
-    "rare_cheap_shot_1": {
-      "id": "rare_cheap_shot_1",
-      "name": "Calculated",
-      "description": "+35.0% Damage to Crowd Controlled Enemies, +30 Armor. Bonus (285 Int): Another +35.0% Damage to Crowd Controlled Enemies.",
-      "bonus": { "damage": 35, "armor": 30 }
-    },
-    "rare_cheap_shot_2": {
-      "id": "rare_cheap_shot_2",
-      "name": "Deviant",
-      "description": "+3.0 Resistance to All Elements, +4.0% Maximum Life. Bonus (305 Int): Another +3.0 Resistance to All Elements.",
+    "Generic_Rare_001": {
+      "id": "Generic_Rare_001",
+      "name": "Resilient",
+      "description": "+11.5% Resistance to All Elements, +6.0% Maximum Life. Bonus: +11.5% more Resistance to All Elements.",
       "bonus": { "armor": 15, "life": 40 }
     },
-    "rare_cheap_shot_3": {
-      "id": "rare_cheap_shot_3",
-      "name": "Devious (Paragon Node)",
-      "description": "+35.0% Damage to Crowd Controlled Enemies, +10 Dexterity. Bonus (305 Int): Another +35.0% Damage to Crowd Controlled Enemies.",
-      "bonus": { "damage": 35, "dexterity": 10 }
+    "Generic_Rare_002": {
+      "id": "Generic_Rare_002",
+      "name": "Swift Attacker",
+      "description": "+3.5% Attack Speed, +30% Skill Damage. Bonus: +3.5% more Attack Speed.",
+      "bonus": { "damage": 30 }
     },
-    "rare_cheap_shot_4": {
-      "id": "rare_cheap_shot_4",
-      "name": "Artifice",
-      "description": "+20% Damage, +10 Dexterity. Bonus (305 Str): Another +20.0% Damage.",
-      "bonus": { "damage": 20, "dexterity": 10 }
+    "Generic_Rare_006": {
+      "id": "Generic_Rare_006",
+      "name": "Resolute",
+      "description": "12% Crowd Control Duration Reduction, 7.5% Damage Over Time Reduction. Bonus: +12% more CC Duration Reduction.",
+      "bonus": { "armor": 10 }
     },
-    "rare_cheap_shot_5": {
-      "id": "rare_cheap_shot_5",
-      "name": "Safeguard (Paragon Node)",
-      "description": "6.5% Damage Reduction from Elites, +30 Armor. Bonus (1215 Dex): Another 6.5% Damage Reduction from Elites.",
-      "bonus": { "armor": 30 }
-    },
-    "rare_cheap_shot_6": {
-      "id": "rare_cheap_shot_6",
-      "name": "Spearhead",
-      "description": "+25.0% Damage to Healthy Enemies, +4.0% Maximum Life. Bonus (265 Int): Another +25.0% Damage to Healthy Enemies.",
-      "bonus": { "damage": 25, "life": 40 }
-    },
-    "rare_no_witnesses_1": {
-      "id": "rare_no_witnesses_1",
-      "name": "Recuperate",
-      "description": "+4.0% Maximum Life, +100 Life per 5 Seconds. Bonus (305 Str): Another +4.0% Maximum Life.",
-      "bonus": { "life": 40 }
-    },
-    "rare_no_witnesses_2": {
-      "id": "rare_no_witnesses_2",
-      "name": "Culler",
-      "description": "+2.5% Attack Speed, +20.0% Non-Physical Damage. Bonus (305 Str): Another +2.5% Attack Speed.",
-      "bonus": { "damage": 20 }
-    },
-    "rare_no_witnesses_3": {
-      "id": "rare_no_witnesses_3",
-      "name": "Deliverance",
-      "description": "+35.0% Ultimate Damage, +10.0% Dexterity. Bonus (285 Int): Another +35.0% Ultimate Damage.",
-      "bonus": { "damage": 35, "dexterity": 10 }
-    },
-    "rare_no_witnesses_4": {
-      "id": "rare_no_witnesses_4",
-      "name": "Fleeting",
-      "description": "12.0% Impairment Reduction, +2.0% Dodge Chance. Bonus (285 Str): Another 12.0% Impairment Reduction.",
-      "bonus": { "armor": 12 }
-    },
-    "rare_no_witnesses_5": {
-      "id": "rare_no_witnesses_5",
-      "name": "Skillful",
-      "description": "+20.0% Damage, +10 Dexterity. Bonus (285 Int): Another +20.0% Damage.",
-      "bonus": { "damage": 20, "dexterity": 10 }
-    },
-    "rare_no_witnesses_6": {
-      "id": "rare_no_witnesses_6",
-      "name": "Training",
-      "description": "+4.0% Maximum Life, +3.0% Resistance to All Elements. Bonus (285 Str): Another +4.0% Maximum Life.",
-      "bonus": { "life": 40, "armor": 15 }
-    },
-    "rare_cunning_stratagem_1": {
-      "id": "rare_cunning_stratagem_1",
-      "name": "Finisher",
-      "description": "+28.0% Core Damage, +10 Dexterity. Bonus (305 Int): Another +28.0% Core Damage.",
-      "bonus": { "damage": 28, "dexterity": 10 }
-    },
-    "rare_cunning_stratagem_2": {
-      "id": "rare_cunning_stratagem_2",
-      "name": "Haven",
-      "description": "+4.0% Maximum Life, +30 Armor. Bonus (305 Int): Another +4.0% Maximum Life.",
-      "bonus": { "life": 40, "armor": 30 }
-    },
-    "rare_cunning_stratagem_3": {
-      "id": "rare_cunning_stratagem_3",
-      "name": "Dominant",
-      "description": "+28.0% Core Damage, +5.0% Basic Attack Speed. Bonus (260 Int + 255 Str): Another +28.0% Core Damage.",
-      "bonus": { "damage": 28 }
-    },
-    "rare_cunning_stratagem_4": {
-      "id": "rare_cunning_stratagem_4",
-      "name": "Fundamentals",
-      "description": "+20.0% Damage, +10 Dexterity. Bonus (265 Str): Another +20.0% Damage.",
-      "bonus": { "damage": 20, "dexterity": 10 }
-    },
-    "rare_cunning_stratagem_5": {
-      "id": "rare_cunning_stratagem_5",
-      "name": "Denial",
-      "description": "+3.0% Resistance to All Elements, +30 Armor. Bonus (265 Str): Another +3.0% Resistance to All Elements.",
-      "bonus": { "armor": 30 }
-    },
-    "rare_cunning_stratagem_6": {
-      "id": "rare_cunning_stratagem_6",
-      "name": "Slayer (Paragon Node)",
-      "description": "+30 Armor, +4.0% Maximum Life. Bonus (285 Str): Another +30 Armor.",
-      "bonus": { "armor": 30, "life": 40 }
-    },
-    "rare_tricks_1": {
-      "id": "rare_tricks_1",
-      "name": "Brawler",
-      "description": "6.0% Damage Reduction from Close Enemies, +24.0% Damage to Close Enemies. Bonus (1155 Dex + 260 Str): Another 6.0% Damage Reduction from Close Enemies.",
-      "bonus": { "damage": 24, "armor": 20 }
-    },
-    "rare_tricks_2": {
-      "id": "rare_tricks_2",
-      "name": "Shadow Resilience",
-      "description": "10.0% Shadow Resistance, +2.0% Maximum Shadow Resistance. Bonus (265 Int): Another +10.0% Shadow Resistance.",
-      "bonus": { "armor": 20 }
-    },
-    "rare_tricks_3": {
-      "id": "rare_tricks_3",
-      "name": "Surgical",
-      "description": "+20.0% Cutthroat Damage, +10 Dexterity. Bonus (285 Str): Another +20.0% Cutthroat Damage.",
-      "bonus": { "damage": 20, "dexterity": 10 }
-    },
-    "rare_tricks_4": {
-      "id": "rare_tricks_4",
-      "name": "Focused",
-      "description": "+20.0% Marksman Damage, +10 Dexterity. Bonus (305 Int): Another +20.0% Marksman Damage.",
-      "bonus": { "damage": 20, "dexterity": 10 }
-    },
-    "rare_tricks_5": {
-      "id": "rare_tricks_5",
-      "name": "Ranger (Paragon Node)",
-      "description": "9.0% Damage Reduction from Distant Enemies, +40.0% Damage to Distant Enemies. Bonus (1155 Dex + 260 Int): Another 9.0% Damage Reduction.",
-      "bonus": { "damage": 40, "armor": 20 }
-    },
-    "rare_tricks_6": {
-      "id": "rare_tricks_6",
-      "name": "Haven",
-      "description": "+4.0% Maximum Life, +30 Armor. Bonus (305 Int): Another +4.0% Maximum Life.",
-      "bonus": { "life": 40, "armor": 30 }
-    },
-    "rare_exploit_weakness_1": {
-      "id": "rare_exploit_weakness_1",
-      "name": "Cold Resilience",
-      "description": "+10.0% Cold Resistance, +2.0% Maximum Cold Resistance. Bonus (285 Int): Another +10.0% Cold Resistance.",
-      "bonus": { "armor": 20 }
-    },
-    "rare_exploit_weakness_2": {
-      "id": "rare_exploit_weakness_2",
-      "name": "Toughened",
-      "description": "+30 Armor, +4.0% Maximum Life. Bonus (285 Int): Another +30 Armor.",
-      "bonus": { "armor": 30, "life": 40 }
-    },
-    "rare_exploit_weakness_3": {
-      "id": "rare_exploit_weakness_3",
-      "name": "Unassailable",
-      "description": "6.0% Damage Reduction from Vulnerable Enemies, +30 Armor. Bonus (260 Int + 255 Str): Another 6.0% Damage Reduction.",
-      "bonus": { "armor": 30 }
-    },
-    "rare_exploit_weakness_4": {
-      "id": "rare_exploit_weakness_4",
-      "name": "Exploit (Paragon Node)",
-      "description": "+25.0% Vulnerable Damage, +5.0% Lucky Hit Chance. Bonus (1155 Dex + 260 Int): Another +25.0% Vulnerable Damage.",
-      "bonus": { "vulnerable": 25 }
-    },
-    "rare_exploit_weakness_5": {
-      "id": "rare_exploit_weakness_5",
-      "name": "Artifice",
-      "description": "+20.0% Damage, +10 Dexterity. Bonus (305 Str): Another +20.0% Damage.",
-      "bonus": { "damage": 20, "dexterity": 10 }
-    },
-    "rare_exploit_weakness_6": {
-      "id": "rare_exploit_weakness_6",
-      "name": "Misery",
-      "description": "+30.0% Damage to Elites, +10 Dexterity. Bonus (285 Int): Another +30.0% Damage to Elites.",
+    "Generic_Rare_007": {
+      "id": "Generic_Rare_007",
+      "name": "Elite Slayer",
+      "description": "+30.0% Damage to Elites, +10 Dexterity. Bonus: +30% more Damage to Elites.",
       "bonus": { "damage": 30, "dexterity": 10 }
     },
-    "rare_leyrana_instinct_1": {
-      "id": "rare_leyrana_instinct_1",
-      "name": "Suffused Resilience",
-      "description": "5.0% Damage Reduction, +3.0% Resistance to All Elements. Bonus (265 Int): Another 5.0% Damage Reduction.",
-      "bonus": { "armor": 15, "life": 20 }
+    "Generic_Rare_011": {
+      "id": "Generic_Rare_011",
+      "name": "Healthy Hunter",
+      "description": "+25.0% Damage to Healthy enemies, +30 Armor. Bonus: +25% more Damage to Healthy enemies.",
+      "bonus": { "damage": 25, "armor": 30 }
     },
-    "rare_leyrana_instinct_2": {
-      "id": "rare_leyrana_instinct_2",
-      "name": "Poison Resilience",
-      "description": "+10.0% Poison Resistance, +2.0% Maximum Poison Resistance. Bonus (265 Str): Another +10.0% Poison Resistance.",
-      "bonus": { "armor": 20 }
+    "Generic_Rare_012": {
+      "id": "Generic_Rare_012",
+      "name": "Cold Resilience",
+      "description": "+10.0% Cold Resistance, +2.0% Max Cold Resistance, +6.0% Maximum Life. Bonus: +10% more Cold Resistance.",
+      "bonus": { "armor": 20, "life": 40 }
     },
-    "rare_leyrana_instinct_3": {
-      "id": "rare_leyrana_instinct_3",
-      "name": "Nimble",
-      "description": "+2.5% Attack Speed, +20.0% Damage. Bonus (1345 Dex): Another +2.5% Attack Speed.",
-      "bonus": { "damage": 20 }
+    "Generic_Rare_016": {
+      "id": "Generic_Rare_016",
+      "name": "Controller",
+      "description": "+35.0% Damage to Crowd Controlled enemies, +10 Dexterity. Bonus: +35% more Damage to CC'd enemies.",
+      "bonus": { "damage": 35, "dexterity": 10 }
     },
-    "rare_leyrana_instinct_4": {
-      "id": "rare_leyrana_instinct_4",
+    "Generic_Rare_018": {
+      "id": "Generic_Rare_018",
+      "name": "Elite Guard",
+      "description": "6.5% Damage Reduction from Elites, +30 Armor. Bonus: +6.5% more Damage Reduction from Elites.",
+      "bonus": { "armor": 30 }
+    },
+    "Generic_Rare_019": {
+      "id": "Generic_Rare_019",
+      "name": "Fortified",
+      "description": "7.5% Damage Over Time Reduction, +3.0% Resistance to All Elements. Bonus: +7.5% more DOT Reduction.",
+      "bonus": { "armor": 15 }
+    },
+    "Generic_Rare_021": {
+      "id": "Generic_Rare_021",
+      "name": "Oppressor",
+      "description": "+5.0% Damage to Crowd Controlled enemies, +4.0% Armor. Bonus: +5% more Damage to CC'd enemies.",
+      "bonus": { "damage": 5, "armor": 10 }
+    },
+    "Generic_Rare_030": {
+      "id": "Generic_Rare_030",
+      "name": "Executioner",
+      "description": "2% chance to Execute low-health non-Elite enemies on hit, +3.0% Attack Speed. Bonus: +2% more Execute chance.",
+      "bonus": { "damage": 5 }
+    },
+    "Generic_Rare_033": {
+      "id": "Generic_Rare_033",
+      "name": "Potion Expert",
+      "description": "+20.0% Potion Healing, Regenerate Life when not taking damage. Bonus: +20% more Potion Healing.",
+      "bonus": { "life": 20 }
+    },
+    "Generic_Rare_041": {
+      "id": "Generic_Rare_041",
+      "name": "Poison Hardy",
+      "description": "+11.5% Poison Resistance, +6.0% Maximum Life. Bonus: +11.5% more Poison Resistance.",
+      "bonus": { "armor": 15, "life": 40 }
+    },
+    "Generic_Rare_042": {
+      "id": "Generic_Rare_042",
       "name": "Restorative",
-      "description": "+4.0% Maximum Life, +6.0% Healing Received. Bonus (285 Int): Another +4.0% Maximum Life.",
+      "description": "+20.0% Potion Healing, +4.0% Maximum Life. Bonus: +20% more Potion Healing.",
       "bonus": { "life": 40 }
     },
-    "rare_leyrana_instinct_5": {
-      "id": "rare_leyrana_instinct_5",
-      "name": "Essential",
-      "description": "+28.0% Core Damage, +10 Dexterity. Bonus (305 Int): Another +28.0% Core Damage.",
-      "bonus": { "damage": 28, "dexterity": 10 }
+    "Generic_Rare_046": {
+      "id": "Generic_Rare_046",
+      "name": "Shadow Hardy",
+      "description": "+11.5% Shadow Resistance, +6.0% Maximum Life. Bonus: +11.5% more Shadow Resistance.",
+      "bonus": { "armor": 15, "life": 40 }
     },
-    "rare_leyrana_instinct_6": {
-      "id": "rare_leyrana_instinct_6",
-      "name": "Punishment",
-      "description": "+20.0% Damage, +10 Dexterity. Bonus (265 Str): Another +20.0% Damage.",
+    "Generic_Rare_049": {
+      "id": "Generic_Rare_049",
+      "name": "Predator",
+      "description": "+5.0% Damage to Vulnerable enemies, +7.5% Damage to Injured enemies. Bonus: +5% more Vulnerable Damage.",
+      "bonus": { "vulnerable": 5, "damage": 8 }
+    },
+    "Generic_Rare_051": {
+      "id": "Generic_Rare_051",
+      "name": "Skillful",
+      "description": "+20.0% Skill Damage, +10 Dexterity. Bonus: +20% more Skill Damage.",
       "bonus": { "damage": 20, "dexterity": 10 }
+    },
+    "Generic_Rare_067": {
+      "id": "Generic_Rare_067",
+      "name": "Armored",
+      "description": "+4.0% Armor, +4.5% Potion Healing. Bonus: +4% more Armor.",
+      "bonus": { "armor": 20, "life": 15 }
+    },
+    "Generic_Rare_075": {
+      "id": "Generic_Rare_075",
+      "name": "Vigorous",
+      "description": "+20.0% Skill Damage, +4.0% Maximum Life. Bonus: +20% more Skill Damage.",
+      "bonus": { "damage": 20, "life": 40 }
+    },
+    "Generic_Rare_082": {
+      "id": "Generic_Rare_082",
+      "name": "Vital",
+      "description": "+4.0% Maximum Life, +10 Dexterity. Bonus: +4% more Maximum Life.",
+      "bonus": { "life": 40, "dexterity": 10 }
+    },
+    "Generic_Rare_096": {
+      "id": "Generic_Rare_096",
+      "name": "Exploit",
+      "description": "+30.0% Damage to Vulnerable enemies, +10 Dexterity. Bonus: +30% more Vulnerable Damage.",
+      "bonus": { "vulnerable": 30, "dexterity": 10 }
+    },
+    "Generic_Rare_100": {
+      "id": "Generic_Rare_100",
+      "name": "Season 5+ Node",
+      "description": "(Tilføjet i Season 5 — data ikke tilgængelig endnu)",
+      "bonus": {}
+    },
+    "Generic_Rare_106": {
+      "id": "Generic_Rare_106",
+      "name": "Season 5+ Node",
+      "description": "(Tilføjet i Season 5 — data ikke tilgængelig endnu)",
+      "bonus": {}
+    },
+    "Necromancer_Rare_011": {
+      "id": "Necromancer_Rare_011",
+      "name": "Unassailable",
+      "description": "5.0% Damage Reduction from Vulnerable enemies, +4.0% Armor. Bonus: +5% more DR from Vulnerable.",
+      "bonus": { "armor": 30 }
+    },
+    "Sorcerer_Rare_034": {
+      "id": "Sorcerer_Rare_034",
+      "name": "Stoic",
+      "description": "+10.0% Resistance to All Elements, +4.0% Armor. Bonus: +10% more Resistance.",
+      "bonus": { "armor": 30 }
+    },
+    "Rogue_Rare_005": {
+      "id": "Rogue_Rare_005",
+      "name": "Core Mastery",
+      "description": "+30.0% Core Skill Damage, +10 Dexterity. Bonus (285 Int): +30% more Core Skill Damage.",
+      "bonus": { "damage": 30, "dexterity": 10 }
+    },
+    "Rogue_Rare_008": {
+      "id": "Rogue_Rare_008",
+      "name": "Trap Expert",
+      "description": "4.0% Trap Skill Cooldown Reduction, −0.5s Trap Arm Time. Bonus (265 Int): +4% more Trap CDR.",
+      "bonus": { "trap": 10 }
+    },
+    "Rogue_Rare_009": {
+      "id": "Rogue_Rare_009",
+      "name": "Potent Imbuer",
+      "description": "+9.0% Imbued Skill Damage, +3.0% Non-Physical Damage. Bonus (1155 Dex + 260 Str): +9% more Imbued Damage.",
+      "bonus": { "damage": 12 }
+    },
+    "Rogue_Rare_010": {
+      "id": "Rogue_Rare_010",
+      "name": "Infused",
+      "description": "+20.0% Non-Physical Damage, 4.0% Skill Cooldown Reduction. Bonus (1345 Dex): +20% more Non-Physical Damage.",
+      "bonus": { "damage": 20 }
+    },
+    "Rogue_Rare_011": {
+      "id": "Rogue_Rare_011",
+      "name": "Versatile Striker",
+      "description": "+30.0% Core Skill Damage, +20.0% Basic Skill Damage. Bonus (1155 Dex + 260 Str): +30% more Core Skill Damage.",
+      "bonus": { "damage": 25 }
+    },
+    "Rogue_Rare_012": {
+      "id": "Rogue_Rare_012",
+      "name": "Imbued Finesse",
+      "description": "+30.0% Imbued Skill Damage, +10 Dexterity. Bonus (260 Str): +30% more Imbued Damage.",
+      "bonus": { "damage": 30, "dexterity": 10 }
+    },
+    "Rogue_Rare_014": {
+      "id": "Rogue_Rare_014",
+      "name": "Basic Combatant",
+      "description": "+25.0% Basic Skill Damage, +20.0% Skill Damage. Bonus (265 Int): +25% more Basic Skill Damage.",
+      "bonus": { "damage": 23 }
+    },
+    "Rogue_Rare_016": {
+      "id": "Rogue_Rare_016",
+      "name": "Brawler",
+      "description": "+20.0% Damage to Close enemies, 6.0% Damage Reduction from Close enemies. Bonus (1155 Dex + 260 Str): +20% more Damage to Close.",
+      "bonus": { "damage": 20, "armor": 15 }
+    },
+    "Rogue_Rare_018": {
+      "id": "Rogue_Rare_018",
+      "name": "Ranger",
+      "description": "+25.0% Damage to Distant enemies, 9.0% Damage Reduction from Distant enemies. Bonus (1155 Dex + 260 Int): +25% more Damage to Distant.",
+      "bonus": { "damage": 25, "armor": 15 }
+    },
+    "Rogue_Rare_027": {
+      "id": "Rogue_Rare_027",
+      "name": "Trap Hunter",
+      "description": "+35.0% Damage to enemies affected by Trap Skills, +10 Dexterity. Bonus (285 Int): +35% more Trap Damage.",
+      "bonus": { "trap": 35, "dexterity": 10 }
+    },
+    "Rogue_Rare_028": {
+      "id": "Rogue_Rare_028",
+      "name": "Trap Warden",
+      "description": "6.0% Damage Reduction from enemies affected by Traps, +10 Dexterity. Bonus (260 Str): +6% more DR from Trapped.",
+      "bonus": { "armor": 15, "dexterity": 10 }
+    },
+    "Rogue_Rare_029": {
+      "id": "Rogue_Rare_029",
+      "name": "Imbued Trapper",
+      "description": "+6.0% Imbued Skill Damage, +3.0% Damage to enemies affected by Trap Skills. Bonus (1155 Dex + 260 Int): +9% combined bonus.",
+      "bonus": { "damage": 9, "trap": 3 }
+    },
+    "Rogue_Rare_037": {
+      "id": "Rogue_Rare_037",
+      "name": "Season 5+ Node",
+      "description": "(Tilføjet i Season 5 — data ikke tilgængelig endnu)",
+      "bonus": {}
+    },
+    "Rogue_Rare_038": {
+      "id": "Rogue_Rare_038",
+      "name": "Season 5+ Node",
+      "description": "(Tilføjet i Season 5 — data ikke tilgængelig endnu)",
+      "bonus": {}
+    },
+    "Rogue_Rare_039": {
+      "id": "Rogue_Rare_039",
+      "name": "Season 5+ Node",
+      "description": "(Tilføjet i Season 5 — data ikke tilgængelig endnu)",
+      "bonus": {}
+    },
+    "Rogue_Rare_040": {
+      "id": "Rogue_Rare_040",
+      "name": "Season 5+ Node",
+      "description": "(Tilføjet i Season 5 — data ikke tilgængelig endnu)",
+      "bonus": {}
+    },
+    "Rogue_Rare_041": {
+      "id": "Rogue_Rare_041",
+      "name": "Season 5+ Node",
+      "description": "(Tilføjet i Season 5 — data ikke tilgængelig endnu)",
+      "bonus": {}
+    },
+    "Rogue_Rare_042": {
+      "id": "Rogue_Rare_042",
+      "name": "Season 5+ Node",
+      "description": "(Tilføjet i Season 5 — data ikke tilgængelig endnu)",
+      "bonus": {}
+    },
+    "Rogue_Rare_044": {
+      "id": "Rogue_Rare_044",
+      "name": "Season 5+ Node",
+      "description": "(Tilføjet i Season 5 — data ikke tilgængelig endnu)",
+      "bonus": {}
+    },
+    "Rogue_Rare_045": {
+      "id": "Rogue_Rare_045",
+      "name": "Season 5+ Node",
+      "description": "(Tilføjet i Season 5 — data ikke tilgængelig endnu)",
+      "bonus": {}
+    },
+    "Rogue_Rare_046": {
+      "id": "Rogue_Rare_046",
+      "name": "Season 5+ Node",
+      "description": "(Tilføjet i Season 5 — data ikke tilgængelig endnu)",
+      "bonus": {}
     },
     "rare_danse_macabre_1": {
       "id": "rare_danse_macabre_1",
       "name": "Assassin",
-      "description": "+25.0% Damage to Healthy Enemies, +10 Dexterity. Bonus (285 Str): Another +25.0% Damage to Healthy Enemies.",
+      "description": "+25.0% Damage to Healthy enemies, +10 Dexterity. Bonus (285 Str): +25% more Damage to Healthy.",
       "bonus": { "damage": 25, "dexterity": 10 }
     },
     "rare_danse_macabre_2": {
       "id": "rare_danse_macabre_2",
       "name": "Giant Killer",
-      "description": "+30.0% Damage to Elites, +10 Dexterity. Bonus (285 Int): Another +30.0% Damage to Elites.",
+      "description": "+30.0% Damage to Elites, +10 Dexterity. Bonus (285 Int): +30% more Damage to Elites.",
       "bonus": { "damage": 30, "dexterity": 10 }
     },
     "rare_danse_macabre_3": {
       "id": "rare_danse_macabre_3",
       "name": "Ranger (Paragon Node)",
-      "description": "9.0% Damage Reduction from Distant Enemies, +40.0% Damage to Distant Enemies. Bonus (1155 Dex + 260 Int): Another 9.0% Damage Reduction.",
+      "description": "9.0% Damage Reduction from Distant enemies, +40.0% Damage to Distant enemies. Bonus: +9% more DR.",
       "bonus": { "damage": 40, "armor": 20 }
     },
     "rare_danse_macabre_4": {
       "id": "rare_danse_macabre_4",
-      "name": "Brawler",
-      "description": "6.0% Damage Reduction from Close Enemies, +24.0% Damage to Close Enemies. Bonus (1155 Dex + 260 Str): Another 6.0% Damage Reduction.",
+      "name": "Brawler (Paragon Node)",
+      "description": "6.0% Damage Reduction from Close enemies, +24.0% Damage to Close enemies. Bonus: +6% more DR.",
       "bonus": { "damage": 24, "armor": 20 }
     },
     "rare_danse_macabre_5": {
       "id": "rare_danse_macabre_5",
       "name": "Skulker",
-      "description": "3.0% Subterfuge Cooldown Reduction, +3.0% Resistance to All Elements. Bonus (305 Int): Another 3.0% Subterfuge Cooldown Reduction.",
+      "description": "3.0% Subterfuge Skill Cooldown Reduction, +3.0% Resistance to All Elements. Bonus (305 Int): +3% more CDR.",
       "bonus": { "armor": 15 }
     },
     "rare_danse_macabre_6": {
       "id": "rare_danse_macabre_6",
       "name": "Acrobat",
-      "description": "3.0% Mobility Cooldown Reduction, +4.0% Maximum Life. Bonus (265 Str): Another 3.0% Mobility Cooldown Reduction.",
+      "description": "3.0% Mobility Skill Cooldown Reduction, +4.0% Maximum Life. Bonus (265 Str): +3% more CDR.",
       "bonus": { "life": 40 }
     }
   }

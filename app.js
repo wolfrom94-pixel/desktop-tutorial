@@ -5,16 +5,16 @@
 // ============================================================
 
 const BOARD_META = {
-  starting:          { name: 'Starting Board',        icon: '⭐', legendaryId: 'starting_legendary',          rareIds: ['rare_starting_1','rare_starting_2','rare_starting_3','rare_starting_4'] },
-  eldritch_bounty:   { name: 'Eldritch Bounty',       icon: '✨', legendaryId: 'eldritch_bounty_legendary',   rareIds: ['rare_eldritch_bounty_1','rare_eldritch_bounty_2','rare_eldritch_bounty_3','rare_eldritch_bounty_4','rare_eldritch_bounty_5','rare_eldritch_bounty_6'] },
-  tricks_of_trade:   { name: 'Tricks of the Trade',   icon: '🃏', legendaryId: 'tricks_legendary',            rareIds: ['rare_tricks_1','rare_tricks_2','rare_tricks_3','rare_tricks_4','rare_tricks_5','rare_tricks_6'] },
-  deadly_ambush:     { name: 'Deadly Ambush',         icon: '💥', legendaryId: 'deadly_ambush_legendary',     rareIds: ['rare_deadly_ambush_1','rare_deadly_ambush_2','rare_deadly_ambush_3','rare_deadly_ambush_4','rare_deadly_ambush_5','rare_deadly_ambush_6'] },
-  cheap_shot:        { name: 'Cheap Shot',            icon: '🎯', legendaryId: 'cheap_shot_legendary',        rareIds: ['rare_cheap_shot_1','rare_cheap_shot_2','rare_cheap_shot_3','rare_cheap_shot_4','rare_cheap_shot_5','rare_cheap_shot_6'] },
-  exploit_weakness:  { name: 'Exploit Weakness',      icon: '💢', legendaryId: 'exploit_legendary',           rareIds: ['rare_exploit_weakness_1','rare_exploit_weakness_2','rare_exploit_weakness_3','rare_exploit_weakness_4','rare_exploit_weakness_5','rare_exploit_weakness_6'] },
-  cunning_stratagem: { name: 'Cunning Stratagem',     icon: '🧠', legendaryId: 'cunning_stratagem_legendary', rareIds: ['rare_cunning_stratagem_1','rare_cunning_stratagem_2','rare_cunning_stratagem_3','rare_cunning_stratagem_4','rare_cunning_stratagem_5','rare_cunning_stratagem_6'] },
-  no_witnesses:      { name: 'No Witnesses',          icon: '☠️', legendaryId: 'no_witnesses_legendary',      rareIds: ['rare_no_witnesses_1','rare_no_witnesses_2','rare_no_witnesses_3','rare_no_witnesses_4','rare_no_witnesses_5','rare_no_witnesses_6'] },
-  leyrana_instinct:  { name: "Leyrana's Instinct",    icon: '👁️', legendaryId: 'leyrana_instinct_legendary',  rareIds: ['rare_leyrana_instinct_1','rare_leyrana_instinct_2','rare_leyrana_instinct_3','rare_leyrana_instinct_4','rare_leyrana_instinct_5','rare_leyrana_instinct_6'] },
-  danse_macabre:     { name: 'Danse Macabre',         icon: '💃', legendaryId: 'danse_macabre_legendary',    rareIds: ['rare_danse_macabre_1','rare_danse_macabre_2','rare_danse_macabre_3','rare_danse_macabre_4','rare_danse_macabre_5','rare_danse_macabre_6'] },
+  starting:          { name: 'Starting Board',        icon: '⭐', legendaryId: 'starting_legendary',          rareIds: ['Generic_Rare_001','Generic_Rare_051','Generic_Rare_075','Rogue_Rare_037'] },
+  eldritch_bounty:   { name: 'Eldritch Bounty',       icon: '✨', legendaryId: 'eldritch_bounty_legendary',   rareIds: ['Generic_Rare_019','Generic_Rare_042','Rogue_Rare_009','Rogue_Rare_010','Rogue_Rare_012','Rogue_Rare_038'] },
+  tricks_of_trade:   { name: 'Tricks of the Trade',   icon: '🃏', legendaryId: 'tricks_legendary',            rareIds: ['Generic_Rare_007','Generic_Rare_046','Rogue_Rare_016','Rogue_Rare_018','Rogue_Rare_039','Rogue_Rare_040'] },
+  cheap_shot:        { name: 'Cheap Shot',            icon: '🎯', legendaryId: 'cheap_shot_legendary',        rareIds: ['Generic_Rare_011','Generic_Rare_016','Generic_Rare_018','Generic_Rare_021','Generic_Rare_096','Rogue_Rare_041'] },
+  deadly_ambush:     { name: 'Deadly Ambush',         icon: '💥', legendaryId: 'deadly_ambush_legendary',     rareIds: ['Generic_Rare_041','Rogue_Rare_008','Rogue_Rare_027','Rogue_Rare_028','Rogue_Rare_029','Rogue_Rare_042'] },
+  leyrana_instinct:  { name: "Leyrana's Instinct",    icon: '👁️', legendaryId: 'leyrana_instinct_legendary',  rareIds: ['Generic_Rare_002','Generic_Rare_019','Generic_Rare_041','Generic_Rare_042','Generic_Rare_100','Rogue_Rare_044'] },
+  no_witnesses:      { name: 'No Witnesses',          icon: '☠️', legendaryId: 'no_witnesses_legendary',      rareIds: ['Generic_Rare_006','Generic_Rare_030','Generic_Rare_033','Generic_Rare_051','Generic_Rare_082','Rogue_Rare_045'] },
+  exploit_weakness:  { name: 'Exploit Weakness',      icon: '💢', legendaryId: 'exploit_legendary',           rareIds: ['Generic_Rare_012','Generic_Rare_049','Generic_Rare_096','Generic_Rare_106','Necromancer_Rare_011','Rogue_Rare_046'] },
+  cunning_stratagem: { name: 'Cunning Stratagem',     icon: '🧠', legendaryId: 'cunning_stratagem_legendary', rareIds: ['Generic_Rare_067','Rogue_Rare_005','Rogue_Rare_011','Rogue_Rare_014','Rogue_Rare_040','Sorcerer_Rare_034'] },
+  danse_macabre:     { name: 'Danse Macabre',         icon: '💃', legendaryId: 'danse_macabre_legendary',     rareIds: ['rare_danse_macabre_1','rare_danse_macabre_2','rare_danse_macabre_3','rare_danse_macabre_4','rare_danse_macabre_5','rare_danse_macabre_6'] },
 };
 
 // Maps board IDs to their board-raw grid files (Rogue_09 not available)
