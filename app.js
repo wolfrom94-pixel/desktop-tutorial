@@ -22,12 +22,12 @@ const BOARD_FILE_MAP = {
   starting:          'board-raw/Rogue_00.json',
   eldritch_bounty:   'board-raw/Rogue_01.json',
   tricks_of_trade:   'board-raw/Rogue_02.json',
-  deadly_ambush:     'board-raw/Rogue_03.json',
-  cheap_shot:        'board-raw/Rogue_04.json',
-  exploit_weakness:  'board-raw/Rogue_05.json',
-  cunning_stratagem: 'board-raw/Rogue_06.json',
-  no_witnesses:      'board-raw/Rogue_07.json',
-  leyrana_instinct:  'board-raw/Rogue_08.json',
+  cheap_shot:        'board-raw/Rogue_03.json',
+  deadly_ambush:     'board-raw/Rogue_04.json',
+  leyrana_instinct:  'board-raw/Rogue_05.json',
+  no_witnesses:      'board-raw/Rogue_06.json',
+  exploit_weakness:  'board-raw/Rogue_07.json',
+  cunning_stratagem: 'board-raw/Rogue_08.json',
 };
 
 const MAX_POINTS = 300;
